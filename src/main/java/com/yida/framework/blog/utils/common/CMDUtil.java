@@ -45,7 +45,7 @@ public class CMDUtil {
 
         if (command == null) {
             // 默认回调
-            callback[0].onFailed(new Exception("command is null"));
+            callback[0].onFailed(new Exception("command is null,please check it out carefully and after try it again."));
             return;
         }
 
@@ -174,6 +174,13 @@ public class CMDUtil {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * @param command 需要执行的命令
+     */
+    public void execute(final String command) {
+        execute(command, null);
     }
 
     // 给字符换行
