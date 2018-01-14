@@ -15,12 +15,12 @@ import java.security.PrivilegedAction;
 public class FileUtil {
     public static void copyFile(String srcpath, String filename, String destpath) {
         if (!srcpath.endsWith("/")) {
-            srcpath = srcpath.replaceAll("\\\\", "/");
-            srcpath += "/";
+            srcpath = srcpath.replaceAll("\\\\", "//");
+            srcpath += "//";
         }
         if (!destpath.endsWith("/")) {
-            destpath = destpath.replaceAll("\\\\", "/");
-            destpath += "/";
+            destpath = destpath.replaceAll("\\\\", "//");
+            destpath += "//";
         }
         File source = new File(srcpath + filename);
         FileChannel fileChannel = null;
@@ -33,7 +33,6 @@ public class FileUtil {
             long size = fileChannel.size();
             MappedByteBuffer buf = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, size);
             out.write(buf);
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -48,7 +47,10 @@ public class FileUtil {
                 e.printStackTrace();
             }
             //文件复制完成后，删除源文件
-            source.delete();
+            //source.getAbsoluteFile().delete();
+
+            source.getAbsoluteFile().delete();
+            //System.gc();
         }
     }
 
@@ -60,7 +62,7 @@ public class FileUtil {
      */
     public static void copyDirectory(String srcPath, String targetPath) {
         if (!targetPath.endsWith("/")) {
-            targetPath = targetPath.replaceAll("\\\\", "/");
+            targetPath = targetPath.replaceAll("\\\\", "//");
             targetPath += "/";
         }
         parseDir(srcPath, targetPath);
@@ -96,13 +98,48 @@ public class FileUtil {
             for (File f : files) {
                 if (f.isDirectory()) {
                     if (!targetPath.endsWith("/")) {
-                        targetPath = targetPath.replaceAll("\\\\", "/");
-                        targetPath += "/";
+                        targetPath = targetPath.replaceAll("\\\\", "//");
+                        targetPath += "//";
                     }
                     parseDir(f.getPath(), targetPath + f.getName());
                 }
             }
         }
+    }
+
+    /**
+     * 删除空目录
+     *
+     * @param dir 待删除的目录路径
+     */
+    private static void doDeleteEmptyDir(String dir) {
+        boolean success = (new File(dir)).delete();
+        if (success) {
+            System.out.println("Successfully deleted empty directory: " + dir);
+        } else {
+            System.out.println("Failed to delete empty directory: " + dir);
+        }
+    }
+
+    /**
+     * 递归删除目录下的所有文件及子目录下所有文件
+     *
+     * @param dir 将要删除的文件目录
+     * @return boolean    只有全部删除成功，才会返回true
+     */
+    private static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            //递归删除目录中的子目录下
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        // 目录此时为空，可以删除
+        return dir.delete();
     }
 
     public static void clean(final Object buffer) throws Exception {
