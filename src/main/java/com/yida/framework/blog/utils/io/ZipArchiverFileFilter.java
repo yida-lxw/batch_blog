@@ -21,8 +21,9 @@ public class ZipArchiverFileFilter extends DefaultArchiverFileFilter {
             if (destpath.contains("\\\\")) {
                 destpath = destpath.replaceAll("\\\\", "/");
             }
+            File outputFile = null;
             while ((zn = zis.getNextEntry()) != null) {
-                File outputFile = new File(destpath.endsWith("/") ? destpath + zn.getName() : destpath + "/" + zn.getName());
+                outputFile = new File(destpath.endsWith("/") ? destpath + zn.getName() : destpath + "/" + zn.getName());
                 if (zn.isDirectory()) {
                     outputFile.mkdirs();
                 } else {
@@ -45,6 +46,7 @@ public class ZipArchiverFileFilter extends DefaultArchiverFileFilter {
                     } finally {
                         bos.flush();
                         bos.close();
+                        fos.close();
                     }
                 }
                 zis.closeEntry();
@@ -53,6 +55,8 @@ public class ZipArchiverFileFilter extends DefaultArchiverFileFilter {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            fis.close();
+            bis.close();
             zis.close();
         }
     }

@@ -9,8 +9,8 @@ import com.yida.framework.blog.utils.io.FileUtil;
  */
 public class FileCopyTest {
     public static void main(String[] args) {
-        String srcpath = "C:\\zip\\word\\media\\";
-        String targetpath = "C:\\zip\\images\\";
+        String srcpath = "G:\\zip\\word\\media\\";
+        String targetpath = "G:\\zip\\images\\";
         FileUtil.copyDirectory(srcpath, targetpath);
     }
 }

@@ -1,9 +1,14 @@
 package com.yida.framework.blog.utils.io;
 
+import sun.nio.ch.FileChannelImpl;
+
 import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -15,42 +20,67 @@ import java.security.PrivilegedAction;
 public class FileUtil {
     public static void copyFile(String srcpath, String filename, String destpath) {
         if (!srcpath.endsWith("/")) {
-            srcpath = srcpath.replaceAll("\\\\", "//");
-            srcpath += "//";
+            srcpath = srcpath.replaceAll("\\\\", "/");
+            srcpath += "/";
         }
         if (!destpath.endsWith("/")) {
-            destpath = destpath.replaceAll("\\\\", "//");
-            destpath += "//";
+            destpath = destpath.replaceAll("\\\\", "/");
+            destpath += "/";
         }
         File source = new File(srcpath + filename);
         FileChannel fileChannel = null;
         File dest = new File(destpath + filename);
-        FileChannel out = null;
+        RandomAccessFile randomAccessFile = null;
+        FileChannel outChannel = null;
+        FileOutputStream fos = null;
+        MappedByteBuffer mappedByteBuffer = null;
+        FileLock lock = null;
         try {
-            fileChannel = new RandomAccessFile(source, "rw").getChannel();
+            randomAccessFile = new RandomAccessFile(source, "rw");
+            fileChannel = randomAccessFile.getChannel();
+            lock = fileChannel.tryLock();
             //in = new FileInputStream(source).getChannel();
-            out = new FileOutputStream(dest).getChannel();
-            long size = fileChannel.size();
-            MappedByteBuffer buf = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, size);
-            out.write(buf);
+            if (null != lock) {
+                fos = new FileOutputStream(dest);
+                outChannel = fos.getChannel();
+                long size = fileChannel.size();
+                mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, size);
+                outChannel.write(mappedByteBuffer);
+                mappedByteBuffer.clear();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            try {
+                lock.release();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                outChannel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             try {
                 fileChannel.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             try {
-                out.close();
+                randomAccessFile.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            //文件复制完成后，删除源文件
-            //source.getAbsoluteFile().delete();
 
+            //删除之前需要先回收ByteBuffer占用的资源,否则文件无法被删除
+            cleanByteBuffer(mappedByteBuffer);
+            //文件复制完成后，删除源文件
             source.getAbsoluteFile().delete();
-            //System.gc();
         }
     }
 
@@ -62,7 +92,7 @@ public class FileUtil {
      */
     public static void copyDirectory(String srcPath, String targetPath) {
         if (!targetPath.endsWith("/")) {
-            targetPath = targetPath.replaceAll("\\\\", "//");
+            targetPath = targetPath.replaceAll("\\\\", "/");
             targetPath += "/";
         }
         parseDir(srcPath, targetPath);
@@ -98,8 +128,8 @@ public class FileUtil {
             for (File f : files) {
                 if (f.isDirectory()) {
                     if (!targetPath.endsWith("/")) {
-                        targetPath = targetPath.replaceAll("\\\\", "//");
-                        targetPath += "//";
+                        targetPath = targetPath.replaceAll("\\\\", "/");
+                        targetPath += "/";
                     }
                     parseDir(f.getPath(), targetPath + f.getName());
                 }
@@ -142,14 +172,20 @@ public class FileUtil {
         return dir.delete();
     }
 
-    public static void clean(final Object buffer) throws Exception {
+    /**
+     * 手动回收ByteBuffer占用的资源,因为DirectByteBuffer分配的是直接堆外内存，
+     * 而堆外内存是不受JVM GC管辖范围内
+     *
+     * @param mappedByteBuffer
+     */
+    public static void cleanByteBuffer(MappedByteBuffer mappedByteBuffer) {
         AccessController.doPrivileged(new PrivilegedAction() {
             public Object run() {
                 try {
-                    Method getCleanerMethod = buffer.getClass().getMethod("cleaner", new Class[0]);
-                    getCleanerMethod.setAccessible(true);
-                    sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod.invoke(buffer, new Object[0]);
-                    cleaner.clean();
+                    Method m = FileChannelImpl.class.getDeclaredMethod("unmap",
+                            MappedByteBuffer.class);
+                    m.setAccessible(true);
+                    m.invoke(FileChannelImpl.class, mappedByteBuffer);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
