@@ -1,0 +1,21 @@
+package com.yida.framework.blog.utils.io;
+
+import java.io.File;
+import java.io.FilenameFilter;
+
+/**
+ * @Author Lanxiaowei
+ * @Date 2018-01-14 21:59
+ * @Description 图片文件过滤器
+ */
+public class ImageFilenameFilter implements FilenameFilter {
+    @Override
+    public boolean accept(File dir, String name) {
+        name = name.toLowerCase();
+        if (name.endsWith(".png") || name.endsWith(".jpg")
+                || name.endsWith(".jpeg") || name.endsWith(".gif")) {
+            return new File(dir + "/" + name).isFile();
+        }
+        return false;
+    }
+}
