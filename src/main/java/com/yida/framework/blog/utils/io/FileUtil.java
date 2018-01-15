@@ -2,13 +2,14 @@ package com.yida.framework.blog.utils.io;
 
 import sun.nio.ch.FileChannelImpl;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
