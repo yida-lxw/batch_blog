@@ -7,5 +7,5 @@ package com.yida.framework.blog.handler;
  */
 public interface Handler<I extends HandlerInput, O extends HandlerOutput> {
 
-    boolean handle(I input, O output);
+    void handle(I input, O output);
 }

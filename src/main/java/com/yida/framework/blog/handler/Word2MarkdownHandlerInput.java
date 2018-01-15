@@ -3,9 +3,9 @@ package com.yida.framework.blog.handler;
 /**
  * @Author Lanxiaowei
  * @Date 2018-01-15 22:45
- * @Description Docx文件转Makedown处理器对应的输入类
+ * @Description Docx文件转Markdown处理器对应的输入类
  */
-public class Word2MakedownHandlerInput extends HandlerInput {
+public class Word2MarkdownHandlerInput extends HandlerInput {
     /**
      * Word文件名称
      */
