@@ -6,4 +6,5 @@ package com.yida.framework.blog.config;
  * @Description Blog配置实体类
  */
 public class BlogConfig {
+
 }
