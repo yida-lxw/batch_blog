@@ -67,7 +67,12 @@ public class ConfigManager {
             }, 0);
         }
         if (ConfigType.PROPERTIES.equals(this.configType)) {
-            return PropertiesUtil.getPropertiesMap(this.configPath);
+            return CacheManager.getData("PROPERTIES_CONFIG", new CacheManager.Load<Map<String, Object>>() {
+                @Override
+                public Map<String, Object> load() {
+                    return PropertiesUtil.getPropertiesMap(configPath);
+                }
+            }, 0);
         }
         if (ConfigType.XML.equals(this.configType)) {
             return CacheManager.getData("XML_CONFIG", new CacheManager.Load<Map<String, Object>>() {

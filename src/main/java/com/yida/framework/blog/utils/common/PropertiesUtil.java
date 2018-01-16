@@ -58,9 +58,9 @@ public class PropertiesUtil {
         Properties pro = proContainer.get(propertyFilePath);
         if (pro == null) {
             pro = loadPropertyFile(propertyFilePath);
-        }
-        if (pro != null) {
-            proContainer.put(propertyFilePath, pro);
+            if (pro != null) {
+                proContainer.put(propertyFilePath, pro);
+            }
         }
         return pro;
     }
