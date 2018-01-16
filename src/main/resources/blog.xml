@@ -4,5 +4,6 @@
 	<comment>Pandoc的安装目录</comment>
 	<entry key="pandoc_home">F:/pandoc-2.1/</entry>
 	<entry key="word_basepath">G:/git-local/blog/</entry>
+	<!-- 多个日期请使用分号;进行分割 -->
 	<entry key="blog_send_dates">20180117</entry>
 </properties>
