@@ -112,7 +112,7 @@ public class PropertiesUtil {
     public static Properties loadPropertyFromFileSystem(final String propertyFilePath) {
         try {
             Properties pro = new Properties();
-            pro.load(new java.io.FileInputStream(propertyFilePath));
+            pro.load(new FileInputStream(propertyFilePath));
             return pro;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -143,7 +143,7 @@ public class PropertiesUtil {
         } catch (FileNotFoundException e) {
             String path = PropertiesUtil.class.getResource(propertyFilePath).getPath();
             try {
-                stream = new java.io.FileOutputStream(path);
+                stream = new FileOutputStream(path);
             } catch (FileNotFoundException e1) {
                 return false;
             }

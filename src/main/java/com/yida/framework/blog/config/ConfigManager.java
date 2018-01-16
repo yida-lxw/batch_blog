@@ -1,5 +1,6 @@
 package com.yida.framework.blog.config;
 
+import com.yida.framework.blog.utils.cache.CacheManager;
 import com.yida.framework.blog.utils.common.GerneralUtil;
 import com.yida.framework.blog.utils.common.PropertiesUtil;
 
@@ -46,7 +47,13 @@ public class ConfigManager {
 
     public Map<String, Object> readConfig() {
         if (ConfigType.JSON.equals(this.configType)) {
-            return readJSONConf();
+            return CacheManager.getData("JSON_CONFIG", new CacheManager.Load<Map<String, Object>>() {
+
+                @Override
+                public Map<String, Object> load() {
+                    return readJSONConf();
+                }
+            }, 0);
         }
         if (ConfigType.PROPERTIES.equals(this.configType)) {
             return PropertiesUtil.getPropertiesMap(this.configPath);
