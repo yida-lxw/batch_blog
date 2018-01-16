@@ -15,6 +15,10 @@ public class Constant {
      */
     public static final String DEFAULT_CHARSET_UTF8 = "UTF-8";
     /**
+     * 默认日期转换格式:yyyy-MM-dd
+     */
+    public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
+    /**
      * 默认读写缓冲区大小
      */
     public static final int BUFFER_SIZE = 4096;

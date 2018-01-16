@@ -1,6 +1,7 @@
 package com.yida.framework.blog.config;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -124,7 +125,24 @@ public class ConfigContext {
         return CONFIG_FILE_NAME + ".json";
     }
 
-    public void setConfigType(ConfigType configType) {
-        this.configType = null == configType ? ConfigType.JSON : configType;
+    /**
+     * 获取Pandoc home环境变量值(当用户未在配置文件中配置pandoc_home时需要配置此环境变量)
+     *
+     * @return
+     */
+    public static String getPandocHome() {
+        String pandocHome = null;
+        Map<String, String> map = System.getenv();
+        for (Iterator<String> itr = map.keySet().iterator(); itr.hasNext(); ) {
+            String key = itr.next();
+            if ("PANDOC_HOME".equals(key)) {
+                pandocHome = map.get(key);
+                break;
+            }
+        }
+        if (null == pandocHome || "".equals(pandocHome)) {
+            return null;
+        }
+        return pandocHome;
     }
 }
