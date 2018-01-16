@@ -21,9 +21,8 @@ public class FastJsonUtil {
      * @param jsonData JSON数据
      * @return
      * @throws Exception
-     * @author myclover
      */
-    public static List<String> getStringList(String jsonData) throws Exception {
+    public static List<String> toStringList(String jsonData) throws Exception {
         return JSON.parseArray(jsonData, String.class);
     }
 
@@ -34,11 +33,21 @@ public class FastJsonUtil {
      * @param clazz    指定的java对象
      * @return
      * @throws Exception
-     * @author myclover
      */
-    public static <T> T getSingleBean(String jsonData, Class<T> clazz)
+    public static <T> T toSingleBean(String jsonData, Class<T> clazz)
             throws Exception {
         return JSON.parseObject(jsonData, clazz);
+    }
+
+    /**
+     * 功能描述：把JSON数据转换成指定的java对象
+     *
+     * @param jsonData JSON数据
+     * @return
+     * @throws Exception
+     */
+    public static Map<String, Object> toMap(String jsonData) throws Exception {
+        return toSingleBean(jsonData, Map.class);
     }
 
     /**
@@ -48,10 +57,8 @@ public class FastJsonUtil {
      * @param clazz    指定的java对象
      * @return
      * @throws Exception
-     * @author myclover
      */
-    public static <T> List<T> getBeanList(String jsonData, Class<T> clazz)
-            throws Exception {
+    public static <T> List<T> toBeanList(String jsonData, Class<T> clazz) throws Exception {
         return JSON.parseArray(jsonData, clazz);
     }
 
@@ -61,9 +68,8 @@ public class FastJsonUtil {
      * @param jsonData JSON数据
      * @return
      * @throws Exception
-     * @author myclover
      */
-    public static List<Map<String, Object>> getBeanMapList(String jsonData) {
+    public static List<Map<String, Object>> toMapList(String jsonData) {
         return JSON.parseObject(jsonData,
                 new TypeReference<List<Map<String, Object>>>() {
                 });

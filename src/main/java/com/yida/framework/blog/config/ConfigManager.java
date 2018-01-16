@@ -3,11 +3,15 @@ package com.yida.framework.blog.config;
 import com.yida.framework.blog.utils.cache.CacheManager;
 import com.yida.framework.blog.utils.common.GerneralUtil;
 import com.yida.framework.blog.utils.common.PropertiesUtil;
+import com.yida.framework.blog.utils.json.FastJsonUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.InputStream;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 
 /**
@@ -16,6 +20,8 @@ import java.util.Scanner;
  * @Description 配置文件加载类
  */
 public class ConfigManager {
+    private Logger log = LogManager.getLogger(ConfigManager.class.getName());
+
     private String configPath;
     private ConfigType configType;
 
@@ -43,12 +49,17 @@ public class ConfigManager {
         configManager.setConfigType(ConfigType.PROPERTIES);
         map = configManager.readConfig();
         System.out.println(map);
+
+        configPath = "blog.xml";
+        configManager.setConfigPath(configPath);
+        configManager.setConfigType(ConfigType.XML);
+        map = configManager.readConfig();
+        System.out.println(map);
     }
 
     public Map<String, Object> readConfig() {
         if (ConfigType.JSON.equals(this.configType)) {
             return CacheManager.getData("JSON_CONFIG", new CacheManager.Load<Map<String, Object>>() {
-
                 @Override
                 public Map<String, Object> load() {
                     return readJSONConf();
@@ -58,6 +69,15 @@ public class ConfigManager {
         if (ConfigType.PROPERTIES.equals(this.configType)) {
             return PropertiesUtil.getPropertiesMap(this.configPath);
         }
+        if (ConfigType.XML.equals(this.configType)) {
+            return CacheManager.getData("XML_CONFIG", new CacheManager.Load<Map<String, Object>>() {
+                @Override
+                public Map<String, Object> load() {
+                    return readXMLConf();
+                }
+            }, 0);
+        }
+        log.error("This config file[{?}] isn't supported at now.", this.configPath);
         return null;
     }
 
@@ -99,10 +119,45 @@ public class ConfigManager {
                 //删除末尾的换行符
                 builder.deleteCharAt(builder.length() - 1);
             }
-            System.out.println(builder.toString());
-            return new HashMap<>();
+            String json = builder.toString().trim();
+            if (json.startsWith("{") && json.endsWith("}")) {
+                try {
+                    return FastJsonUtil.toMap(json);
+                } catch (Exception e) {
+                    log.error("Convert JSON String[{?}] to Map<String,Object> occured an unexcepted exception.", json);
+                    return null;
+                }
+            }
         }
         return null;
+    }
+
+    /**
+     * 读取XML格式的配置文件
+     *
+     * @return
+     */
+    private Map<String, Object> readXMLConf() {
+        Properties props = new Properties();
+        InputStream input = this.getClass().getClassLoader().getResourceAsStream(this.configPath);
+        if (input != null) {
+            try {
+                props.loadFromXML(input);
+                return PropertiesUtil.properties2Map(props);
+            } catch (IOException e) {
+                log.error("Load the xml config file[{?}] occured an unexcepted exception.", this.configPath);
+                return null;
+            } finally {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    log.error("Close the inputStream for the xml file[{?}] occured an unexcepted exception.", this.configPath);
+                }
+            }
+        } else {
+            log.error("We can't find the xml config file[{?}].", this.configPath);
+            return null;
+        }
     }
 
     public String getConfigPath() {
