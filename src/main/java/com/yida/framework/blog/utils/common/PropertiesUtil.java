@@ -2,17 +2,8 @@ package com.yida.framework.blog.utils.common;
 
 import com.yida.framework.blog.utils.io.FileUtil;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -75,13 +66,13 @@ public class PropertiesUtil {
     }
 
     /**
-     * 加载Properties(默认从类路径下查找，没找到才会根据提供的文件路径去文件系统中查找)
+     * 加载Properties配置文件(默认先查找缓存，若没有然后查找类路径，最后查找文件系统，最后更新缓存)
      *
      * @param propertyFilePath
      * @return
      */
-    public static Properties loadPropertyFile(String propertyFilePath) {
-        return loadPropertyFile(propertyFilePath, true);
+    public final static Map<String, Object> getPropertiesMap(String propertyFilePath) {
+        return properties2Map(getProperties(propertyFilePath));
     }
 
     /**
@@ -90,15 +81,14 @@ public class PropertiesUtil {
      * @param propertyFilePath
      * @return
      */
-    public static Properties loadPropertyFile(String propertyFilePath, boolean debug) {
+    public static Properties loadPropertyFile(String propertyFilePath) {
         InputStream is = null;
-        if (debug) {
+        if (!propertyFilePath.startsWith("/")) {
+            propertyFilePath = "/" + propertyFilePath;
+        }
+        is = PropertiesUtil.class.getResourceAsStream(propertyFilePath);
+        if (null == is) {
             is = PropertiesUtil.class.getClassLoader().getResourceAsStream(propertyFilePath);
-        } else {
-            if (!propertyFilePath.startsWith("/")) {
-                propertyFilePath = "/" + propertyFilePath;
-            }
-            is = PropertiesUtil.class.getResourceAsStream(propertyFilePath);
         }
         if (is == null) {
             return loadPropertyFromFileSystem(System.getProperty("user.dir") + propertyFilePath);

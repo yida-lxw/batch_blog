@@ -1,0 +1,10 @@
+{
+  //pandoc的安装根目录
+  "pandoc.home": "F:/pandoc-2.\" ,1\",/",
+  //word文档的存储根目录
+  "word_basepath": "G:/git-local/blog/",
+  //
+  //
+  "blog_send_dates": "20180117"
+  //我是注释
+}
