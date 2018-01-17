@@ -53,7 +53,7 @@ public class ZipArchiverFileFilter extends DefaultArchiverFileFilter {
                             bos.write(buf, 0, len);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("While the decompression file have been unziping, An error occurred:\n", e.getMessage(), e);
                     } finally {
                         bos.flush();
                         bos.close();
