@@ -1,5 +1,7 @@
 package com.yida.framework.blog.handler;
 
+import java.util.List;
+
 /**
  * @Author Lanxiaowei
  * @Date 2018-01-15 22:45
@@ -7,29 +9,16 @@ package com.yida.framework.blog.handler;
  */
 public class Word2MarkdownHandlerInput extends HandlerInput {
     /**
-     * Word文件名称
+     * Word文件列表
      */
-    protected String wordFileName;
+    protected List<String> wordFilesName;
 
-    /**
-     * 你需要发布哪一天的博客,日期格式为yyyyMMdd格式,比如:20180115
-     */
-    protected String blogDate;
-
-    public String getWordFileName() {
-        return wordFileName;
+    public List<String> getWordFilesName() {
+        return wordFilesName;
     }
 
-    protected void setWordFileName(String wordFileName) {
-        this.wordFileName = wordFileName;
-    }
-
-    public String getBlogDate() {
-        return blogDate;
-    }
-
-    public void setBlogDate(String blogDate) {
-        this.blogDate = blogDate;
+    public void setWordFilesName(List<String> wordFilesName) {
+        this.wordFilesName = wordFilesName;
     }
 }
 
