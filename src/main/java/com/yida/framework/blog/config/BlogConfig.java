@@ -14,6 +14,7 @@ import java.util.List;
 public class BlogConfig {
     private static final String PANDOC_HOME = "pandoc_home";
     private static final String WORD_BASEPATH = "word_basepath";
+    private static final String MARKDOWN_BASEPATH = "markdown_basepath";
     private static final String BLOG_SEND_DATE = "blog_send_dates";
     private static final String GITHUB_USERNAME = "github_username";
     private static final String GITHUB_PASSWORD = "github_pwd";
@@ -26,6 +27,11 @@ public class BlogConfig {
      * Word文档的存储根目录
      */
     private String wordBasePath;
+    /**
+     * Markdown文档的存储根目录,当你指定了此参数,即表示你的博客是直接采用Markdown编写的,
+     * 此时不需要进行Word文档到Markdown之间的文件格式转换
+     */
+    private String markdownBasePath;
     /**
      * 博客发送日期
      */
@@ -70,8 +76,11 @@ public class BlogConfig {
         }
         this.wordBasePath = ConfigContext.getStringProperty(WORD_BASEPATH);
         if (null == this.wordBasePath || "".equals(this.wordBasePath)) {
-            //Word文档的存储目录参数必须指定,否则程序无法继续,所以只好抛异常以示警示
-            throw new IllegalArgumentException("YOU MUST specify the storage path parameter[word_basepath] for the word document.");
+            this.markdownBasePath = ConfigContext.getStringProperty(MARKDOWN_BASEPATH);
+            if (null == this.markdownBasePath || "".equals(this.markdownBasePath)) {
+                //Word文档的存储目录参数必须指定,否则程序无法继续,所以只好抛异常以示警示
+                throw new IllegalArgumentException("YOU MUST specify the storage path parameter[word_basepath or markdown_basepath] for the word document.");
+            }
         }
         this.blogSendDate = ConfigContext.getStringProperty(BLOG_SEND_DATE);
         if (null == this.blogSendDate || "".equals(this.blogSendDate)) {
@@ -92,6 +101,7 @@ public class BlogConfig {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Pandoc Home: " + getPandocHome() + "\n");
         stringBuilder.append("Word BasePath: " + getWordBasePath() + "\n");
+        stringBuilder.append("Markdown BasePath: " + getMarkdownBasePath() + "\n");
         stringBuilder.append("Blog SendDate: " + getBlogSendDate() + "\n");
         stringBuilder.append("Github UserName: " + getGithubUserName() + "\n");
         stringBuilder.append("Github Password: " + getGithubPassword() + "\n");
@@ -114,12 +124,28 @@ public class BlogConfig {
         this.wordBasePath = wordBasePath;
     }
 
+    public String getMarkdownBasePath() {
+        return markdownBasePath;
+    }
+
+    public void setMarkdownBasePath(String markdownBasePath) {
+        this.markdownBasePath = markdownBasePath;
+    }
+
     public String getBlogSendDate() {
         return blogSendDate;
     }
 
     public void setBlogSendDate(String blogSendDate) {
         this.blogSendDate = blogSendDate;
+    }
+
+    public List<String> getBlogSendDates() {
+        return blogSendDates;
+    }
+
+    public void setBlogSendDates(List<String> blogSendDates) {
+        this.blogSendDates = blogSendDates;
     }
 
     public String getGithubUserName() {

@@ -4,6 +4,8 @@
 	<comment>Pandoc的安装目录</comment>
 	<entry key="pandoc_home">F:/pandoc-2.1/</entry>
 	<entry key="word_basepath">G:/git-local/blog/</entry>
+	<!-- Markdown文档的存储根目录,当你的博客是直接采用Markdown格式编写的,此时你可以配置此参数,它与word_basepath参数二选一即可 -->
+	<entry key="markdown_basepath">G:/git-local/blog/</entry>
 	<!-- 多个日期请使用分号;进行分割 -->
 	<entry key="blog_send_dates">20180117</entry>
 </properties>
