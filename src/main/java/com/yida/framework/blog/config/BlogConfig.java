@@ -78,7 +78,8 @@ public class BlogConfig {
         if (null == this.wordBasePath || "".equals(this.wordBasePath)) {
             this.markdownBasePath = ConfigContext.getStringProperty(MARKDOWN_BASEPATH);
             if (null == this.markdownBasePath || "".equals(this.markdownBasePath)) {
-                //Word文档的存储目录参数必须指定,否则程序无法继续,所以只好抛异常以示警示
+                //Word文档的存储目录或者Markdown文档的存储目录参数两者必须至少指定其中一个,否则程序无法继续,所以只好抛异常以示警示
+                //若两者同时指定了,那么默认会以markdownBasePath参数为准
                 throw new IllegalArgumentException("YOU MUST specify the storage path parameter[word_basepath or markdown_basepath] for the word document.");
             }
         }
