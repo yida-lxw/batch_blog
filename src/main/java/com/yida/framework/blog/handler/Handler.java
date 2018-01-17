@@ -1,5 +1,8 @@
 package com.yida.framework.blog.handler;
 
+import com.yida.framework.blog.handler.input.HandlerInput;
+import com.yida.framework.blog.handler.output.HandlerOutput;
+
 /**
  * @Author Lanxiaowei
  * @Date 2018-01-15 13:12

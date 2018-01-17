@@ -1,5 +1,7 @@
 package com.yida.framework.blog.handler;
 
+import com.yida.framework.blog.handler.input.WordFilterHandlerInput;
+import com.yida.framework.blog.handler.output.WordFilterHandlerOutput;
 import com.yida.framework.blog.utils.io.DefaultArchiverFileFilter;
 
 import java.io.File;

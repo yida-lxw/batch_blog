@@ -1,4 +1,4 @@
-package com.yida.framework.blog.handler;
+package com.yida.framework.blog.handler.output;
 
 /**
  * @Author Lanxiaowei

@@ -1,4 +1,4 @@
-package com.yida.framework.blog.handler;
+package com.yida.framework.blog.handler.input;
 
 import java.util.List;
 

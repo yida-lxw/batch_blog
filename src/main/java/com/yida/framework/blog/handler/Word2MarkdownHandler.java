@@ -1,5 +1,7 @@
 package com.yida.framework.blog.handler;
 
+import com.yida.framework.blog.handler.input.Word2MarkdownHandlerInput;
+import com.yida.framework.blog.handler.output.Word2MarkdownHandlerOutput;
 import com.yida.framework.blog.utils.common.CMDUtil;
 
 import java.util.List;
