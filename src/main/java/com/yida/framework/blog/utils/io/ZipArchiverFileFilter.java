@@ -1,5 +1,8 @@
 package com.yida.framework.blog.utils.io;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -10,10 +13,17 @@ import java.util.zip.ZipInputStream;
  * @Description ZIP文件的压缩与解压缩
  */
 public class ZipArchiverFileFilter extends DefaultArchiverFileFilter {
+    private Logger log = LogManager.getLogger(ZipArchiverFileFilter.class.getName());
     @Override
-    public void doUnArchiver(File srcfile, String destpath) throws IOException {
+    public boolean doUnArchiver(File srcfile, String destpath) {
         byte[] buf = new byte[1024];
-        FileInputStream fis = new FileInputStream(srcfile);
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(srcfile);
+        } catch (FileNotFoundException e) {
+            log.error("We can't found the file[{?}],thrown error exception:\n[{?}]", srcfile.getAbsolutePath(), e.getMessage(), e);
+            return false;
+        }
         BufferedInputStream bis = new BufferedInputStream(fis);
         ZipInputStream zis = new ZipInputStream(bis);
         ZipEntry zn = null;
@@ -51,13 +61,26 @@ public class ZipArchiverFileFilter extends DefaultArchiverFileFilter {
                 }
                 zis.closeEntry();
             }
-
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("UnZip the DOCX File[{?}] have thrown error exception:\n[{?}]", srcfile.getAbsolutePath(), e.getMessage());
+            return false;
         } finally {
-            fis.close();
-            bis.close();
-            zis.close();
+            try {
+                fis.close();
+            } catch (IOException e) {
+                log.error("Closing the FileInputStream have thrown error exception:\n[{?}]", e.getMessage());
+            }
+            try {
+                bis.close();
+            } catch (IOException e) {
+                log.error("Closing the BufferedInputStream have thrown error exception:\n[{?}]", e.getMessage());
+            }
+            try {
+                zis.close();
+            } catch (IOException e) {
+                log.error("Closing the ZipInputStream have thrown error exception:\n[{?}]", e.getMessage());
+            }
         }
     }
 }

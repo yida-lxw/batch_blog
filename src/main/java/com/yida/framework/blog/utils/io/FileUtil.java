@@ -2,6 +2,8 @@ package com.yida.framework.blog.utils.io;
 
 import com.yida.framework.blog.utils.Constant;
 import com.yida.framework.blog.utils.common.GerneralUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sun.nio.ch.FileChannelImpl;
 
 import javax.sql.rowset.serial.SerialBlob;
@@ -32,12 +34,8 @@ import java.util.regex.Pattern;
  * @Description 文件IO操作工具类
  */
 public class FileUtil {
-    /**
-     * 允许上传文件的最大字节数
-     */
-    public static final int MAX_FILE_SIZE = 20 * 1024 * 1024;
-
-    public static String PATH_SEPERATOR = "/";
+    public static String PATH_SEPERATOR = File.separator;
+    private static Logger log = LogManager.getLogger(FileUtil.class.getName());
 
     static {
         String property = System.getProperties().getProperty("file.separator");
@@ -388,6 +386,38 @@ public class FileUtil {
             }
         }
         return folderList;
+    }
+
+    /**
+     * 文件重命名
+     *
+     * @param path    文件的存放路径
+     * @param oldname 文件的原始名称
+     * @param newname 文件的新名称
+     * @return
+     */
+    public static boolean renameFile(String path, String oldname, String newname) {
+        if (oldname.equals(newname)) {
+            return false;
+        }
+        File oldfile = null;
+        File newfile = null;
+        if (path.endsWith("/")) {
+            oldfile = new File(path + oldname);
+            newfile = new File(path + newname);
+        } else {
+            oldfile = new File(path + "/" + oldname);
+            newfile = new File(path + "/" + newname);
+        }
+        if (!oldfile.exists() || newfile.exists()) {
+            return false;
+        }
+        try {
+            return oldfile.renameTo(newfile);
+        } catch (Exception e) {
+            log.error("Rename the file[{?}] have occured unexcepted exception:\n{?}", oldfile.getAbsolutePath(), e.getMessage());
+            return false;
+        }
     }
 
     /**

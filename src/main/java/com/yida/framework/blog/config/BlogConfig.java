@@ -49,6 +49,10 @@ public class BlogConfig {
         initialize();
     }
 
+    private static class SingletonHolder {
+        private static final BlogConfig INSTANCE = new BlogConfig();
+    }
+
     public static final BlogConfig getInstance() {
         return SingletonHolder.INSTANCE;
     }
@@ -132,9 +136,5 @@ public class BlogConfig {
 
     public void setGithubPassword(String githubPassword) {
         this.githubPassword = githubPassword;
-    }
-
-    private static class SingletonHolder {
-        private static final BlogConfig INSTANCE = new BlogConfig();
     }
 }

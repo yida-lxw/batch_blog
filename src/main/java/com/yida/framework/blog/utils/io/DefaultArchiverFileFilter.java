@@ -10,12 +10,12 @@ import java.io.IOException;
  */
 public class DefaultArchiverFileFilter extends ArchiverFileFilter {
     @Override
-    public void doArchiver(File[] srcFiles, String destpath) throws IOException {
-
+    public boolean doArchiver(File[] srcFiles, String destpath) throws IOException {
+        return false;
     }
 
     @Override
-    public void doUnArchiver(File srcfile, String destpath) throws IOException {
-
+    public boolean doUnArchiver(File srcfile, String destpath) throws IOException {
+        return false;
     }
 }

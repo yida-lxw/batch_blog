@@ -16,7 +16,7 @@ public interface Archiver {
      * @param destpath 目标输出路径
      * @throws IOException
      */
-    void doArchiver(File[] srcFiles, String destpath) throws IOException;
+    boolean doArchiver(File[] srcFiles, String destpath) throws IOException;
 
     /**
      * 解压文件
@@ -24,5 +24,5 @@ public interface Archiver {
      * @param srcfile  需要解压的源文件
      * @param destpath 目标输出路径
      */
-    void doUnArchiver(File srcfile, String destpath) throws IOException;
+    boolean doUnArchiver(File srcfile, String destpath) throws IOException;
 }
