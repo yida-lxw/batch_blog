@@ -14,6 +14,8 @@ import java.util.List;
  * @Description Word文档过滤任务处理器
  */
 public class WordFilterHandler implements Handler<WordFilterHandlerInput, WordFilterHandlerOutput> {
+    private DefaultArchiverFileFilter defaultArchiverFileFilter = new DefaultArchiverFileFilter();
+
     @Override
     public void handle(WordFilterHandlerInput input, WordFilterHandlerOutput output) {
         String wordBasePath = input.getWordBasePath();
@@ -32,11 +34,11 @@ public class WordFilterHandler implements Handler<WordFilterHandlerInput, WordFi
         }
         File file = null;
         String wordPath = null;
-        DefaultArchiverFileFilter defaultArchiverFileFilter = new DefaultArchiverFileFilter();
+
         for (String blogSendDate : blogSendDates) {
             wordPath = wordBasePath + blogSendDate;
             file = new File(wordPath);
-            String[] files = file.list(defaultArchiverFileFilter);
+            String[] files = file.list(this.defaultArchiverFileFilter);
             if (null == files || files.length <= 0) {
                 continue;
             }
