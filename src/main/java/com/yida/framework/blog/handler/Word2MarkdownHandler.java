@@ -52,7 +52,9 @@ public class Word2MarkdownHandler implements Handler<Word2MarkdownHandlerInput, 
      */
     private String buildCommand(String pandocHome, String wordFileName) {
         String mdFileName = getMarkdownFileName(wordFileName);
-        return String.format("cmd /c %s && pandoc -o %s %s", "王力", pandocHome, mdFileName, wordFileName);
+        //获取Pandoc安装目录所在盘符
+        String drive = pandocHome.substring(0, 1);
+        return String.format("cmd /c %s: && cd %s && pandoc -o %s %s", drive, pandocHome, mdFileName, wordFileName);
     }
 
     /**
