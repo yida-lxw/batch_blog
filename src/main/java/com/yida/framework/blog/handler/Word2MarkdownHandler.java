@@ -27,11 +27,13 @@ public class Word2MarkdownHandler implements Handler<Word2MarkdownHandlerInput, 
         CMDUtil cmdUtil = new CMDUtil(3000);
         boolean invokeResult = false;
         int successCount = 0;
+        List<String> markdownFilesPath = output.getMarkdownFilesPath();
         //遍历处理每个Word文档(todo:后续再考虑采用多线程去处理)
         for (String wordFileName : wordFilesName) {
             command = buildCommand(pandocHome, wordFileName);
             invokeResult = cmdUtil.execute(command);
             if (invokeResult) {
+                markdownFilesPath.add(getMarkdownFileName(wordFileName));
                 successCount++;
                 if (!output.isSuccessful()) {
                     output.setSuccessful(invokeResult);
@@ -49,10 +51,20 @@ public class Word2MarkdownHandler implements Handler<Word2MarkdownHandlerInput, 
      * @return
      */
     private String buildCommand(String pandocHome, String wordFileName) {
+        String mdFileName = getMarkdownFileName(wordFileName);
+        return String.format("cmd /c %s && pandoc -o %s %s", "王力", pandocHome, mdFileName, wordFileName);
+    }
+
+    /**
+     * 获取生成的Markdown文件名,默认只是替换一下文件的后缀名
+     *
+     * @param wordFileName
+     * @return
+     */
+    private String getMarkdownFileName(String wordFileName) {
         if (wordFileName.endsWith(".DOCX")) {
             wordFileName = wordFileName.replace(".DOCX", ".docx");
         }
-        String mdFileName = wordFileName.replace(".docx", ".md");
-        return String.format("cmd /c %s && pandoc -o %s %s", "王力", pandocHome, mdFileName, wordFileName);
+        return wordFileName.replace(".docx", ".md");
     }
 }

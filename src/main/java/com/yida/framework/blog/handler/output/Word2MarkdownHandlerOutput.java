@@ -1,5 +1,6 @@
 package com.yida.framework.blog.handler.output;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +24,9 @@ public class Word2MarkdownHandlerOutput extends HandlerOutput {
     private int successfulCount;
 
     public List<String> getMarkdownFilesPath() {
+        if (null == markdownFilesPath || markdownFilesPath.size() <= 0) {
+            markdownFilesPath = new ArrayList<String>(20);
+        }
         return markdownFilesPath;
     }
 
