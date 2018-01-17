@@ -1,5 +1,7 @@
 package com.yida.framework.blog.handler;
 
+import java.util.List;
+
 /**
  * @Author Lanxiaowei
  * @Date 2018-01-15 23:10
@@ -7,11 +9,40 @@ package com.yida.framework.blog.handler;
  */
 public class Word2MarkdownHandlerOutput extends HandlerOutput {
     /**
-     * 生成的Markdown文件存储绝对路径
+     * 生成的Markdown文件完整路径(生成的Markdown文件的名称,默认与Word文档的名称保持一致)
      */
-    protected String markdownFilePath;
+    protected List<String> markdownFilesPath;
     /**
-     * 生成的Markdown文件的名称,默认与Word文档的名称保持一致
+     * 是否生成成功(只要有一个生成成功,就视为生成成功)
      */
-    protected String markdownFileName;
+    protected boolean successful;
+
+    /**
+     * 文件转换成功的个数
+     */
+    private int successfulCount;
+
+    public List<String> getMarkdownFilesPath() {
+        return markdownFilesPath;
+    }
+
+    public void setMarkdownFilesPath(List<String> markdownFilesPath) {
+        this.markdownFilesPath = markdownFilesPath;
+    }
+
+    public boolean isSuccessful() {
+        return successful;
+    }
+
+    public void setSuccessful(boolean successful) {
+        this.successful = successful;
+    }
+
+    public int getSuccessfulCount() {
+        return successfulCount;
+    }
+
+    public void setSuccessfulCount(int successfulCount) {
+        this.successfulCount = successfulCount;
+    }
 }

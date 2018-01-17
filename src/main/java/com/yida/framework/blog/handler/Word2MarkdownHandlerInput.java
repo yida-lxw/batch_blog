@@ -12,6 +12,18 @@ public class Word2MarkdownHandlerInput extends HandlerInput {
      * Word文件列表
      */
     protected List<String> wordFilesName;
+    /**
+     * Pandoc的安装根目录
+     */
+    private String pandocHome;
+
+    public String getPandocHome() {
+        return pandocHome;
+    }
+
+    public void setPandocHome(String pandocHome) {
+        this.pandocHome = pandocHome;
+    }
 
     public List<String> getWordFilesName() {
         return wordFilesName;

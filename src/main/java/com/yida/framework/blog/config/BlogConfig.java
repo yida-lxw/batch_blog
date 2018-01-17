@@ -89,13 +89,13 @@ public class BlogConfig {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Pandoc Home: " + getPandocHome() + "\n");
-        sb.append("Word BasePath: " + getWordBasePath() + "\n");
-        sb.append("Blog SendDate: " + getBlogSendDate() + "\n");
-        sb.append("Github UserName: " + getGithubUserName() + "\n");
-        sb.append("Github Password: " + getGithubPassword() + "\n");
-        return sb.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Pandoc Home: " + getPandocHome() + "\n");
+        stringBuilder.append("Word BasePath: " + getWordBasePath() + "\n");
+        stringBuilder.append("Blog SendDate: " + getBlogSendDate() + "\n");
+        stringBuilder.append("Github UserName: " + getGithubUserName() + "\n");
+        stringBuilder.append("Github Password: " + getGithubPassword() + "\n");
+        return stringBuilder.toString();
     }
 
     public String getPandocHome() {

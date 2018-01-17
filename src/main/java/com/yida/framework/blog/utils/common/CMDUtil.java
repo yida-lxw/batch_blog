@@ -1,5 +1,8 @@
 package com.yida.framework.blog.utils.common;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,6 +14,7 @@ import java.io.UnsupportedEncodingException;
  * @Description  Windows里的DOS命令执行工具类
  */
 public class CMDUtil {
+    private Logger log = LogManager.getLogger(CMDUtil.class.getName());
     private static final String WINDOWS_DEFAULT_CHARSET = "gb2312";
     public CMDUtil(long time) {
         this.timeout = time;
@@ -35,7 +39,7 @@ public class CMDUtil {
      * @param cb
      *            回调
      */
-    public void execute(final String command, final CallBack cb) {
+    public boolean execute(final String command, final CallBack cb) {
         final CallBack[] callback = new CallBack[1];
         if (cb == null) {
             callback[0] = new DefaultCallback();
@@ -46,7 +50,7 @@ public class CMDUtil {
         if (command == null) {
             // 默认回调
             callback[0].onFailed(new Exception("command is null,please check it out carefully and after try it again."));
-            return;
+            return false;
         }
 
         final Process[] process = new Process[1];
@@ -166,21 +170,25 @@ public class CMDUtil {
             try {
                 thread.join(timeout); // 超时的时间
                 if (thread.isAlive()) {// 没有执行完，超时
-
                     thread.interrupt();
+                } else {
+                    return true;
                 }
+                return false;
             } catch (InterruptedException e) {
-                // callback[0].onTimeout();
-                e.printStackTrace();
+                log.error("invoke the dos command [" + command + "] occured exception:\n" + e.getMessage());
+                return false;
             }
+        } else {
+            return true;
         }
     }
 
     /**
      * @param command 需要执行的命令
      */
-    public void execute(final String command) {
-        execute(command, null);
+    public boolean execute(final String command) {
+        return execute(command, null);
     }
 
     // 给字符换行
