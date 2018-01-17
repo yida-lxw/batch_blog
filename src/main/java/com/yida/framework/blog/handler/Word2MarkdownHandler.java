@@ -12,6 +12,7 @@ import java.util.List;
  * @Description docx文件转换成Markdown文件
  */
 public class Word2MarkdownHandler implements Handler<Word2MarkdownHandlerInput, Word2MarkdownHandlerOutput> {
+    private CMDUtil cmdUtil = new CMDUtil(3000);
 
     @Override
     public void handle(Word2MarkdownHandlerInput input, Word2MarkdownHandlerOutput output) {
@@ -24,7 +25,6 @@ public class Word2MarkdownHandler implements Handler<Word2MarkdownHandlerInput, 
         }
 
         String command = null;
-        CMDUtil cmdUtil = new CMDUtil(3000);
         boolean invokeResult = false;
         int successCount = 0;
         List<String> markdownFilesPath = output.getMarkdownFilesPath();
