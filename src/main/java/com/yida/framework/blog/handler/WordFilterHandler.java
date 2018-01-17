@@ -3,6 +3,8 @@ package com.yida.framework.blog.handler;
 import com.yida.framework.blog.utils.io.DefaultArchiverFileFilter;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author Lanxiaowei
@@ -13,16 +15,33 @@ public class WordFilterHandler implements Handler<WordFilterHandlerInput, WordFi
     @Override
     public void handle(WordFilterHandlerInput input, WordFilterHandlerOutput output) {
         String wordBasePath = input.getWordBasePath();
-        File file = new File(wordBasePath);
-        String[] files = file.list(new DefaultArchiverFileFilter());
-        if (null == files || files.length <= 0) {
-            return;
-        }
         if (!wordBasePath.endsWith("/") && !wordBasePath.endsWith("\\")) {
             wordBasePath += "/";
         }
-        for (String fileName : files) {
-            output.getWordFilesPath().add(wordBasePath + fileName);
+        List<String> blogSendDates = input.getBlogSendDates();
+        if (null == blogSendDates || blogSendDates.size() <= 0) {
+            String blogSendDate = input.getBlogSendDate();
+            if (null == blogSendDate || "".equals(blogSendDate)) {
+                output.setSuccessful(false);
+                return;
+            }
+            blogSendDates = new ArrayList<String>();
+            blogSendDates.add(blogSendDate);
         }
+        File file = null;
+        String wordPath = null;
+        DefaultArchiverFileFilter defaultArchiverFileFilter = new DefaultArchiverFileFilter();
+        for (String blogSendDate : blogSendDates) {
+            wordPath = wordBasePath + blogSendDate;
+            file = new File(wordPath);
+            String[] files = file.list(defaultArchiverFileFilter);
+            if (null == files || files.length <= 0) {
+                continue;
+            }
+            for (String fileName : files) {
+                output.getWordFilesPath().add(wordPath + "/" + fileName);
+            }
+        }
+        output.setSuccessful(output.getWordFilesPath().size() > 0);
     }
 }

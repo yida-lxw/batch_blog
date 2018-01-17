@@ -14,6 +14,11 @@ public class WordFilterHandlerOutput extends HandlerOutput {
      */
     private List<String> wordFilesPath;
 
+    /**
+     * 文件过滤任务是否处理成功
+     */
+    private boolean successful;
+
     public List<String> getWordFilesPath() {
         if (null == wordFilesPath) {
             wordFilesPath = new ArrayList<String>(20);
@@ -23,5 +28,13 @@ public class WordFilterHandlerOutput extends HandlerOutput {
 
     public void setWordFilesPath(List<String> wordFilesPath) {
         this.wordFilesPath = wordFilesPath;
+    }
+
+    public boolean isSuccessful() {
+        return successful;
+    }
+
+    public void setSuccessful(boolean successful) {
+        this.successful = successful;
     }
 }
