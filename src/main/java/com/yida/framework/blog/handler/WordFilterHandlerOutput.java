@@ -1,5 +1,6 @@
 package com.yida.framework.blog.handler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +15,9 @@ public class WordFilterHandlerOutput extends HandlerOutput {
     private List<String> wordFilesPath;
 
     public List<String> getWordFilesPath() {
+        if (null == wordFilesPath) {
+            wordFilesPath = new ArrayList<String>(20);
+        }
         return wordFilesPath;
     }
 
