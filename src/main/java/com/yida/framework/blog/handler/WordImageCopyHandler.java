@@ -4,6 +4,7 @@ import com.yida.framework.blog.handler.input.WordImageCopyHandlerInput;
 import com.yida.framework.blog.handler.output.WordImageCopyHandlerOutput;
 import com.yida.framework.blog.utils.io.FileUtil;
 import com.yida.framework.blog.utils.io.ImageFilenameFilter;
+import com.yida.framework.blog.utils.io.MarkdownFilenameFilter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,9 +19,11 @@ import java.util.Map;
  */
 public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, WordImageCopyHandlerOutput> {
     private ImageFilenameFilter imageFilenameFilter;
+    private MarkdownFilenameFilter markdownFilenameFilter;
 
     public WordImageCopyHandler() {
         this.imageFilenameFilter = new ImageFilenameFilter();
+        this.markdownFilenameFilter = new MarkdownFilenameFilter();
     }
 
     @Override
@@ -32,28 +35,37 @@ public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, 
             List<String> imagesPreMarkdown = null;
             String actualImagePath = null;
             String imagesNewPath = null;
+            String[] images = null;
+            String[] markdowns = null;
             for (String unzipFilePath : unzipFilePaths) {
                 file = new File(unzipFilePath);
                 if (!file.exists() || !file.isDirectory()) {
                     continue;
                 }
-                String[] images = file.list(this.imageFilenameFilter);
+                images = file.list(this.imageFilenameFilter);
                 if (!unzipFilePath.endsWith("/")) {
                     if (!unzipFilePath.endsWith("\\")) {
                         unzipFilePath += "/";
                     }
                 }
-                imagesPreMarkdown = new ArrayList<String>();
-                //图片实际需要复制到的新路径
-                imagesNewPath = unzipFilePath + output.MD_IMAGE_BASEPATH;
-                //解压后图片的实际路径
-                actualImagePath = unzipFilePath + input.WORD_IMAGE_PATH;
-                for (String imageFileName : images) {
-                    imagesPreMarkdown.add(imagesNewPath + imageFileName);
+
+                if (null != images && images.length > 0) {
+                    imagesPreMarkdown = new ArrayList<String>();
+                    //图片实际需要复制到的新路径
+                    imagesNewPath = unzipFilePath + output.MD_IMAGE_BASEPATH;
+                    //解压后图片的实际路径
+                    actualImagePath = unzipFilePath + input.WORD_IMAGE_PATH;
+                    for (String imageFileName : images) {
+                        imagesPreMarkdown.add(imagesNewPath + imageFileName);
+                    }
+                    //开始图片复制操作
+                    FileUtil.copyDirectory(actualImagePath, imagesNewPath, this.imageFilenameFilter);
+                    imagesMap.put(imagesNewPath, imagesPreMarkdown);
+                } else {
+                    //若找不到图片
+                    imagesMap.put(imagesNewPath, null);
                 }
-                //开始图片复制操作
-                FileUtil.copyDirectory(actualImagePath, imagesNewPath, this.imageFilenameFilter);
-                imagesMap.put(imagesNewPath, imagesPreMarkdown);
+
                 //开始删除其他文件(images目录除外)
                 FileUtil.deleteDirs(unzipFilePath + "_rels");
                 FileUtil.deleteDirs(unzipFilePath + "docProps");

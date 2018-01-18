@@ -14,11 +14,6 @@ public class WordImageCopyHandlerOutput extends HandlerOutput {
      */
     private Map<String, List<String>> imagesFilePath;
 
-    /**
-     * 所有Markdown文件列表,下一步需要遍历这些Markdown文件并对其中的图片路径进行调整
-     */
-    private List<String> markdownFilesPath;
-
     public Map<String, List<String>> getImagesFilePath() {
         return imagesFilePath;
     }
