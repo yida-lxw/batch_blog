@@ -9,6 +9,5 @@ public abstract class HandlerInput {
     /**
      * Word文档内部存储Image图片的相对路径
      */
-    public static final String WORD_IMAGE_PATH = "/word/media/";
-
+    public String WORD_IMAGE_PATH = "word/media/";
 }

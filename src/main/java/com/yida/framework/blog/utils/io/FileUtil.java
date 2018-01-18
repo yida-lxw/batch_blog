@@ -17,6 +17,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.sql.Blob;
@@ -113,25 +115,41 @@ public class FileUtil {
     /**
      * 目录复制
      *
-     * @param srcPath    待复制的目录
-     * @param targetPath 目录下的所有文件和文件夹复制到哪里
+     * @param srcPath        待复制的目录
+     * @param targetPath     目录下的所有文件和文件夹复制到哪里
+     * @param filenameFilter 文件名称过滤器
      */
-    public static void copyDirectory(String srcPath, String targetPath) {
+    public static void copyDirectory(String srcPath, String targetPath, FilenameFilter filenameFilter) {
         if (!targetPath.endsWith("/")) {
             targetPath = targetPath.replaceAll("\\\\", "/");
             targetPath += "/";
         }
         parseDir(srcPath, targetPath);
         File f = new File(srcPath);
-        File[] fileList = f.listFiles(new ImageFilenameFilter());
+        File[] fileList = f.listFiles(filenameFilter);
         for (File f1 : fileList) {
             if (f1.isFile()) {
                 copyFile(srcPath, f1.getName(), targetPath);
             }
             //判断是否是目录
             if (f1.isDirectory()) {
-                copyDirectory(f1.getPath().toString(), targetPath + f1.getName());
+                copyDirectory(f1.getPath().toString(), targetPath + f1.getName(), filenameFilter);
             }
+        }
+    }
+
+    /**
+     * 删除文件或者空目录
+     *
+     * @param path
+     * @return
+     */
+    public static boolean deleteFileOrDirectory(String path) {
+        try {
+            return Files.deleteIfExists(Paths.get(path));
+        } catch (IOException e) {
+            log.error("deleting the file[{}] occured unexcepted exception:\n", path, e.getMessage(), e);
+            return false;
         }
     }
 
