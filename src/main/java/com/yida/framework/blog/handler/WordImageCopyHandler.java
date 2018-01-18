@@ -47,14 +47,20 @@ public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, 
                 //图片实际需要复制到的新路径
                 imagesNewPath = unzipFilePath + output.MD_IMAGE_BASEPATH;
                 //解压后图片的实际路径
-                actualImagePath = actualImagePath = unzipFilePath + input.WORD_IMAGE_PATH;
+                actualImagePath = unzipFilePath + input.WORD_IMAGE_PATH;
                 for (String imageFileName : images) {
                     imagesPreMarkdown.add(imagesNewPath + imageFileName);
                 }
                 //开始图片复制操作
                 FileUtil.copyDirectory(actualImagePath, imagesNewPath, this.imageFilenameFilter);
-                imagesMap.put(unzipFilePath, imagesPreMarkdown);
+                imagesMap.put(imagesNewPath, imagesPreMarkdown);
+                //开始删除其他文件(images目录除外)
+                FileUtil.deleteDirs(unzipFilePath + "_rels");
+                FileUtil.deleteDirs(unzipFilePath + "docProps");
+                FileUtil.deleteDirs(unzipFilePath + "word");
+                FileUtil.deleteFileOrDirectory(unzipFilePath + "[Content_Types].xml");
             }
+            output.setImagesFilePath(imagesMap);
         }
     }
 }

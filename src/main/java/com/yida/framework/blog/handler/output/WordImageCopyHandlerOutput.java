@@ -10,9 +10,14 @@ import java.util.Map;
  */
 public class WordImageCopyHandlerOutput extends HandlerOutput {
     /**
-     * 从Word文档内复制出来的图片文件列表,Key为Word文档解压目录，Value为该目录下的所有图片路径
+     * 从Word文档内复制出来的图片文件列表,Key为Word文档解压目录下的images目录路径，Value为该目录下的所有图片路径
      */
     private Map<String, List<String>> imagesFilePath;
+
+    /**
+     * 所有Markdown文件列表,下一步需要遍历这些Markdown文件并对其中的图片路径进行调整
+     */
+    private List<String> markdownFilesPath;
 
     public Map<String, List<String>> getImagesFilePath() {
         return imagesFilePath;
