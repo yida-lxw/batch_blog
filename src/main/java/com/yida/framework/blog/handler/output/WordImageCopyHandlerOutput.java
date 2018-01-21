@@ -1,5 +1,6 @@
 package com.yida.framework.blog.handler.output;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,5 +21,16 @@ public class WordImageCopyHandlerOutput extends HandlerOutput {
 
     public void setImagesFilePath(Map<String, List<String>> imagesFilePath) {
         this.imagesFilePath = imagesFilePath;
+    }
+
+    public List<String> getMarkdownParentPath() {
+        if (null != imagesFilePath && imagesFilePath.size() > 0) {
+            List<String> parentPathList = new ArrayList<String>();
+            for (String path : imagesFilePath.keySet()) {
+                parentPathList.add(path.replace(this.MD_IMAGE_BASEPATH, ""));
+            }
+            return parentPathList;
+        }
+        return null;
     }
 }
