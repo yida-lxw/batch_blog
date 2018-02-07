@@ -8,12 +8,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Author Lanxiaowei
@@ -24,31 +25,57 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
     private Logger log = LogManager.getLogger(MarkdownFixHandler.class.getName());
     private MarkdownFilenameFilter markdownFilenameFilter;
 
-    public MarkdownFixHandler() {
-        this.markdownFilenameFilter = new MarkdownFilenameFilter();
-    }
-
-    public static void main(String[] args) {
-        System.out.println(String.format("![%s", Constant.SYSTEM_TEMP_DIR));
-        File file = new File(String.format("![%s", Constant.SYSTEM_TEMP_DIR) + "1516427572.bmp");
-        System.out.println(file.exists());
+    public MarkdownFixHandler(MarkdownFilenameFilter markdownFilenameFilter) {
+        this.markdownFilenameFilter = markdownFilenameFilter;
     }
 
     @Override
     public void handle(MarkdownFixHandlerInput input, MarkdownFixHandlerOutput output) {
-        List<String> markdownParentPath = input.getMarkdownParentPath();
-        if (null == markdownParentPath || markdownParentPath.size() <= 0) {
-            return;
+        List<String> markdownParentPath = null;
+        String wordBasePath = input.getWordBasePath();
+        if (!wordBasePath.endsWith("/") && !wordBasePath.endsWith("\\")) {
+            wordBasePath += "/";
         }
-        Map<String, List<String>> imagesFilePathMap = input.getImagesFilePath();
-        if (null == imagesFilePathMap || imagesFilePathMap.size() <= 0) {
+        List<String> blogSendDates = input.getBlogSendDates();
+        if (null == blogSendDates || blogSendDates.size() <= 0) {
+            String blogSendDate = input.getBlogSendDate();
+            if (null == blogSendDate || "".equals(blogSendDate)) {
+                return;
+            }
+            blogSendDates = new ArrayList<String>();
+            blogSendDates.add(blogSendDate);
+        }
+
+        if (null == blogSendDates || blogSendDates.size() <= 0) {
             return;
         }
         File file = null;
-        //File markdownFile = null;
+        String wordPath = null;
+        markdownParentPath = new ArrayList<String>();
+        for (String blogSendDate : blogSendDates) {
+            wordPath = wordBasePath + blogSendDate;
+            file = new File(wordPath);
+            String[] directories = file.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    File tempFile = new File(dir.getAbsolutePath() + "/" + name);
+                    return tempFile.isDirectory();
+                }
+            });
+            if (null == directories || directories.length <= 0) {
+                continue;
+            }
+            for (String directory : directories) {
+                markdownParentPath.add(wordPath + "/" + directory);
+            }
+        }
+
+
+        if (null == markdownParentPath || markdownParentPath.size() <= 0) {
+            return;
+        }
+
         String[] markdowns = null;
-        String imagePathPermarkdown = null;
-        List<String> imagesPath = null;
         List<String> lines = null;
         String tempDirDemo = String.format("![%s", Constant.SYSTEM_TEMP_DIR);
         for (String parentPath : markdownParentPath) {
@@ -66,12 +93,9 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
                     parentPath += "/";
                 }
             }
-            imagePathPermarkdown = parentPath + output.MD_IMAGE_BASEPATH;
-            imagesPath = imagesFilePathMap.get(imagePathPermarkdown);
             String markdownPath = null;
             StringBuilder builder = new StringBuilder();
             try {
-                int index = 0;
                 String content = null;
                 for (String markdownFileName : markdowns) {
                     markdownPath = parentPath + markdownFileName;
@@ -82,15 +106,13 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
                     }
                     boolean nextSkip = false;
                     for (String line : lines) {
-                        if (null == line || "".equals(line)) {
+                        if (null == line) {
                             continue;
                         }
-                        if (line.startsWith("![C:\\\\Users\\\\ADMINI")) {
+                        if (line.startsWith(tempDirDemo)) {
                             //如果makedown里引用了系统临时文件夹里的图片文件
-                            if (line.contains("C:\\\\Users\\\\ADMINI\\~1\\\\AppData\\\\Local\\\\Temp\\\\")) {
-                                String picPath = line.substring(line.indexOf("[") + 1, line.indexOf("]"));
-                                line = line.replace(picPath, "");
-                            }
+                            String picPath = line.substring(line.indexOf("[") + 1, line.indexOf("]"));
+                            line = line.replace(picPath, "");
                             nextSkip = true;
                         }
                         if (line.startsWith("![](media")) {

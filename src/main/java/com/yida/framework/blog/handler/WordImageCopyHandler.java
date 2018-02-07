@@ -42,7 +42,7 @@ public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, 
                 }
                 file = new File(unzipFilePath + input.WORD_IMAGE_PATH);
                 if (!file.exists() || !file.isDirectory()) {
-                    FileUtil.deleteDirs(unzipFilePath);
+                    deleteNoUseFile(unzipFilePath);
                     continue;
                 }
                 images = file.list(this.imageFilenameFilter);
@@ -70,12 +70,16 @@ public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, 
                 }
 
                 //开始删除其他文件(images目录除外)
-                FileUtil.deleteDirs(unzipFilePath + "_rels");
-                FileUtil.deleteDirs(unzipFilePath + "docProps");
-                FileUtil.deleteDirs(unzipFilePath + "word");
-                FileUtil.deleteFileOrDirectory(unzipFilePath + "[Content_Types].xml");
+                deleteNoUseFile(unzipFilePath);
             }
             output.setImagesFilePath(imagesMap);
         }
+    }
+
+    private void deleteNoUseFile(String unzipFilePath) {
+        FileUtil.deleteDirs(unzipFilePath + "_rels");
+        FileUtil.deleteDirs(unzipFilePath + "docProps");
+        FileUtil.deleteDirs(unzipFilePath + "word");
+        FileUtil.deleteFileOrDirectory(unzipFilePath + "[Content_Types].xml");
     }
 }

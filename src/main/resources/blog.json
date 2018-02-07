@@ -2,10 +2,10 @@
   //pandoc的安装根目录
   "pandoc_home": "F:/pandoc-2.1/",
   //word文档的存储根目录
-  "word_basepath": "G:/git-local/blog/",
+  "word_basepath": "C:/myblog/",
   /**Markdown文档的存储根目录,当你的博客是直接采用Markdown格式编写的，此时你可以配置此参数,它与word_basepath参数二选一即可*/
   "markdown_basepath": "G:/git-local/blog/",
-  "blog_send_dates": "20180117",
+  "blog_send_dates": "20180207",
   "github_username": "yida-lxw",
   "github_pwd": "1234567890"
 }
