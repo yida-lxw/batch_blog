@@ -2,7 +2,7 @@ package com.yida.framework.blog.handler;
 
 import com.yida.framework.blog.handler.input.WordFilterHandlerInput;
 import com.yida.framework.blog.handler.output.WordFilterHandlerOutput;
-import com.yida.framework.blog.utils.io.DefaultArchiverFileFilter;
+import com.yida.framework.blog.utils.io.DocxFilenameFilter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,7 +14,11 @@ import java.util.List;
  * @Description Word文档过滤任务处理器
  */
 public class WordFilterHandler implements Handler<WordFilterHandlerInput, WordFilterHandlerOutput> {
-    private DefaultArchiverFileFilter defaultArchiverFileFilter = new DefaultArchiverFileFilter();
+    private DocxFilenameFilter docxFilenameFilter;
+
+    public WordFilterHandler(DocxFilenameFilter docxFilenameFilter) {
+        this.docxFilenameFilter = docxFilenameFilter;
+    }
 
     @Override
     public void handle(WordFilterHandlerInput input, WordFilterHandlerOutput output) {
@@ -38,7 +42,7 @@ public class WordFilterHandler implements Handler<WordFilterHandlerInput, WordFi
         for (String blogSendDate : blogSendDates) {
             wordPath = wordBasePath + blogSendDate;
             file = new File(wordPath);
-            String[] files = file.list(this.defaultArchiverFileFilter);
+            String[] files = file.list(this.docxFilenameFilter);
             if (null == files || files.length <= 0) {
                 continue;
             }

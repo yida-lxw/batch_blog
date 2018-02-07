@@ -36,7 +36,6 @@ public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, 
             String actualImagePath = null;
             String imagesNewPath = null;
             String[] images = null;
-            String[] markdowns = null;
             for (String unzipFilePath : unzipFilePaths) {
                 file = new File(unzipFilePath);
                 if (!file.exists() || !file.isDirectory()) {
