@@ -20,14 +20,23 @@ import java.util.Map;
 public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, WordImageCopyHandlerOutput> {
     private ImageFilenameFilter imageFilenameFilter;
     private MarkdownFilenameFilter markdownFilenameFilter;
+    private WordUnzipHandler wordUnzipHandler;
 
     public WordImageCopyHandler(ImageFilenameFilter imageFilenameFilter, MarkdownFilenameFilter markdownFilenameFilter) {
         this.imageFilenameFilter = imageFilenameFilter;
         this.markdownFilenameFilter = markdownFilenameFilter;
     }
 
+    public WordImageCopyHandler(WordUnzipHandler wordUnzipHandler, ImageFilenameFilter imageFilenameFilter, MarkdownFilenameFilter markdownFilenameFilter) {
+        this.wordUnzipHandler = wordUnzipHandler;
+        this.imageFilenameFilter = imageFilenameFilter;
+        this.markdownFilenameFilter = markdownFilenameFilter;
+    }
+
     @Override
     public void handle(WordImageCopyHandlerInput input, WordImageCopyHandlerOutput output) {
+        this.wordUnzipHandler.handle(input.getWordUnzipHandlerInput(), output.getWordUnzipHandlerOutput());
+        input.setUnzipFilePaths(output.getWordUnzipHandlerOutput().getUnzipFilePaths());
         List<String> unzipFilePaths = input.getUnzipFilePaths();
         if (null != unzipFilePaths && unzipFilePaths.size() > 0) {
             File file = null;

@@ -23,6 +23,12 @@ public class Word2MarkdownHandlerOutput extends HandlerOutput {
      */
     private int successfulCount;
 
+    private WordFilterHandlerOutput wordFilterHandlerOutput;
+
+    public Word2MarkdownHandlerOutput() {
+        this.wordFilterHandlerOutput = new WordFilterHandlerOutput();
+    }
+
     public List<String> getMarkdownFilesPath() {
         if (null == markdownFilesPath || markdownFilesPath.size() <= 0) {
             markdownFilesPath = new ArrayList<String>(20);
@@ -48,5 +54,13 @@ public class Word2MarkdownHandlerOutput extends HandlerOutput {
 
     public void setSuccessfulCount(int successfulCount) {
         this.successfulCount = successfulCount;
+    }
+
+    public WordFilterHandlerOutput getWordFilterHandlerOutput() {
+        return wordFilterHandlerOutput;
+    }
+
+    public void setWordFilterHandlerOutput(WordFilterHandlerOutput wordFilterHandlerOutput) {
+        this.wordFilterHandlerOutput = wordFilterHandlerOutput;
     }
 }

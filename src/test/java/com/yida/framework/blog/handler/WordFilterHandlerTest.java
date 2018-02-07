@@ -22,7 +22,7 @@ public class WordFilterHandlerTest {
         ZipArchiverFileFilter zipArchiverFileFilter = new ZipArchiverFileFilter();
         DocxFilenameFilter docxFilenameFilter = new DocxFilenameFilter();
 
-        WordFilterHandlerInput wordFilterHandlerInput = new WordFilterHandlerInput(blogBasePath, blogSendDate);
+        WordFilterHandlerInput wordFilterHandlerInput = new WordFilterHandlerInput();
         WordFilterHandlerOutput wordFilterHandlerOutput = new WordFilterHandlerOutput();
         WordFilterHandler wordFilterHandler = new WordFilterHandler(docxFilenameFilter);
         wordFilterHandler.handle(wordFilterHandlerInput, wordFilterHandlerOutput);

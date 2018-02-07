@@ -14,8 +14,16 @@ import java.util.List;
 public class Word2MarkdownHandler implements Handler<Word2MarkdownHandlerInput, Word2MarkdownHandlerOutput> {
     private CMDUtil cmdUtil = new CMDUtil(3000);
 
+    private WordFilterHandler wordFilterHandler;
+
+    public Word2MarkdownHandler(WordFilterHandler wordFilterHandler) {
+        this.wordFilterHandler = wordFilterHandler;
+    }
+
     @Override
     public void handle(Word2MarkdownHandlerInput input, Word2MarkdownHandlerOutput output) {
+        this.wordFilterHandler.handle(input.getWordFilterHandlerInput(), output.getWordFilterHandlerOutput());
+        input.setWordFilesName(output.getWordFilterHandlerOutput().getWordFilesPath());
         String pandocHome = input.getPandocHome();
         List<String> wordFilesName = input.getWordFilesName();
         //如果没有Word文件需要处理

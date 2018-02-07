@@ -18,6 +18,12 @@ public class WordUnzipHandlerOutput extends HandlerOutput {
      */
     private boolean successful;
 
+    private WordFilterHandlerOutput wordFilterHandlerOutput;
+
+    public WordUnzipHandlerOutput() {
+        this.wordFilterHandlerOutput = new WordFilterHandlerOutput();
+    }
+
     public List<String> getUnzipFilePaths() {
         return unzipFilePaths;
     }
@@ -32,5 +38,13 @@ public class WordUnzipHandlerOutput extends HandlerOutput {
 
     public void setSuccessful(boolean successful) {
         this.successful = successful;
+    }
+
+    public WordFilterHandlerOutput getWordFilterHandlerOutput() {
+        return wordFilterHandlerOutput;
+    }
+
+    public void setWordFilterHandlerOutput(WordFilterHandlerOutput wordFilterHandlerOutput) {
+        this.wordFilterHandlerOutput = wordFilterHandlerOutput;
     }
 }

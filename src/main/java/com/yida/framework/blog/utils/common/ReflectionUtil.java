@@ -1,12 +1,7 @@
 package com.yida.framework.blog.utils.common;
 
 import java.lang.annotation.Inherited;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,6 +14,16 @@ import java.util.List;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class ReflectionUtil {
+    public static <T> T createInstance(String className) {
+        Class cls = null;
+        try {
+            cls = Class.forName(className);
+            return (T) cls.newInstance();
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+            return null;
+        }
+    }
+
     /**
      * 调用Getter方法
      */
@@ -452,7 +457,7 @@ public class ReflectionUtil {
      * @param clazz         待检测类型
      * @param includeParent 是否包含从父类继承的方法
      */
-    public static void getMothds(List<Method> methodList, Class clazz, boolean includeParent) {
+    public static void getMethods(List<Method> methodList, Class clazz, boolean includeParent) {
         if (null == methodList) {
             methodList = new ArrayList<Method>();
         }

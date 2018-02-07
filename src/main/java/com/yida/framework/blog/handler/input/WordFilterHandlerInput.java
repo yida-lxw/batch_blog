@@ -23,14 +23,10 @@ public class WordFilterHandlerInput extends HandlerInput {
      */
     private List<String> blogSendDates;
 
-    public WordFilterHandlerInput(String wordBasePath, String blogSendDate) {
-        this.wordBasePath = wordBasePath;
-        this.blogSendDate = blogSendDate;
-    }
-
-    public WordFilterHandlerInput(String wordBasePath, List<String> blogSendDates) {
-        this.wordBasePath = wordBasePath;
-        this.blogSendDates = blogSendDates;
+    public WordFilterHandlerInput() {
+        this.wordBasePath = this.config.getWordBasePath();
+        this.blogSendDate = this.config.getBlogSendDate();
+        this.blogSendDates = this.config.getBlogSendDates();
     }
 
     public String getWordBasePath() {

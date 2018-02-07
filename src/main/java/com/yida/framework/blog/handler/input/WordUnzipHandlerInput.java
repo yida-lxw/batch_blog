@@ -15,11 +15,25 @@ public class WordUnzipHandlerInput extends HandlerInput {
      */
     protected List<String> wordFilesName;
 
+    private WordFilterHandlerInput wordFilterHandlerInput;
+
+    public WordUnzipHandlerInput() {
+        this.wordFilterHandlerInput = new WordFilterHandlerInput();
+    }
+
     public List<String> getWordFilesName() {
         return wordFilesName;
     }
 
     public void setWordFilesName(List<String> wordFilesName) {
         this.wordFilesName = wordFilesName;
+    }
+
+    public WordFilterHandlerInput getWordFilterHandlerInput() {
+        return wordFilterHandlerInput;
+    }
+
+    public void setWordFilterHandlerInput(WordFilterHandlerInput wordFilterHandlerInput) {
+        this.wordFilterHandlerInput = wordFilterHandlerInput;
     }
 }

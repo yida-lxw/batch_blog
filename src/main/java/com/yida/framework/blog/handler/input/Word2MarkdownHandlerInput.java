@@ -12,17 +12,15 @@ public class Word2MarkdownHandlerInput extends HandlerInput {
      * Word文件列表
      */
     protected List<String> wordFilesName;
-    /**
-     * Pandoc的安装根目录
-     */
-    private String pandocHome;
 
-    public String getPandocHome() {
-        return pandocHome;
+    private WordFilterHandlerInput wordFilterHandlerInput;
+
+    public Word2MarkdownHandlerInput() {
+        this.wordFilterHandlerInput = new WordFilterHandlerInput();
     }
 
-    public void setPandocHome(String pandocHome) {
-        this.pandocHome = pandocHome;
+    public String getPandocHome() {
+        return this.config.getPandocHome();
     }
 
     public List<String> getWordFilesName() {
@@ -31,6 +29,14 @@ public class Word2MarkdownHandlerInput extends HandlerInput {
 
     public void setWordFilesName(List<String> wordFilesName) {
         this.wordFilesName = wordFilesName;
+    }
+
+    public WordFilterHandlerInput getWordFilterHandlerInput() {
+        return wordFilterHandlerInput;
+    }
+
+    public void setWordFilterHandlerInput(WordFilterHandlerInput wordFilterHandlerInput) {
+        this.wordFilterHandlerInput = wordFilterHandlerInput;
     }
 }
 

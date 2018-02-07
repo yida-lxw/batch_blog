@@ -13,11 +13,25 @@ public class WordImageCopyHandlerInput extends HandlerInput {
      */
     private List<String> unzipFilePaths;
 
+    private WordUnzipHandlerInput wordUnzipHandlerInput;
+
+    public WordImageCopyHandlerInput() {
+        this.wordUnzipHandlerInput = new WordUnzipHandlerInput();
+    }
+
     public List<String> getUnzipFilePaths() {
         return unzipFilePaths;
     }
 
     public void setUnzipFilePaths(List<String> unzipFilePaths) {
         this.unzipFilePaths = unzipFilePaths;
+    }
+
+    public WordUnzipHandlerInput getWordUnzipHandlerInput() {
+        return wordUnzipHandlerInput;
+    }
+
+    public void setWordUnzipHandlerInput(WordUnzipHandlerInput wordUnzipHandlerInput) {
+        this.wordUnzipHandlerInput = wordUnzipHandlerInput;
     }
 }

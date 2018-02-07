@@ -15,12 +15,26 @@ public class WordImageCopyHandlerOutput extends HandlerOutput {
      */
     private Map<String, List<String>> imagesFilePath;
 
+    private WordUnzipHandlerOutput wordUnzipHandlerOutput;
+
+    public WordImageCopyHandlerOutput() {
+        this.wordUnzipHandlerOutput = new WordUnzipHandlerOutput();
+    }
+
     public Map<String, List<String>> getImagesFilePath() {
         return imagesFilePath;
     }
 
     public void setImagesFilePath(Map<String, List<String>> imagesFilePath) {
         this.imagesFilePath = imagesFilePath;
+    }
+
+    public WordUnzipHandlerOutput getWordUnzipHandlerOutput() {
+        return wordUnzipHandlerOutput;
+    }
+
+    public void setWordUnzipHandlerOutput(WordUnzipHandlerOutput wordUnzipHandlerOutput) {
+        this.wordUnzipHandlerOutput = wordUnzipHandlerOutput;
     }
 
     public List<String> getMarkdownParentPath() {

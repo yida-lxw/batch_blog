@@ -26,7 +26,7 @@ public class WordUnzipHandlerTest {
         ZipArchiverFileFilter zipArchiverFileFilter = new ZipArchiverFileFilter();
         DocxFilenameFilter docxFilenameFilter = new DocxFilenameFilter();
 
-        WordFilterHandlerInput wordFilterHandlerInput = new WordFilterHandlerInput(blogBasePath, blogSendDate);
+        WordFilterHandlerInput wordFilterHandlerInput = new WordFilterHandlerInput();
         WordFilterHandlerOutput wordFilterHandlerOutput = new WordFilterHandlerOutput();
         WordFilterHandler wordFilterHandler = new WordFilterHandler(docxFilenameFilter);
         wordFilterHandler.handle(wordFilterHandlerInput, wordFilterHandlerOutput);
@@ -35,10 +35,9 @@ public class WordUnzipHandlerTest {
 
 
         Word2MarkdownHandlerInput word2MarkdownHandlerInput = new Word2MarkdownHandlerInput();
-        word2MarkdownHandlerInput.setPandocHome(pandocPath);
         word2MarkdownHandlerInput.setWordFilesName(wordFilterHandlerOutput.getWordFilesPath());
         Word2MarkdownHandlerOutput word2MarkdownHandlerOutput = new Word2MarkdownHandlerOutput();
-        Word2MarkdownHandler word2MarkdownHandler = new Word2MarkdownHandler();
+        Word2MarkdownHandler word2MarkdownHandler = new Word2MarkdownHandler(wordFilterHandler);
         word2MarkdownHandler.handle(word2MarkdownHandlerInput, word2MarkdownHandlerOutput);
         System.out.println(word2MarkdownHandlerOutput);
 
@@ -46,7 +45,7 @@ public class WordUnzipHandlerTest {
         WordUnzipHandlerInput wordUnzipHandlerInput = new WordUnzipHandlerInput();
         wordUnzipHandlerInput.setWordFilesName(wordFilterHandlerOutput.getWordFilesPath());
         WordUnzipHandlerOutput wordUnzipHandlerOutput = new WordUnzipHandlerOutput();
-        WordUnzipHandler wordUnzipHandler = new WordUnzipHandler(zipArchiverFileFilter);
+        WordUnzipHandler wordUnzipHandler = new WordUnzipHandler(wordFilterHandler, zipArchiverFileFilter);
         wordUnzipHandler.handle(wordUnzipHandlerInput, wordUnzipHandlerOutput);
         System.out.println(wordUnzipHandlerOutput);
     }

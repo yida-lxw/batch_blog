@@ -24,7 +24,7 @@ public class Word2MarkdownHandlerTest {
         ZipArchiverFileFilter zipArchiverFileFilter = new ZipArchiverFileFilter();
         DocxFilenameFilter docxFilenameFilter = new DocxFilenameFilter();
 
-        WordFilterHandlerInput wordFilterHandlerInput = new WordFilterHandlerInput(blogBasePath, blogSendDate);
+        WordFilterHandlerInput wordFilterHandlerInput = new WordFilterHandlerInput();
         WordFilterHandlerOutput wordFilterHandlerOutput = new WordFilterHandlerOutput();
         WordFilterHandler wordFilterHandler = new WordFilterHandler(docxFilenameFilter);
         wordFilterHandler.handle(wordFilterHandlerInput, wordFilterHandlerOutput);
@@ -33,10 +33,9 @@ public class Word2MarkdownHandlerTest {
 
 
         Word2MarkdownHandlerInput word2MarkdownHandlerInput = new Word2MarkdownHandlerInput();
-        word2MarkdownHandlerInput.setPandocHome(pandocPath);
         word2MarkdownHandlerInput.setWordFilesName(wordFilterHandlerOutput.getWordFilesPath());
         Word2MarkdownHandlerOutput word2MarkdownHandlerOutput = new Word2MarkdownHandlerOutput();
-        Word2MarkdownHandler word2MarkdownHandler = new Word2MarkdownHandler();
+        Word2MarkdownHandler word2MarkdownHandler = new Word2MarkdownHandler(wordFilterHandler);
         word2MarkdownHandler.handle(word2MarkdownHandlerInput, word2MarkdownHandlerOutput);
         System.out.println(word2MarkdownHandlerOutput);
 
