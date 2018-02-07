@@ -17,8 +17,8 @@ import java.util.List;
 public class WordUnzipHandler implements Handler<WordUnzipHandlerInput, WordUnzipHandlerOutput> {
     private ZipArchiverFileFilter zipArchiverFileFilter;
 
-    public WordUnzipHandler() {
-        this.zipArchiverFileFilter = new ZipArchiverFileFilter();
+    public WordUnzipHandler(ZipArchiverFileFilter zipArchiverFileFilter) {
+        this.zipArchiverFileFilter = zipArchiverFileFilter;
     }
 
     @Override
