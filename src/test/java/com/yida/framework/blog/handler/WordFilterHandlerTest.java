@@ -1,6 +1,5 @@
-package com.yida.framework.blog;
+package com.yida.framework.blog.handler;
 
-import com.yida.framework.blog.handler.WordFilterHandler;
 import com.yida.framework.blog.handler.input.WordFilterHandlerInput;
 import com.yida.framework.blog.handler.output.WordFilterHandlerOutput;
 import com.yida.framework.blog.utils.io.DocxFilenameFilter;
@@ -27,7 +26,7 @@ public class WordFilterHandlerTest {
         WordFilterHandlerOutput wordFilterHandlerOutput = new WordFilterHandlerOutput();
         WordFilterHandler wordFilterHandler = new WordFilterHandler(docxFilenameFilter);
         wordFilterHandler.handle(wordFilterHandlerInput, wordFilterHandlerOutput);
-
+        //打印结果
         System.out.println(wordFilterHandlerOutput);
     }
 }
