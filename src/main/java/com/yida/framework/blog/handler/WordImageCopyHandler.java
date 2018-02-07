@@ -21,9 +21,9 @@ public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, 
     private ImageFilenameFilter imageFilenameFilter;
     private MarkdownFilenameFilter markdownFilenameFilter;
 
-    public WordImageCopyHandler() {
-        this.imageFilenameFilter = new ImageFilenameFilter();
-        this.markdownFilenameFilter = new MarkdownFilenameFilter();
+    public WordImageCopyHandler(ImageFilenameFilter imageFilenameFilter, MarkdownFilenameFilter markdownFilenameFilter) {
+        this.imageFilenameFilter = imageFilenameFilter;
+        this.markdownFilenameFilter = markdownFilenameFilter;
     }
 
     @Override
@@ -37,8 +37,12 @@ public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, 
             String imagesNewPath = null;
             String[] images = null;
             for (String unzipFilePath : unzipFilePaths) {
-                file = new File(unzipFilePath);
+                if (!unzipFilePath.endsWith("/")) {
+                    unzipFilePath = unzipFilePath + "/";
+                }
+                file = new File(unzipFilePath + input.WORD_IMAGE_PATH);
                 if (!file.exists() || !file.isDirectory()) {
+                    FileUtil.deleteDirs(unzipFilePath);
                     continue;
                 }
                 images = file.list(this.imageFilenameFilter);
@@ -48,10 +52,10 @@ public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, 
                     }
                 }
 
+                //图片实际需要复制到的新路径
+                imagesNewPath = unzipFilePath + output.MD_IMAGE_BASEPATH;
                 if (null != images && images.length > 0) {
                     imagesPerMarkdown = new ArrayList<String>();
-                    //图片实际需要复制到的新路径
-                    imagesNewPath = unzipFilePath + output.MD_IMAGE_BASEPATH;
                     //解压后图片的实际路径
                     actualImagePath = unzipFilePath + input.WORD_IMAGE_PATH;
                     for (String imageFileName : images) {

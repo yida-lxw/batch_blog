@@ -12,8 +12,10 @@ public class ImageFilenameFilter implements FilenameFilter {
     @Override
     public boolean accept(File dir, String name) {
         name = name.toLowerCase();
-        if (name.endsWith(".png") || name.endsWith(".jpg")
-                || name.endsWith(".jpeg") || name.endsWith(".gif")) {
+        if (name.endsWith(".png") || name.endsWith(".PNG") ||
+                name.endsWith(".jpg") || name.endsWith(".JPG") ||
+                name.endsWith(".jpeg") || name.endsWith(".JPEG") ||
+                name.endsWith(".gif") || name.endsWith(".GIF")) {
             return new File(dir + "/" + name).isFile();
         }
         return false;
