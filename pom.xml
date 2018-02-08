@@ -33,6 +33,7 @@
 
 
 	<dependencies>
+		<!-- HttpClient begin -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -50,17 +51,25 @@
 			<artifactId>httpclient-cache</artifactId>
 			<version>${httpclient.version}</version>
 		</dependency>
+		<!-- HttpClient end -->
 
+		<!-- JGit begin -->
 		<dependency>
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>4.10.0.201712302008-r</version>
 		</dependency>
+		<!-- JGit end -->
+
+		<!-- FastJSON begin -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>1.2.44</version>
 		</dependency>
+		<!-- FastJSON end -->
+
+		<!-- LOG begin -->
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
@@ -71,14 +80,16 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.5</version>
 		</dependency>
+		<!-- LOG end -->
 
-
+		<!-- JUnit begin -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- JUnit end -->
 	</dependencies>
 
 	<build>
