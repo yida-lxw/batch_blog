@@ -188,6 +188,4 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
         sslContext.init(null, new TrustManager[]{trustManager}, null);
         return sslContext;
     }
-
-
 }
