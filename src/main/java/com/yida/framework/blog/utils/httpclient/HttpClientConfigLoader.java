@@ -163,4 +163,8 @@ public class HttpClientConfigLoader {
         }
         return Arrays.asList(array);
     }
+
+    public static Map<String, Object> getConfigMap() {
+        return configMap;
+    }
 }
