@@ -37,13 +37,16 @@ public class HttpClientUtil {
     /**
      * Post方式提交表单
      *
-     * @param url             Post提交的请求URL地址
-     * @param formParams      表单提交参数
-     * @param headers         请求头信息
-     * @param contentEncoding 请求体内容的字符编码
+     * @param url                     Post提交的请求URL地址
+     * @param formParams              表单提交参数
+     * @param headers                 请求头信息
+     * @param contentEncoding         响应体内容的字符编码,默认为UTF-8
+     * @param responseContentType     响应体内容的MIME类型,默认为text/html
+     * @param formEncoding            请求参数的编码字符集,默认为UTF-8
      * @return
      */
-    public static String postForm(String url, Map<String, String> formParams, Map<String, String> headers, String contentEncoding) {
+    public static String postForm(String url, Map<String, String> formParams, Map<String, String> headers,
+                                  String contentEncoding, String responseContentType, String formEncoding) {
         //Get HttpClient instance
         CloseableHttpClient closeHttpClient = getHttpClient();
         CloseableHttpResponse httpResponse = null;
@@ -66,8 +69,8 @@ public class HttpClientUtil {
 
             try {
                 httpPost.setEntity(new UrlEncodedFormEntity(params,
-                        (null == contentEncoding || "".equals(contentEncoding)) ?
-                                StandardCharsets.UTF_8.displayName() : contentEncoding));
+                        (null == formEncoding || "".equals(formEncoding)) ?
+                                StandardCharsets.UTF_8.displayName() : formEncoding));
             } catch (UnsupportedEncodingException e) {
                 log.error("An exception occurs when we encoding the form parameter:\n{}", e.getMessage());
             }
@@ -82,7 +85,10 @@ public class HttpClientUtil {
                 if (instream == null) {
                     return null;
                 } else {
-                    ContentType contentType = ContentType.create("text/html", contentEncoding);
+                    ContentType contentType = ContentType.create(
+                            (null == responseContentType || "".equals(responseContentType)) ? "text/html" : responseContentType,
+                            (null == contentEncoding || "".equals(contentEncoding)) ?
+                                    StandardCharsets.UTF_8.displayName() : contentEncoding);
                     try {
                         Args.check(httpEntity.getContentLength() <= 2147483647L, "HTTP entity too large to be buffered in memory");
                         int capacity = (int) httpEntity.getContentLength();
@@ -130,6 +136,117 @@ public class HttpClientUtil {
     }
 
     /**
+     * Post方式提交表单
+     *
+     * @param url                 Post提交的请求URL地址
+     * @param formParams          表单提交参数
+     * @param headers             请求头信息
+     * @param contentEncoding     响应体内容的字符编码,默认为UTF-8
+     * @param responseContentType 响应体内容的MIME类型,默认为text/html
+     * @return
+     */
+    public static String postForm(String url, Map<String, String> formParams, Map<String, String> headers,
+                                  String contentEncoding, String responseContentType) {
+        return postForm(url, formParams, headers, contentEncoding, responseContentType, null);
+    }
+
+    /**
+     * Post方式提交表单
+     *
+     * @param url             Post提交的请求URL地址
+     * @param formParams      表单提交参数
+     * @param headers         请求头信息
+     * @param contentEncoding 响应体内容的字符编码,默认为UTF-8
+     * @return
+     */
+    public static String postForm(String url, Map<String, String> formParams, Map<String, String> headers,
+                                  String contentEncoding) {
+        return postForm(url, formParams, headers, contentEncoding, null, null);
+    }
+
+    /**
+     * Post方式提交表单
+     *
+     * @param url        Post提交的请求URL地址
+     * @param formParams 表单提交参数
+     * @param headers    请求头信息
+     * @return
+     */
+    public static String postForm(String url, Map<String, String> formParams, Map<String, String> headers) {
+        return postForm(url, formParams, headers, null, null, null);
+    }
+
+    /**
+     * Post方式提交表单
+     *
+     * @param url                 Post提交的请求URL地址
+     * @param formParams          表单提交参数
+     * @param contentEncoding     响应体内容的字符编码,默认为UTF-8
+     * @param responseContentType 响应体内容的MIME类型,默认为text/html
+     * @return
+     */
+    public static String postForm(String url, Map<String, String> formParams, String contentEncoding, String responseContentType) {
+        return postForm(url, formParams, null, contentEncoding, responseContentType, null);
+    }
+
+    /**
+     * Post方式提交表单
+     *
+     * @param url             Post提交的请求URL地址
+     * @param formParams      表单提交参数
+     * @param contentEncoding 响应体内容的字符编码,默认为UTF-8
+     * @return
+     */
+    public static String postForm(String url, Map<String, String> formParams, String contentEncoding) {
+        return postForm(url, formParams, null, contentEncoding, null, null);
+    }
+
+    /**
+     * Post方式提交表单
+     *
+     * @param url        Post提交的请求URL地址
+     * @param formParams 表单提交参数
+     * @return
+     */
+    public static String postForm(String url, Map<String, String> formParams) {
+        return postForm(url, formParams, null, null, null, null);
+    }
+
+    /**
+     * Post方式提交表单
+     *
+     * @param url                 Post提交的请求URL地址
+     * @param contentEncoding     响应体内容的字符编码,默认为UTF-8
+     * @param responseContentType 响应体内容的MIME类型,默认为text/html
+     * @return
+     */
+    public static String postForm(String url, String contentEncoding, String responseContentType) {
+        return postForm(url, null, null, contentEncoding, responseContentType, null);
+    }
+
+    /**
+     * Post方式提交表单
+     *
+     * @param url             Post提交的请求URL地址
+     * @param contentEncoding 响应体内容的字符编码,默认为UTF-8
+     * @return
+     */
+    public static String postForm(String url, String contentEncoding) {
+        return postForm(url, null, null, contentEncoding, null, null);
+    }
+
+    /**
+     * Post方式提交表单
+     *
+     * @param url Post提交的请求URL地址
+     * @return
+     */
+    public static String postForm(String url) {
+        return postForm(url, null, null, null, null, null);
+    }
+
+
+    /**
      * 获取HttpClient实例对象,内部使用了单例模式,不会重复创建
      *
      * @return
@@ -163,7 +280,7 @@ public class HttpClientUtil {
         return returnVal;
     }
 
-    /**
+    /** Post Json Parameters
      * StringEntity content=new StringEntity(data, Charset.forName("utf-8"));// 设置编码
      content.setContentType("application/json; charset=UTF-8");
      content.setContentEncoding("utf-8");
