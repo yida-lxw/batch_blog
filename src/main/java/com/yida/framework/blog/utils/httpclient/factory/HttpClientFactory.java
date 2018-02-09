@@ -164,6 +164,10 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
         this.httpClient = httpClientBuilder.build();
     }
 
+    public CloseableHttpClient getHttpClient() {
+        return httpClient;
+    }
+
     public SSLContext createIgnoreVerifySSL() throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sslContext = SSLContext.getInstance(this.clientConfig.getHttpSslProtocolVersion());
         // 实现一个X509TrustManager接口，用于绕过验证
