@@ -158,8 +158,10 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
         //Http Proxy Config
         String proxyHostName = this.clientConfig.getProxyHostName();
         if (null != proxyHostName && !"".equals(proxyHostName)) {
-            httpClientBuilder = (CachingHttpClientBuilder) httpClientBuilder.setProxy(new HttpHost(this.clientConfig.getProxyHostName(),
-                    this.clientConfig.getProxyPort(), this.getClientConfig().getProxySchema()));
+            httpClientBuilder = (CachingHttpClientBuilder) httpClientBuilder.setProxy(
+                    new HttpHost(proxyHostName,
+                            this.clientConfig.getProxyPort(),
+                            this.getClientConfig().getProxySchema()));
         }
         this.httpClient = httpClientBuilder.build();
     }
