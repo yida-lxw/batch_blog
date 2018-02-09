@@ -6,8 +6,6 @@ package com.yida.framework.blog.utils.httpclient;
  * @Description HttpClient相关配置
  */
 public class HttpClientConfig {
-
-
     //Keys
     private static final String HTTP_USER_AGENT = "http.user_agent";
     private static final String HTTP_ACCEPT_CHARSET = "http.accept.charset";
@@ -36,6 +34,13 @@ public class HttpClientConfig {
     private static final String SOCKET_TIMEOUT = "socket.timeout";
     private static final String SOCKET_RECEIVE_BUFFER_SIZE = "socket.receive.buffer.size";
     private static final String SOCKET_SEND_BUFFER_SIZE = "socket.send.buffer.size";
+    private static final String CACHE_ENTRY_MAX_SIZE = "cache.entry.max.size";
+    private static final String CACHE_OBJECT_MAX_SIZE = "cache.object.max.size";
+    private static final String CACHE_UPDATE_RETRY_MAX_TIMES = "cache.update.retry.max.times";
+    private static final String CACHE_SHARED_ENABLED = "cache.shared.enable";
+    private static final String CACHE_ASYN_WORKER_IDLE_LIFETIME = "cache.asyn.worker.idle.lifetime";
+    private static final String CACHE_ASYN_WORKER_CORE_SIZE = "cache.asyn.worker.idle.lifetime";
+
     //Default values
     private static final String DEFAULT_HTTP_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36";
     private static final String DEFAULT_HTTP_ACCEPT_CHARSET = "utf8,gbk,gb2312,iso-8859-1";
@@ -44,25 +49,32 @@ public class HttpClientConfig {
     private static final String DEFAULT_HTTP_ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
     private static final String DEFAULT_HTTP_CACHE_CONTROL = "max-age=0";
     private static final String DEFAULT_HTTP_CONNECTION = "keep-alive";
-    private static final int DEFAULT_HTTP_CONNECTION_REQUEST_TIMEOUT = 3000;
-    private static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 5000;
-    private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 10000;
-    private static final boolean DEFAULT_HTTP_REDIRECTS_ENABLED = true;
+    private static final Integer DEFAULT_HTTP_CONNECTION_REQUEST_TIMEOUT = 3000;
+    private static final Integer DEFAULT_HTTP_CONNECT_TIMEOUT = 5000;
+    private static final Integer DEFAULT_HTTP_SOCKET_TIMEOUT = 10000;
+    private static final Boolean DEFAULT_HTTP_REDIRECTS_ENABLED = true;
     private static final String DEFAULT_HTTP_SSL_PROTOCOL_VERSION = "SSLv3";
-    private static final int DEFAULT_HTTP_CONNECTION_BUFFER_SIZE = 16384;
-    private static final int DEFAULT_HTTP_CONNECTION_POOL_MAX_TOTAL = 100;
-    private static final int DEFAULT_HTTP_CONNECTION_POOL_MAX_PER_ROUTE = 10;
-    private static final int DEFAULT_HTTP_CONNECTION_TIME_TO_LIVE = 1200000;
-    private static final int DEFAULT_HTTP_CONNECTION_POOL_VALIDATE_AFTER_INACTIVITY = 200;
-    private static final boolean DEFAULT_HTTP_STATE_CONNECTION_CHECK_ENABLED = true;
-    private static final boolean DEFAULT_SOCKET_ADDRESS_REUSE = false;
-    private static final int DEFAULT_SOCKET_LINGER = -1;
-    private static final boolean DEFAULT_SOCKET_KEEP_ALIVE = true;
-    private static final boolean DEFAULT_SOCKET_TCP_NODELAY = true;
-    private static final int DEFAULT_SOCKET_BACKLOG_SIZE = 2048;
-    private static final int DEFAULT_SOCKET_TIMEOUT = 20000;
-    private static final int DEFAULT_SOCKET_RECEIVE_BUFFER_SIZE = 32768;
-    private static final int DEFAULT_SOCKET_SEND_BUFFER_SIZE = 32768;
+    private static final Integer DEFAULT_HTTP_CONNECTION_BUFFER_SIZE = 16384;
+    private static final Integer DEFAULT_HTTP_CONNECTION_POOL_MAX_TOTAL = 100;
+    private static final Integer DEFAULT_HTTP_CONNECTION_POOL_MAX_PER_ROUTE = 10;
+    private static final Integer DEFAULT_HTTP_CONNECTION_TIME_TO_LIVE = 1200000;
+    private static final Integer DEFAULT_HTTP_CONNECTION_POOL_VALIDATE_AFTER_INACTIVITY = 200;
+    private static final Boolean DEFAULT_HTTP_STATE_CONNECTION_CHECK_ENABLED = true;
+    private static final Boolean DEFAULT_SOCKET_ADDRESS_REUSE = false;
+    private static final Integer DEFAULT_SOCKET_LINGER = -1;
+    private static final Boolean DEFAULT_SOCKET_KEEP_ALIVE = true;
+    private static final Boolean DEFAULT_SOCKET_TCP_NODELAY = true;
+    private static final Integer DEFAULT_SOCKET_BACKLOG_SIZE = 2048;
+    private static final Integer DEFAULT_SOCKET_TIMEOUT = 20000;
+    private static final Integer DEFAULT_SOCKET_RECEIVE_BUFFER_SIZE = 32768;
+    private static final Integer DEFAULT_SOCKET_SEND_BUFFER_SIZE = 32768;
+    private static final Integer DEFAULT_CACHE_ENTRY_MAX_SIZE = 1024;
+    private static final Integer DEFAULT_CACHE_OBJECT_MAX_SIZE = 8192;
+    private static final Integer DEFAULT_CACHE_UPDATE_RETRY_MAX_TIMES = 5;
+    private static final Boolean DEFAULT_CACHE_SHARED_ENABLED = false;
+    private static final Integer DEFAULT_CACHE_ASYN_WORKER_IDLE_LIFETIME = 30;
+    private static final Integer DEFAULT_CACHE_ASYN_WORKER_CORE_SIZE = 20;
+
     private String httpUserAgent;
     private String httpAcceptCharset;
     private String httpAcceptLanguage;
@@ -71,25 +83,30 @@ public class HttpClientConfig {
     private String httpAccept;
     private String httpCacheControl;
     private String httpConnection;
-    private int httpConnectionRequestTimeout;
-    private int httpConnectTimeout;
-    private int httpSocketTimeout;
-    private boolean httpRedirectsEnabled;
+    private Integer httpConnectionRequestTimeout;
+    private Integer httpConnectTimeout;
+    private Integer httpSocketTimeout;
+    private Boolean httpRedirectsEnabled;
     private String httpSslProtocolVersion;
-    private int httpConnectionBufferSize;
-    private int httpConnectionPoolMaxTotal;
-    private int httpConnectionPoolMaxPerRoute;
-    private int httpConnectionTimeToLive;
-    private int httpConnectionPoolValidateAfterInactivity;
-    private boolean httpStaleConnectionCheckEnabled;
-    private boolean socketAddressReuse;
-    private int socketLinger;
-    private boolean socketKeepAlive;
-    private boolean socketTcpNodelay;
-    private int socketBacklogSize;
-    private int socketTimeout;
-    private int socketReceiveBufferSize;
-    private int socketSendBufferSize;
+    private Integer httpConnectionBufferSize;
+    private Integer httpConnectionPoolMaxTotal;
+    private Integer httpConnectionPoolMaxPerRoute;
+    private Integer httpConnectionTimeToLive;
+    private Integer httpConnectionPoolValidateAfterInactivity;
+    private Boolean httpStaleConnectionCheckEnabled;
+    private Boolean socketAddressReuse;
+    private Integer socketLinger;
+    private Boolean socketKeepAlive;
+    private Boolean socketTcpNodelay;
+    private Integer socketBacklogSize;
+    private Integer socketTimeout;
+    private Integer socketReceiveBufferSize;
+    private Integer socketSendBufferSize;
+    private Integer cacheEntryMaxSize;
+    private Integer cacheObjectMaxSize;
+    private Boolean cacheSharedEnabled;
+    private Integer cacheAsynWorkerIdleLifetime;
+    private Integer cacheAsynWorkerCoreSize;
 
     private HttpClientConfig() {
         initialize();
@@ -130,6 +147,17 @@ public class HttpClientConfig {
         this.socketTimeout = HttpClientConfigLoader.getIntProperty(SOCKET_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
         this.socketReceiveBufferSize = HttpClientConfigLoader.getIntProperty(SOCKET_RECEIVE_BUFFER_SIZE, DEFAULT_SOCKET_RECEIVE_BUFFER_SIZE);
         this.socketSendBufferSize = HttpClientConfigLoader.getIntProperty(SOCKET_SEND_BUFFER_SIZE, DEFAULT_SOCKET_SEND_BUFFER_SIZE);
+
+        //Http Cache Configuration
+        this.cacheEntryMaxSize = HttpClientConfigLoader.getIntProperty(CACHE_ENTRY_MAX_SIZE, DEFAULT_CACHE_ENTRY_MAX_SIZE);
+        this.cacheObjectMaxSize = HttpClientConfigLoader.getIntProperty(CACHE_OBJECT_MAX_SIZE, DEFAULT_CACHE_OBJECT_MAX_SIZE);
+        this.cacheSharedEnabled = HttpClientConfigLoader.getBooleanProperty(CACHE_SHARED_ENABLED, DEFAULT_CACHE_SHARED_ENABLED);
+        this.cacheAsynWorkerIdleLifetime = HttpClientConfigLoader.getIntProperty(CACHE_ASYN_WORKER_IDLE_LIFETIME, DEFAULT_CACHE_ASYN_WORKER_IDLE_LIFETIME);
+        this.cacheAsynWorkerCoreSize = HttpClientConfigLoader.getIntProperty(CACHE_ASYN_WORKER_CORE_SIZE, DEFAULT_CACHE_ASYN_WORKER_CORE_SIZE);
+    }
+
+    public Integer getHttpConnectionRequestTimeout() {
+        return httpConnectionRequestTimeout;
     }
 
     public String getHttpUserAgent() {
@@ -196,36 +224,36 @@ public class HttpClientConfig {
         this.httpConnection = httpConnection;
     }
 
-    public int getHttpConnectionRequestTimeout() {
-        return httpConnectionRequestTimeout;
-    }
-
-    public void setHttpConnectionRequestTimeout(int httpConnectionRequestTimeout) {
+    public void setHttpConnectionRequestTimeout(Integer httpConnectionRequestTimeout) {
         this.httpConnectionRequestTimeout = httpConnectionRequestTimeout;
     }
 
-    public int getHttpConnectTimeout() {
+    public Integer getHttpConnectTimeout() {
         return httpConnectTimeout;
     }
 
-    public void setHttpConnectTimeout(int httpConnectTimeout) {
+    public void setHttpConnectTimeout(Integer httpConnectTimeout) {
         this.httpConnectTimeout = httpConnectTimeout;
     }
 
-    public int getHttpSocketTimeout() {
+    public Integer getHttpSocketTimeout() {
         return httpSocketTimeout;
     }
 
-    public void setHttpSocketTimeout(int httpSocketTimeout) {
+    public void setHttpSocketTimeout(Integer httpSocketTimeout) {
         this.httpSocketTimeout = httpSocketTimeout;
     }
 
-    public boolean isHttpRedirectsEnabled() {
+    public Boolean getHttpRedirectsEnabled() {
         return httpRedirectsEnabled;
     }
 
-    public void setHttpRedirectsEnabled(boolean httpRedirectsEnabled) {
+    public void setHttpRedirectsEnabled(Boolean httpRedirectsEnabled) {
         this.httpRedirectsEnabled = httpRedirectsEnabled;
+    }
+
+    public Integer getHttpConnectionBufferSize() {
+        return httpConnectionBufferSize;
     }
 
     public String getHttpSslProtocolVersion() {
@@ -236,116 +264,152 @@ public class HttpClientConfig {
         this.httpSslProtocolVersion = httpSslProtocolVersion;
     }
 
-    public int getHttpConnectionBufferSize() {
-        return httpConnectionBufferSize;
-    }
-
-    public void setHttpConnectionBufferSize(int httpConnectionBufferSize) {
+    public void setHttpConnectionBufferSize(Integer httpConnectionBufferSize) {
         this.httpConnectionBufferSize = httpConnectionBufferSize;
     }
 
-    public int getHttpConnectionPoolMaxTotal() {
+    public Integer getHttpConnectionPoolMaxTotal() {
         return httpConnectionPoolMaxTotal;
     }
 
-    public void setHttpConnectionPoolMaxTotal(int httpConnectionPoolMaxTotal) {
+    public void setHttpConnectionPoolMaxTotal(Integer httpConnectionPoolMaxTotal) {
         this.httpConnectionPoolMaxTotal = httpConnectionPoolMaxTotal;
     }
 
-    public int getHttpConnectionPoolMaxPerRoute() {
+    public Integer getHttpConnectionPoolMaxPerRoute() {
         return httpConnectionPoolMaxPerRoute;
     }
 
-    public void setHttpConnectionPoolMaxPerRoute(int httpConnectionPoolMaxPerRoute) {
+    public void setHttpConnectionPoolMaxPerRoute(Integer httpConnectionPoolMaxPerRoute) {
         this.httpConnectionPoolMaxPerRoute = httpConnectionPoolMaxPerRoute;
     }
 
-    public int getHttpConnectionTimeToLive() {
+    public Integer getHttpConnectionTimeToLive() {
         return httpConnectionTimeToLive;
     }
 
-    public void setHttpConnectionTimeToLive(int httpConnectionTimeToLive) {
+    public void setHttpConnectionTimeToLive(Integer httpConnectionTimeToLive) {
         this.httpConnectionTimeToLive = httpConnectionTimeToLive;
     }
 
-    public int getHttpConnectionPoolValidateAfterInactivity() {
+    public Integer getHttpConnectionPoolValidateAfterInactivity() {
         return httpConnectionPoolValidateAfterInactivity;
     }
 
-    public void setHttpConnectionPoolValidateAfterInactivity(int httpConnectionPoolValidateAfterInactivity) {
+    public void setHttpConnectionPoolValidateAfterInactivity(Integer httpConnectionPoolValidateAfterInactivity) {
         this.httpConnectionPoolValidateAfterInactivity = httpConnectionPoolValidateAfterInactivity;
     }
 
-    public boolean isHttpStaleConnectionCheckEnabled() {
+    public Boolean getHttpStaleConnectionCheckEnabled() {
         return httpStaleConnectionCheckEnabled;
     }
 
-    public void setHttpStaleConnectionCheckEnabled(boolean httpStaleConnectionCheckEnabled) {
+    public void setHttpStaleConnectionCheckEnabled(Boolean httpStaleConnectionCheckEnabled) {
         this.httpStaleConnectionCheckEnabled = httpStaleConnectionCheckEnabled;
     }
 
-    public boolean isSocketAddressReuse() {
+    public Boolean getSocketAddressReuse() {
         return socketAddressReuse;
     }
 
-    public void setSocketAddressReuse(boolean socketAddressReuse) {
+    public void setSocketAddressReuse(Boolean socketAddressReuse) {
         this.socketAddressReuse = socketAddressReuse;
     }
 
-    public int getSocketLinger() {
+    public Integer getSocketLinger() {
         return socketLinger;
     }
 
-    public void setSocketLinger(int socketLinger) {
+    public void setSocketLinger(Integer socketLinger) {
         this.socketLinger = socketLinger;
     }
 
-    public boolean isSocketKeepAlive() {
+    public Boolean getSocketKeepAlive() {
         return socketKeepAlive;
     }
 
-    public void setSocketKeepAlive(boolean socketKeepAlive) {
+    public void setSocketKeepAlive(Boolean socketKeepAlive) {
         this.socketKeepAlive = socketKeepAlive;
     }
 
-    public boolean isSocketTcpNodelay() {
+    public Boolean getSocketTcpNodelay() {
         return socketTcpNodelay;
     }
 
-    public void setSocketTcpNodelay(boolean socketTcpNodelay) {
+    public void setSocketTcpNodelay(Boolean socketTcpNodelay) {
         this.socketTcpNodelay = socketTcpNodelay;
     }
 
-    public int getSocketBacklogSize() {
+    public Integer getSocketBacklogSize() {
         return socketBacklogSize;
     }
 
-    public void setSocketBacklogSize(int socketBacklogSize) {
+    public void setSocketBacklogSize(Integer socketBacklogSize) {
         this.socketBacklogSize = socketBacklogSize;
     }
 
-    public int getSocketTimeout() {
+    public Integer getSocketTimeout() {
         return socketTimeout;
     }
 
-    public void setSocketTimeout(int socketTimeout) {
+    public void setSocketTimeout(Integer socketTimeout) {
         this.socketTimeout = socketTimeout;
     }
 
-    public int getSocketReceiveBufferSize() {
+    public Integer getSocketReceiveBufferSize() {
         return socketReceiveBufferSize;
     }
 
-    public void setSocketReceiveBufferSize(int socketReceiveBufferSize) {
+    public void setSocketReceiveBufferSize(Integer socketReceiveBufferSize) {
         this.socketReceiveBufferSize = socketReceiveBufferSize;
     }
 
-    public int getSocketSendBufferSize() {
+    public Integer getSocketSendBufferSize() {
         return socketSendBufferSize;
     }
 
-    public void setSocketSendBufferSize(int socketSendBufferSize) {
+    public void setSocketSendBufferSize(Integer socketSendBufferSize) {
         this.socketSendBufferSize = socketSendBufferSize;
+    }
+
+    public Integer getCacheEntryMaxSize() {
+        return cacheEntryMaxSize;
+    }
+
+    public void setCacheEntryMaxSize(Integer cacheEntryMaxSize) {
+        this.cacheEntryMaxSize = cacheEntryMaxSize;
+    }
+
+    public Integer getCacheObjectMaxSize() {
+        return cacheObjectMaxSize;
+    }
+
+    public void setCacheObjectMaxSize(Integer cacheObjectMaxSize) {
+        this.cacheObjectMaxSize = cacheObjectMaxSize;
+    }
+
+    public Boolean getCacheSharedEnabled() {
+        return cacheSharedEnabled;
+    }
+
+    public void setCacheSharedEnabled(Boolean cacheSharedEnabled) {
+        this.cacheSharedEnabled = cacheSharedEnabled;
+    }
+
+    public Integer getCacheAsynWorkerIdleLifetime() {
+        return cacheAsynWorkerIdleLifetime;
+    }
+
+    public void setCacheAsynWorkerIdleLifetime(Integer cacheAsynWorkerIdleLifetime) {
+        this.cacheAsynWorkerIdleLifetime = cacheAsynWorkerIdleLifetime;
+    }
+
+    public Integer getCacheAsynWorkerCoreSize() {
+        return cacheAsynWorkerCoreSize;
+    }
+
+    public void setCacheAsynWorkerCoreSize(Integer cacheAsynWorkerCoreSize) {
+        this.cacheAsynWorkerCoreSize = cacheAsynWorkerCoreSize;
     }
 
     private static class SingletonHolder {
