@@ -48,9 +48,7 @@ public class HttpClientConfig {
     private static final String CACHE_ASYN_WORKER_CORE_SIZE = "cache.asyn.worker.core.size";
     private static final String PROXY_SCHEMA = "proxy.schema";
     private static final String CACHE_FOR_HTTP_ENABLED = "cache.for.http.enabled";
-    private static final Integer DEFAULT_HTTP_REDIRECT_MAX_TIMES = 2;
-    private static final Boolean DEFAULT_HTTP_SSL_VERIFY_IGNORE = true;
-    private static final Long DEFAULT_HTTP_CONNECTION_TIME_TO_LIVE = 1200000L;
+
 
 
 
@@ -58,7 +56,7 @@ public class HttpClientConfig {
     private static final String DEFAULT_HTTP_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36";
     private static final String DEFAULT_HTTP_ACCEPT_CHARSET = "utf8,gbk,gb2312,iso-8859-1";
     private static final String DEFAULT_HTTP_ACCEPT_LANGUAGE = "zh-CN,zh;q=0.6, en-US;q=0.3, *;q=0.1";
-    private static final String DEFAULT_HTTP_ACCEPT_ENCODING = "gzip, deflate, br";
+    private static final String DEFAULT_HTTP_ACCEPT_ENCODING = null;
     private static final String DEFAULT_HTTP_ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
     private static final String DEFAULT_HTTP_CACHE_CONTROL = "max-age=0";
     private static final String DEFAULT_HTTP_CONNECTION = "keep-alive";
@@ -91,6 +89,12 @@ public class HttpClientConfig {
     private static final Integer DEFAULT_CACHE_ASYN_WORKER_CORE_SIZE = 20;
     private static final String DEFAULT_PROXY_SCHEMA = "http";
     private static final Boolean DEFAULT_CACHE_FOR_HTTP_ENABLED = true;
+    private static final Integer DEFAULT_HTTP_REDIRECT_MAX_TIMES = 5;
+    private static final Boolean DEFAULT_HTTP_SSL_VERIFY_IGNORE = true;
+    private static final Long DEFAULT_HTTP_CONNECTION_TIME_TO_LIVE = 1200000L;
+
+
+
     private Integer httpRedirectMaxTimes;
     private Boolean httpSslVerifyIgnore;
     private Long httpConnectionTimeToLive;

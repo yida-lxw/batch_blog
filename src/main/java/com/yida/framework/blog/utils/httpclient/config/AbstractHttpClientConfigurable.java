@@ -8,6 +8,10 @@ package com.yida.framework.blog.utils.httpclient.config;
 public abstract class AbstractHttpClientConfigurable implements HttpClientConfigurable {
     protected HttpClientConfig clientConfig;
 
+    public AbstractHttpClientConfigurable() {
+        initConfig();
+    }
+
     @Override
     public HttpClientConfig initConfig() {
         this.clientConfig = HttpClientConfig.getInstance();

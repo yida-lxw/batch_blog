@@ -109,12 +109,14 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
 
         Collection<Header> defaultHeaders = new ArrayList<>();
         defaultHeaders.add(new BasicHeader("Accept", this.clientConfig.getHttpAccept()));
-        defaultHeaders.add(new BasicHeader("Accept-Encoding", this.clientConfig.getHttpAcceptEncoding()));
         defaultHeaders.add(new BasicHeader("Accept-Charset", this.clientConfig.getHttpAcceptCharset()));
         defaultHeaders.add(new BasicHeader("Accept-Language", this.clientConfig.getHttpAcceptLanguage()));
         defaultHeaders.add(new BasicHeader("Cache-Control", this.clientConfig.getHttpCacheControl()));
         defaultHeaders.add(new BasicHeader("Connection", this.clientConfig.getHttpConnection()));
         defaultHeaders.add(new BasicHeader("User-Agent", this.clientConfig.getHttpUserAgent()));
+        if (null != this.getClientConfig().getHttpAcceptEncoding() && !"".equals(this.getClientConfig().getHttpAcceptEncoding())) {
+            defaultHeaders.add(new BasicHeader("Accept-Encoding", this.clientConfig.getHttpAcceptEncoding()));
+        }
         if (null != this.getClientConfig().getHttpAcceptRanges() && !"".equals(this.getClientConfig().getHttpAcceptRanges())) {
             defaultHeaders.add(new BasicHeader("Accept-Ranges", this.clientConfig.getHttpAcceptRanges()));
         }

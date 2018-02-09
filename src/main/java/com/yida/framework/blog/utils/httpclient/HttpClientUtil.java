@@ -264,6 +264,7 @@ public class HttpClientUtil {
         try {
             httpResponse = closeHttpClient.execute(httpGet);
         } catch (IOException e) {
+            e.printStackTrace();
             log.error("An exception occurred while performing the HTTP get request with URL[{}]:\n{}.", httpGet.getURI().toString(), e.getMessage());
             return null;
         }
@@ -351,6 +352,17 @@ public class HttpClientUtil {
      */
     public static String get(String url, Map<String, String> requestParams) {
         return get(url, requestParams, null, null, null, null);
+    }
+
+    /**
+     * 发送Http get请求
+     *
+     * @param url             get请求的请求URL
+     * @param contentEncoding 响应体内容的字符串编码,默认为UTF-8
+     * @return
+     */
+    public static String get(String url, String contentEncoding) {
+        return get(url, null, null, contentEncoding, null, null);
     }
 
     /**

@@ -48,7 +48,7 @@ public class HttpClientConfigLoader {
         try {
             return (null == val) ? defaultValue : Integer.valueOf(val.toString());
         } catch (Exception e) {
-            return null;
+            return defaultValue;
         }
     }
 
@@ -61,7 +61,7 @@ public class HttpClientConfigLoader {
         try {
             return (null == val) ? defaultValue : Short.valueOf(val.toString());
         } catch (Exception e) {
-            return null;
+            return defaultValue;
         }
     }
 
@@ -74,7 +74,7 @@ public class HttpClientConfigLoader {
         try {
             return (null == val) ? defaultValue : Long.valueOf(val.toString());
         } catch (Exception e) {
-            return null;
+            return defaultValue;
         }
     }
 
@@ -87,7 +87,7 @@ public class HttpClientConfigLoader {
         try {
             return (null == val) ? defaultValue : Float.valueOf(val.toString());
         } catch (Exception e) {
-            return null;
+            return defaultValue;
         }
     }
 
@@ -100,7 +100,7 @@ public class HttpClientConfigLoader {
         try {
             return (null == val) ? defaultValue : Double.valueOf(val.toString());
         } catch (Exception e) {
-            return null;
+            return defaultValue;
         }
     }
 
@@ -113,7 +113,7 @@ public class HttpClientConfigLoader {
         try {
             return (null == val) ? defaultValue : Boolean.valueOf(val.toString());
         } catch (Exception e) {
-            return null;
+            return defaultValue;
         }
     }
 
