@@ -102,6 +102,7 @@ public class HttpClientConfig {
     private Integer socketTimeout;
     private Integer socketReceiveBufferSize;
     private Integer socketSendBufferSize;
+    private Integer cacheUpdateRetryMaxTimes;
     private Integer cacheEntryMaxSize;
     private Integer cacheObjectMaxSize;
     private Boolean cacheSharedEnabled;
@@ -152,8 +153,13 @@ public class HttpClientConfig {
         this.cacheEntryMaxSize = HttpClientConfigLoader.getIntProperty(CACHE_ENTRY_MAX_SIZE, DEFAULT_CACHE_ENTRY_MAX_SIZE);
         this.cacheObjectMaxSize = HttpClientConfigLoader.getIntProperty(CACHE_OBJECT_MAX_SIZE, DEFAULT_CACHE_OBJECT_MAX_SIZE);
         this.cacheSharedEnabled = HttpClientConfigLoader.getBooleanProperty(CACHE_SHARED_ENABLED, DEFAULT_CACHE_SHARED_ENABLED);
+        this.cacheUpdateRetryMaxTimes = HttpClientConfigLoader.getIntProperty(CACHE_UPDATE_RETRY_MAX_TIMES, DEFAULT_CACHE_UPDATE_RETRY_MAX_TIMES);
         this.cacheAsynWorkerIdleLifetime = HttpClientConfigLoader.getIntProperty(CACHE_ASYN_WORKER_IDLE_LIFETIME, DEFAULT_CACHE_ASYN_WORKER_IDLE_LIFETIME);
         this.cacheAsynWorkerCoreSize = HttpClientConfigLoader.getIntProperty(CACHE_ASYN_WORKER_CORE_SIZE, DEFAULT_CACHE_ASYN_WORKER_CORE_SIZE);
+    }
+
+    public Integer getCacheUpdateRetryMaxTimes() {
+        return cacheUpdateRetryMaxTimes;
     }
 
     public Integer getHttpConnectionRequestTimeout() {
@@ -392,6 +398,14 @@ public class HttpClientConfig {
         return cacheSharedEnabled;
     }
 
+    public void setCacheUpdateRetryMaxTimes(Integer cacheUpdateRetryMaxTimes) {
+        this.cacheUpdateRetryMaxTimes = cacheUpdateRetryMaxTimes;
+    }
+
+    private static class SingletonHolder {
+        private static final HttpClientConfig INSTANCE = new HttpClientConfig();
+    }
+
     public void setCacheSharedEnabled(Boolean cacheSharedEnabled) {
         this.cacheSharedEnabled = cacheSharedEnabled;
     }
@@ -410,9 +424,5 @@ public class HttpClientConfig {
 
     public void setCacheAsynWorkerCoreSize(Integer cacheAsynWorkerCoreSize) {
         this.cacheAsynWorkerCoreSize = cacheAsynWorkerCoreSize;
-    }
-
-    private static class SingletonHolder {
-        private static final HttpClientConfig INSTANCE = new HttpClientConfig();
     }
 }

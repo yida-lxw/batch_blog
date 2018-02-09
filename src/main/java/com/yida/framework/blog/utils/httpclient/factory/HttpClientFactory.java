@@ -1,5 +1,7 @@
 package com.yida.framework.blog.utils.httpclient.factory;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+
 /**
  * @Author Lanxiaowei
  * @Date 2018-02-09 11:43
@@ -8,4 +10,21 @@ package com.yida.framework.blog.utils.httpclient.factory;
  * 故需要设计为单例模式
  */
 public class HttpClientFactory {
+    private CloseableHttpClient httpClient;
+
+    private HttpClientFactory() {
+        initialize();
+    }
+
+    public static final HttpClientFactory getInstance() {
+        return HttpClientFactory.SingletonHolder.INSTANCE;
+    }
+
+    public void initialize() {
+
+    }
+
+    private static class SingletonHolder {
+        private static final HttpClientFactory INSTANCE = new HttpClientFactory();
+    }
 }
