@@ -1,4 +1,4 @@
-package com.yida.framework.blog.utils.httpclient;
+package com.yida.framework.blog.utils.httpclient.config;
 
 import com.yida.framework.blog.utils.cache.CacheManager;
 import com.yida.framework.blog.utils.common.PropertiesUtil;

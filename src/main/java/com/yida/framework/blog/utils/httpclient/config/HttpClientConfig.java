@@ -1,4 +1,4 @@
-package com.yida.framework.blog.utils.httpclient;
+package com.yida.framework.blog.utils.httpclient.config;
 
 /**
  * @Author Lanxiaowei
@@ -39,7 +39,7 @@ public class HttpClientConfig {
     private static final String CACHE_UPDATE_RETRY_MAX_TIMES = "cache.update.retry.max.times";
     private static final String CACHE_SHARED_ENABLED = "cache.shared.enable";
     private static final String CACHE_ASYN_WORKER_IDLE_LIFETIME = "cache.asyn.worker.idle.lifetime";
-    private static final String CACHE_ASYN_WORKER_CORE_SIZE = "cache.asyn.worker.idle.lifetime";
+    private static final String CACHE_ASYN_WORKER_CORE_SIZE = "cache.asyn.worker.core.size";
 
     //Default values
     private static final String DEFAULT_HTTP_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36";

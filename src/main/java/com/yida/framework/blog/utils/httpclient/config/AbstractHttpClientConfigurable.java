@@ -1,4 +1,4 @@
-package com.yida.framework.blog.utils.httpclient;
+package com.yida.framework.blog.utils.httpclient.config;
 
 /**
  * @Author Lanxiaowei

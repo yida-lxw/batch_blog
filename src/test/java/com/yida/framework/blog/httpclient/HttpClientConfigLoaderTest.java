@@ -1,6 +1,6 @@
 package com.yida.framework.blog.httpclient;
 
-import com.yida.framework.blog.utils.httpclient.HttpClientConfigLoader;
+import com.yida.framework.blog.utils.httpclient.config.HttpClientConfigLoader;
 
 import java.util.Map;
 
