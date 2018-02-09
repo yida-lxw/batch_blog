@@ -14,22 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Description HttpClient配置加载器
  */
 public class HttpClientConfigLoader {
-
-
-    /**
-     * PoolingHttpClientConnectionManager poolingmgr = new PoolingHttpClientConnectionManager(
-     RegistryBuilder.<ConnectionSocketFactory>create()
-     .register("http", PlainConnectionSocketFactory.getSocketFactory())
-     .register("https", sslSocketFactoryCopy)
-     .build(),
-     null,
-     null,
-     null,
-     connTimeToLive,
-     connTimeToLiveTimeUnit != null ? connTimeToLiveTimeUnit : TimeUnit.MILLISECONDS);
-     */
-
-
     private static final String HTTPCLIENT_CONFIG_FILENAME = "httpclient.properties";
 
     private static Map<String, Object> configMap = new ConcurrentHashMap<String, Object>();

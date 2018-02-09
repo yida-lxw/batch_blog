@@ -121,7 +121,9 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
             defaultHeaders.add(new BasicHeader("Accept-Ranges", this.clientConfig.getHttpAcceptRanges()));
         }
         socketFactoryRegistry = registryBuilder.build();
-        PoolingHttpClientConnectionManager poolingHttpClientConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+        PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
+                new PoolingHttpClientConnectionManager(socketFactoryRegistry, null, null, null,
+                        this.clientConfig.getHttpConnectionTimeToLive(), TimeUnit.MILLISECONDS);
         poolingHttpClientConnectionManager.setDefaultMaxPerRoute(this.clientConfig.getHttpConnectionPoolMaxPerRoute());
         poolingHttpClientConnectionManager.setMaxTotal(this.clientConfig.getHttpConnectionPoolMaxTotal());
         poolingHttpClientConnectionManager.setValidateAfterInactivity(this.clientConfig.getHttpConnectionPoolValidateAfterInactivity());
