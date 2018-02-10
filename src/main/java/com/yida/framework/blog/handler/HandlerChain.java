@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @Author Lanxiaowei
  * @Date 2018-01-15 23:32
- * @Description 这里是类的描述信息
+ * @Description 任务处理器链, 多个任务组成一个任务处理链
  */
 public class HandlerChain implements Handler<HandlerChainInput, HandlerChainOutput> {
     private List<Handler> handlers = new ArrayList<Handler>();
