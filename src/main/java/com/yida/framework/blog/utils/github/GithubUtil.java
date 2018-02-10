@@ -5,10 +5,12 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.*;
@@ -16,6 +18,9 @@ import org.eclipse.jgit.util.FS;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @Author Lanxiaowei
@@ -40,14 +45,19 @@ public class GithubUtil {
         //Git git = getGit(localRepositoryPath);
 
 
-        //git clone vi http url
+        //git clone via http url
         //Git git = cloneRepositoryWithHttpAuth(remoteRepoHttpUrl, localRepositoryPath, githubUserName, githubPassword);
         //System.out.println("git clone via http:" + git);
 
-        //git clone vi ssh url
-        Git git = cloneRepositoryWithSSHAuth(remoteRepoSSHUrl, localRepositoryPath);
-        System.out.println("git clone via ssh:" + git);
+        //git clone via ssh url
+        //Git git = cloneRepositoryWithSSHAuth(remoteRepoSSHUrl, localRepositoryPath);
+        //System.out.println("git clone via ssh:" + git);
 
+        Git git = getGit(localRepositoryPath);
+
+        //git add
+        DirCache dirCache = add(git);
+        System.out.println(dirCache);
     }
 
     /**
@@ -366,6 +376,80 @@ public class GithubUtil {
     }
 
     /**
+     * 将文件添加至本地暂存区,相当于git add命令
+     *
+     * @param git          Git实例对象
+     * @param filePatterns 需要添加的文件表达式,默认是相对本地仓库根目录
+     * @param update       是否开启更新模式,在更新模式下,不会添加新文件,只会更新已有文件的内容,默认不开启
+     */
+    public static DirCache add(Git git, String[] filePatterns, boolean update) {
+        AddCommand addCommand = git.add().setUpdate(update);
+        if (null != filePatterns && filePatterns.length > 0) {
+            Set<String> filePatternSet = new HashSet<String>(Arrays.asList(filePatterns));
+            for (String filePattern : filePatternSet) {
+                if (null == filePattern) {
+                    continue;
+                }
+                if ("".equals(filePattern)) {
+                    filePattern = ".";
+                }
+                addCommand = addCommand.addFilepattern(filePattern);
+            }
+        } else {
+            // default add all files
+            addCommand = addCommand.addFilepattern(".");
+        }
+        try {
+            return addCommand.call();
+        } catch (GitAPIException e) {
+            log.error("While add File to the local repository with filePatterns[{}],we occur exception:\n{}",
+                    filePatterns, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 将文件添加至本地暂存区,相当于git add命令
+     *
+     * @param git          Git实例对象
+     * @param filePatterns 需要添加的文件表达式,默认是相对本地仓库根目录
+     */
+    public static DirCache add(Git git, String[] filePatterns) {
+        return add(git, filePatterns, false);
+    }
+
+    /**
+     * 将文件添加至本地暂存区,相当于git add命令
+     *
+     * @param git Git实例对象
+     */
+    public static DirCache add(Git git) {
+        return add(git, (String) null, false);
+    }
+
+    /**
+     * 将文件添加至本地暂存区,相当于git add命令
+     *
+     * @param git         Git实例对象
+     * @param filePattern 需要添加的文件表达式,默认是相对本地仓库根目录
+     * @param update      是否开启更新模式,在更新模式下,不会添加新文件,只会更新已有文件的内容,默认不开启
+     */
+    public static DirCache add(Git git, String filePattern, boolean update) {
+        return add(git, (null == filePattern) ? null : new String[]{filePattern}, update);
+    }
+
+    /**
+     * 将文件添加至本地暂存区,相当于git add命令
+     *
+     * @param git         Git实例对象
+     * @param filePattern 需要添加的文件表达式,默认是相对本地仓库根目录
+     */
+    public static DirCache add(Git git, String filePattern) {
+        return add(git, filePattern, false);
+    }
+
+
+    /**
      * 关闭Git实例,释放文件句柄资源
      *
      * @param git
@@ -527,6 +611,14 @@ public class GithubUtil {
      */
 
     //list all branchs
+    /**
+     * Collection<Ref> remoteRefs = Git.lsRemoteRepository()
+     .setHeads( true )
+     .setRemote( "https://github.com/eclipse/jgit.git" )
+     .call();
+     */
+
+    //list repository
     /**
      * Collection<Ref> remoteRefs = Git.lsRemoteRepository()
      .setHeads( true )
