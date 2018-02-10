@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.*;
@@ -29,28 +30,22 @@ public class GithubUtil {
     String localCodeDirectory;
 
     public static void main(String[] args) throws IOException {
-        FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder()
-                .setGitDir(new File("G:/git-local/blog/.git"))
-                .setMustExist(false);
-        Repository repository = repositoryBuilder.build();
-        if (repository.getRef("HEAD") != null) {
-            System.out.println("本地仓库存在");
-        } else {
-            System.out.println("本地仓库不存在");
-        }
+        String localRepositoryPath = "G:/git4test/blog";
+        String remoteRepoUrl = "git@github.com:yida-lxw/batch_blog.git";
+
+        Git git = initLocalRepo(localRepositoryPath);
+
+
     }
 
     /**
-     * 判断一个本地仓库是否与远程仓库已关联,即本地仓库目录下是否拥有一个名称为.git的隐藏文件夹
+     * 判断一个本地仓库是否存在,即本地仓库目录下是否拥有一个名称为.git的隐藏文件夹
      *
      * @param localRepositoryPath 本地Git仓库目录路径,比如:G:/git-local/blog/
      * @return
      */
     public static boolean isLocalRepoExists(String localRepositoryPath) {
-        localRepositoryPath = localRepositoryPath.replaceAll("\\\\", "/");
-        if (!localRepositoryPath.endsWith("/")) {
-            localRepositoryPath = localRepositoryPath + "/";
-        }
+        localRepositoryPath = fixedPathDelimiter(localRepositoryPath);
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder()
                 .setGitDir(new File(localRepositoryPath + ".git"))
                 .setMustExist(false);
@@ -63,6 +58,27 @@ public class GithubUtil {
             log.error("Building the Repository instance with the FileRepositoryBuilder class occur exception:\n{}", e.getMessage());
         }
         return result;
+    }
+
+    /**
+     * 初始化一个本地git仓库,类似于执行git init命令
+     *
+     * @param localRepositoryPath 本地仓库目录
+     * @return
+     */
+    public static Git initLocalRepo(String localRepositoryPath) {
+        localRepositoryPath = fixedPathDelimiter(localRepositoryPath);
+        Git git = null;
+        try {
+            git = Git.init()
+                    .setBare(true)
+                    .setDirectory(new File(localRepositoryPath + ".git"))
+                    .call();
+        } catch (GitAPIException e) {
+            log.error("While Initializating the local repository with localRepositoryPath[{}],we occur exception:\n{}",
+                    localRepositoryPath, e.getMessage());
+        }
+        return git;
     }
 
     public static void cloneRepositoryWithSSHAuth(Git git) {
@@ -92,6 +108,23 @@ public class GithubUtil {
                 sshTransport.setSshSessionFactory(sshSessionFactory);
             }
         });
+    }
+
+    /**
+     * 将路径字符串里的\\转换成/
+     *
+     * @param path
+     * @return
+     */
+    private static String fixedPathDelimiter(String path) {
+        if (null == path || "".equals(path)) {
+            return path;
+        }
+        path = path.replaceAll("\\\\", "/");
+        if (!path.endsWith("/")) {
+            path = path + "/";
+        }
+        return path;
     }
 
     /**Commit*/
