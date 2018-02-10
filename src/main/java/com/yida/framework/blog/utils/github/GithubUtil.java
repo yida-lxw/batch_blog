@@ -33,8 +33,8 @@ public class GithubUtil {
         String localRepositoryPath = "G:/git4test/blog";
         String remoteRepoUrl = "git@github.com:yida-lxw/batch_blog.git";
 
-        Git git = initLocalRepo(localRepositoryPath);
-
+        Git git = getGit(localRepositoryPath);
+        System.out.println("git:" + git);
 
     }
 
@@ -77,6 +77,40 @@ public class GithubUtil {
         } catch (GitAPIException e) {
             log.error("While Initializating the local repository with localRepositoryPath[{}],we occur exception:\n{}",
                     localRepositoryPath, e.getMessage());
+        }
+        return git;
+    }
+
+    /**
+     * 打开本地仓库,获取Git实例对象,为执行后续Git操作做准备
+     *
+     * @param localRepositoryPath 本地仓库目录
+     * @return
+     */
+    public static Git openLocalRepo(String localRepositoryPath) {
+        localRepositoryPath = fixedPathDelimiter(localRepositoryPath);
+        Git git = null;
+        try {
+            return Git.open(new File(localRepositoryPath));
+        } catch (IOException e) {
+            log.error("While Opening the local repository with localRepositoryPath[{}],we occur exception:\n{}",
+                    localRepositoryPath, e.getMessage());
+        }
+        return git;
+    }
+
+    /**
+     * 获取Git实例对象,此对象请不要重复创建
+     *
+     * @param localRepositoryPath 本地仓库目录
+     * @return
+     */
+    public static Git getGit(String localRepositoryPath) {
+        Git git = null;
+        if (isLocalRepoExists(localRepositoryPath)) {
+            git = openLocalRepo(localRepositoryPath);
+        } else {
+            git = initLocalRepo(localRepositoryPath);
         }
         return git;
     }
