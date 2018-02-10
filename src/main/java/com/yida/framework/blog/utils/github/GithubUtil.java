@@ -5,13 +5,12 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.jgit.api.AddCommand;
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.TransportConfigCallback;
+import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.dircache.DirCache;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.util.FS;
@@ -58,6 +57,10 @@ public class GithubUtil {
         //git add
         DirCache dirCache = add(git);
         System.out.println(dirCache);
+
+        //git commit
+        RevCommit revCommit = commit(git, "commit via jgit for Testing", "Lanxiaowei", "736031305@qq.com", true, false);
+        System.out.println(revCommit);
     }
 
     /**
@@ -448,6 +451,85 @@ public class GithubUtil {
         return add(git, filePattern, false);
     }
 
+    /**
+     * git提交操作即将新增/更新/删除的文件提交到本地仓库
+     *
+     * @param git            Git实例对象
+     * @param commitMessage  提交注释说明信息
+     * @param committerName  提交者的姓名
+     * @param committerEmail 提交者的邮箱地址
+     * @param allowEmpty     是否允许空提交
+     * @param amend          修改当前分支的冲突
+     */
+    public static RevCommit commit(Git git, String commitMessage,
+                                   String committerName, String committerEmail,
+                                   boolean allowEmpty, boolean amend) {
+        CommitCommand commitCommand = git.commit()
+                .setAllowEmpty(allowEmpty)
+                .setAmend(amend);
+        if ((null != committerName && !"".equals(committerName)) ||
+                (null != committerEmail && !"".equals(committerEmail))) {
+            commitCommand = commitCommand.setAuthor(new PersonIdent(committerName, committerEmail));
+            commitCommand = commitCommand.setCommitter(committerName, committerEmail);
+        }
+        if (null != commitMessage && !"".equals(commitMessage)) {
+            commitCommand = commitCommand.setMessage(commitMessage);
+        }
+        try {
+            return commitCommand.call();
+        } catch (GitAPIException e) {
+            log.error("While commit File to the local repository with message[{}],we occur exception:\n{}",
+                    commitMessage, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * git提交操作即将新增/更新/删除的文件提交到本地仓库
+     *
+     * @param git            Git实例对象
+     * @param commitMessage  提交注释说明信息
+     * @param committerName  提交者的姓名
+     * @param committerEmail 提交者的邮箱地址
+     * @param allowEmpty     是否允许空提交
+     */
+    public static RevCommit commit(Git git, String commitMessage,
+                                   String committerName, String committerEmail,
+                                   boolean allowEmpty) {
+        return commit(git, commitMessage, committerName, committerEmail, allowEmpty, false);
+    }
+
+    /**
+     * git提交操作即将新增/更新/删除的文件提交到本地仓库
+     *
+     * @param git            Git实例对象
+     * @param commitMessage  提交注释说明信息
+     * @param committerName  提交者的姓名
+     * @param committerEmail 提交者的邮箱地址
+     */
+    public static RevCommit commit(Git git, String commitMessage,
+                                   String committerName, String committerEmail) {
+        return commit(git, commitMessage, committerName, committerEmail, true, false);
+    }
+
+    /**
+     * git提交操作即将新增/更新/删除的文件提交到本地仓库
+     *
+     * @param git           Git实例对象
+     * @param commitMessage 提交注释说明信息
+     */
+    public static RevCommit commit(Git git, String commitMessage) {
+        return commit(git, commitMessage, null, null, true, false);
+    }
+
+    /**
+     * git提交操作即将新增/更新/删除的文件提交到本地仓库
+     *
+     * @param git Git实例对象
+     */
+    public static RevCommit commit(Git git) {
+        return commit(git, null, null, null, true, false);
+    }
 
     /**
      * 关闭Git实例,释放文件句柄资源
@@ -636,5 +718,6 @@ public class GithubUtil {
      call();
      */
 
-
+    //git checkout
+    //git.checkout().setCreateBranch( true ).setName( "new-branch" ).setStartPoint( "<id-to-commit>" ).call();
 }

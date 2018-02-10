@@ -15,4 +15,16 @@
 	<entry key="github_remote_repo_path">git@github.com:yida-lxw/blog.git</entry>
 	<!-- 本地项目代码存放目录-->
 	<entry key="github_local_code_dir">G:/git-local/blog/</entry>
+
+	<!-- Github本地私钥存放路径,若未指定或留空,则默认值为C:/Users/Administrator/.ssh/id_rsa-->
+	<entry key="github_private_key_path"></entry>
+	<!-- Github登录账号-->
+	<entry key="github_username">yida-lxw</entry>
+	<!-- Github登录密码 -->
+	<entry key="github_pwd">1234567890</entry>
+
+	<!-- Github提交操作设置的作者和提交者的姓名信息-->
+	<entry key="github_author_name">Lanxiaowei</entry>
+	<!-- Github提交操作设置的作者和提交者的邮箱地址信息-->
+	<entry key="github_author_email">736031305@qq.com</entry>
 </properties>

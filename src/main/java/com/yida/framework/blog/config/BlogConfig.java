@@ -18,10 +18,12 @@ public class BlogConfig {
     private static final String BLOG_SEND_DATE = "blog_send_dates";
     private static final String GITHUB_USERNAME = "github_username";
     private static final String GITHUB_PASSWORD = "github_pwd";
-
+    private static final String GITHUB_PRIVATE_KEY_PATH = "github_private_key_path";
     private static final String GITHUB_LOCAL_REPO_PATH = "github_local_repo_path";
     private static final String GITHUB_REMOTE_REPO_PATH = "github_remote_repo_path";
     private static final String GITHUB_LOCAL_CODE_DIR = "github_local_code_dir";
+    private static final String GITHUB_AUTHOR_NAME = "github_author_name";
+    private static final String GITHUB_AUTHOR_EMAIL = "github_author_email";
 
     /**
      * Pandoc的安装目录
@@ -70,6 +72,21 @@ public class BlogConfig {
      */
     private String githubLocalCodeDir;
 
+    /**
+     * Github提交操作设置的作者和提交者的姓名信息
+     */
+    private String githubAuthorName;
+
+    /**
+     * Github提交操作设置的作者和提交者的邮箱地址信息
+     */
+    private String githubAuthorEmail;
+
+    /**
+     * Github私钥存放地址
+     */
+    private String githubPrivateKeyPath;
+
 
     private BlogConfig() {
         initialize();
@@ -115,9 +132,12 @@ public class BlogConfig {
         }
         this.githubUserName = ConfigContext.getStringProperty(GITHUB_USERNAME);
         this.githubPassword = ConfigContext.getStringProperty(GITHUB_PASSWORD);
+        this.githubPrivateKeyPath = ConfigContext.getStringProperty(GITHUB_PRIVATE_KEY_PATH);
         this.githubLocalRepoPath = ConfigContext.getStringProperty(GITHUB_LOCAL_REPO_PATH);
         this.githubRemoteRepoPath = ConfigContext.getStringProperty(GITHUB_REMOTE_REPO_PATH);
         this.githubLocalCodeDir = ConfigContext.getStringProperty(GITHUB_LOCAL_CODE_DIR);
+        this.githubAuthorName = ConfigContext.getStringProperty(GITHUB_AUTHOR_NAME);
+        this.githubAuthorEmail = ConfigContext.getStringProperty(GITHUB_AUTHOR_EMAIL);
     }
 
     @Override
@@ -129,9 +149,12 @@ public class BlogConfig {
         stringBuilder.append("Blog SendDate: " + getBlogSendDate() + "\n");
         stringBuilder.append("Github UserName: " + getGithubUserName() + "\n");
         stringBuilder.append("Github Password: " + getGithubPassword() + "\n");
+        stringBuilder.append("Github Private Key: " + getGithubPrivateKeyPath() + "\n");
         stringBuilder.append("Github Local Repository Path: " + getGithubLocalRepoPath() + "\n");
         stringBuilder.append("Github Remote Repository Path: " + getGithubRemoteRepoPath() + "\n");
-        stringBuilder.append("Github Local Code directory: " + getGithubLocalCodeDir());
+        stringBuilder.append("Github Local Code directory: " + getGithubLocalCodeDir() + "\n");
+        stringBuilder.append("Github Author/Committer Name: " + getGithubAuthorName() + "\n");
+        stringBuilder.append("Github Author/Committer Email: " + getGithubAuthorEmail());
         return stringBuilder.toString();
     }
 
@@ -213,5 +236,29 @@ public class BlogConfig {
 
     public void setGithubLocalCodeDir(String githubLocalCodeDir) {
         this.githubLocalCodeDir = githubLocalCodeDir;
+    }
+
+    public String getGithubAuthorName() {
+        return githubAuthorName;
+    }
+
+    public void setGithubAuthorName(String githubAuthorName) {
+        this.githubAuthorName = githubAuthorName;
+    }
+
+    public String getGithubAuthorEmail() {
+        return githubAuthorEmail;
+    }
+
+    public void setGithubAuthorEmail(String githubAuthorEmail) {
+        this.githubAuthorEmail = githubAuthorEmail;
+    }
+
+    public String getGithubPrivateKeyPath() {
+        return githubPrivateKeyPath;
+    }
+
+    public void setGithubPrivateKeyPath(String githubPrivateKeyPath) {
+        this.githubPrivateKeyPath = githubPrivateKeyPath;
     }
 }
