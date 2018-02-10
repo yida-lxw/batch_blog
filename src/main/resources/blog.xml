@@ -8,4 +8,11 @@
 	<entry key="markdown_basepath">G:/git-local/blog/</entry>
 	<!-- 多个日期请使用分号;进行分割 -->
 	<entry key="blog_send_dates">20180117</entry>
+
+	<!-- Github的本地仓库目录 -->
+	<entry key="github_local_repo_path">G:/git-local</entry>
+	<!-- Github的远程仓库的URL -->
+	<entry key="github_remote_repo_path">git@github.com:yida-lxw/blog.git</entry>
+	<!-- 本地项目代码存放目录-->
+	<entry key="github_local_code_dir">G:/git-local/blog/</entry>
 </properties>

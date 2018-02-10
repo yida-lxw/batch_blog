@@ -19,6 +19,10 @@ public class BlogConfig {
     private static final String GITHUB_USERNAME = "github_username";
     private static final String GITHUB_PASSWORD = "github_pwd";
 
+    private static final String GITHUB_LOCAL_REPO_PATH = "github_local_repo_path";
+    private static final String GITHUB_REMOTE_REPO_PATH = "github_remote_repo_path";
+    private static final String GITHUB_LOCAL_CODE_DIR = "github_local_code_dir";
+
     /**
      * Pandoc的安装目录
      */
@@ -50,6 +54,22 @@ public class BlogConfig {
      * Github的登录密码
      */
     private String githubPassword;
+
+    /**
+     * Github的本地仓库目录
+     */
+    private String githubLocalRepoPath;
+
+    /**
+     * Github的远程仓库URL
+     */
+    private String githubRemoteRepoPath;
+
+    /**
+     * 本地项目代码的存放目录
+     */
+    private String githubLocalCodeDir;
+
 
     private BlogConfig() {
         initialize();
@@ -95,6 +115,9 @@ public class BlogConfig {
         }
         this.githubUserName = ConfigContext.getStringProperty(GITHUB_USERNAME);
         this.githubPassword = ConfigContext.getStringProperty(GITHUB_PASSWORD);
+        this.githubLocalRepoPath = ConfigContext.getStringProperty(GITHUB_LOCAL_REPO_PATH);
+        this.githubRemoteRepoPath = ConfigContext.getStringProperty(GITHUB_REMOTE_REPO_PATH);
+        this.githubLocalCodeDir = ConfigContext.getStringProperty(GITHUB_LOCAL_CODE_DIR);
     }
 
     @Override
@@ -106,6 +129,9 @@ public class BlogConfig {
         stringBuilder.append("Blog SendDate: " + getBlogSendDate() + "\n");
         stringBuilder.append("Github UserName: " + getGithubUserName() + "\n");
         stringBuilder.append("Github Password: " + getGithubPassword() + "\n");
+        stringBuilder.append("Github Local Repository Path: " + getGithubLocalRepoPath() + "\n");
+        stringBuilder.append("Github Remote Repository Path: " + getGithubRemoteRepoPath() + "\n");
+        stringBuilder.append("Github Local Code directory: " + getGithubLocalCodeDir());
         return stringBuilder.toString();
     }
 
@@ -163,5 +189,29 @@ public class BlogConfig {
 
     public void setGithubPassword(String githubPassword) {
         this.githubPassword = githubPassword;
+    }
+
+    public String getGithubLocalRepoPath() {
+        return githubLocalRepoPath;
+    }
+
+    public void setGithubLocalRepoPath(String githubLocalRepoPath) {
+        this.githubLocalRepoPath = githubLocalRepoPath;
+    }
+
+    public String getGithubRemoteRepoPath() {
+        return githubRemoteRepoPath;
+    }
+
+    public void setGithubRemoteRepoPath(String githubRemoteRepoPath) {
+        this.githubRemoteRepoPath = githubRemoteRepoPath;
+    }
+
+    public String getGithubLocalCodeDir() {
+        return githubLocalCodeDir;
+    }
+
+    public void setGithubLocalCodeDir(String githubLocalCodeDir) {
+        this.githubLocalCodeDir = githubLocalCodeDir;
     }
 }

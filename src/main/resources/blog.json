@@ -6,6 +6,9 @@
   /**Markdown文档的存储根目录,当你的博客是直接采用Markdown格式编写的，此时你可以配置此参数,它与word_basepath参数二选一即可*/
   "markdown_basepath": "G:/git-local/blog/",
   "blog_send_dates": "20180207",
+  "github_local_repo_path": "G:/git-local",
+  "github_remote_repo_path": "git@github.com:yida-lxw/blog.git",
+  "github_local_code_dir": "G:/git-local/blog/",
   "github_username": "yida-lxw",
   "github_pwd": "1234567890"
 }
