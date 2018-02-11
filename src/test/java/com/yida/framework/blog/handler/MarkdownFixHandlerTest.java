@@ -61,8 +61,7 @@ public class MarkdownFixHandlerTest {
         //need WordUnzipHandler
         WordImageCopyHandlerInput wordImageCopyHandlerInput = new WordImageCopyHandlerInput();
         WordImageCopyHandlerOutput wordImageCopyHandlerOutput = new WordImageCopyHandlerOutput();
-        WordImageCopyHandler wordImageCopyHandler = new WordImageCopyHandler(wordUnzipHandler,
-                imageFilenameFilter, markdownFilenameFilter);
+        WordImageCopyHandler wordImageCopyHandler = new WordImageCopyHandler(wordUnzipHandler, imageFilenameFilter);
         wordImageCopyHandler.handle(wordImageCopyHandlerInput, wordImageCopyHandlerOutput);
         System.out.println(wordImageCopyHandlerOutput);
 

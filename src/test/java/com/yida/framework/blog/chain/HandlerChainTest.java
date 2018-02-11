@@ -27,8 +27,7 @@ public class HandlerChainTest {
         WordUnzipHandler wordUnzipHandler = new WordUnzipHandler(wordFilterHandler, zipArchiverFileFilter);
 
         Word2MarkdownHandler word2MarkdownHandler = new Word2MarkdownHandler(wordFilterHandler);
-        WordImageCopyHandler wordImageCopyHandler = new WordImageCopyHandler(wordUnzipHandler,
-                imageFilenameFilter, markdownFilenameFilter);
+        WordImageCopyHandler wordImageCopyHandler = new WordImageCopyHandler(wordUnzipHandler, imageFilenameFilter);
         MarkdownMoveHandler markdownMoveHandler = new MarkdownMoveHandler();
         MarkdownFixHandler markdownFixHandler = new MarkdownFixHandler(markdownFilenameFilter);
 

@@ -55,7 +55,7 @@ public class WordImageCopyHandlerTest {
         WordImageCopyHandlerInput wordImageCopyHandlerInput = new WordImageCopyHandlerInput();
         wordImageCopyHandlerInput.setUnzipFilePaths(wordUnzipHandlerOutput.getUnzipFilePaths());
         WordImageCopyHandlerOutput wordImageCopyHandlerOutput = new WordImageCopyHandlerOutput();
-        WordImageCopyHandler wordImageCopyHandler = new WordImageCopyHandler(wordUnzipHandler, imageFilenameFilter, markdownFilenameFilter);
+        WordImageCopyHandler wordImageCopyHandler = new WordImageCopyHandler(wordUnzipHandler, imageFilenameFilter);
         wordImageCopyHandler.handle(wordImageCopyHandlerInput, wordImageCopyHandlerOutput);
         System.out.println(wordImageCopyHandlerOutput);
 

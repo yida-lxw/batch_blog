@@ -4,7 +4,6 @@ import com.yida.framework.blog.handler.input.WordImageCopyHandlerInput;
 import com.yida.framework.blog.handler.output.WordImageCopyHandlerOutput;
 import com.yida.framework.blog.utils.io.FileUtil;
 import com.yida.framework.blog.utils.io.ImageFilenameFilter;
-import com.yida.framework.blog.utils.io.MarkdownFilenameFilter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,18 +18,15 @@ import java.util.Map;
  */
 public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, WordImageCopyHandlerOutput> {
     private ImageFilenameFilter imageFilenameFilter;
-    private MarkdownFilenameFilter markdownFilenameFilter;
     private WordUnzipHandler wordUnzipHandler;
 
-    public WordImageCopyHandler(ImageFilenameFilter imageFilenameFilter, MarkdownFilenameFilter markdownFilenameFilter) {
+    public WordImageCopyHandler(ImageFilenameFilter imageFilenameFilter) {
         this.imageFilenameFilter = imageFilenameFilter;
-        this.markdownFilenameFilter = markdownFilenameFilter;
     }
 
-    public WordImageCopyHandler(WordUnzipHandler wordUnzipHandler, ImageFilenameFilter imageFilenameFilter, MarkdownFilenameFilter markdownFilenameFilter) {
+    public WordImageCopyHandler(WordUnzipHandler wordUnzipHandler, ImageFilenameFilter imageFilenameFilter) {
         this.wordUnzipHandler = wordUnzipHandler;
         this.imageFilenameFilter = imageFilenameFilter;
-        this.markdownFilenameFilter = markdownFilenameFilter;
     }
 
     @Override
