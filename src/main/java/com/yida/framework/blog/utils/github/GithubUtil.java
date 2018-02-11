@@ -85,6 +85,10 @@ public class GithubUtil {
             status = pushResult.getRemoteUpdate("refs/heads/" + BRANCH_MASTER).getStatus();
             System.out.println(status.toString());
         }
+
+
+        //git close only after a sort of operation of git
+        git.close();
     }
 
     /**
@@ -683,11 +687,272 @@ public class GithubUtil {
     }
 
     /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git                 Git实例对象
+     * @param branchName          分支名称,若不指定或留空,则默认值为master
+     * @param remote              远程仓库别名,若不指定或留空,则默认值为origin
+     * @param privateKeyPath      本地私钥文件的存放路径
+     * @param removeDeletedRefs   是否删除已经不存在的引用,默认为true即删除
+     * @param checkFetchedObjects 接收之前是否先校验对象的有效性
+     * @param dryRun              开启dry-run模拟测试
+     * @param thinPack            是否开启Git的数据包瘦身优化,默认为true即开启
+     */
+    public static FetchResult fetchWithSSH(Git git, String branchName, String remote, String privateKeyPath,
+                                           boolean removeDeletedRefs, boolean checkFetchedObjects, boolean dryRun, boolean thinPack) {
+        if (null == branchName || "".equals(branchName)) {
+            branchName = BRANCH_MASTER;
+        }
+        FetchCommand fetchCommand = git.fetch().setCheckFetchedObjects(checkFetchedObjects)
+                .setRemoveDeletedRefs(removeDeletedRefs)
+                .setDryRun(dryRun).setThin(thinPack);
+        if (null != remote && !"".equals(remote)) {
+            fetchCommand = fetchCommand.setRemote(remote);
+        }
+        RefSpec refSpec = new RefSpec(branchName + ":" + branchName);
+        fetchCommand = fetchCommand.setRefSpecs(refSpec);
+        SshSessionFactory sshSessionFactory = createSshSessionFactory(privateKeyPath);
+        if (null != sshSessionFactory) {
+            fetchCommand = fetchCommand.setTransportConfigCallback(new TransportConfigCallback() {
+                @Override
+                public void configure(Transport transport) {
+                    SshTransport sshTransport = (SshTransport) transport;
+                    sshTransport.setSshSessionFactory(sshSessionFactory);
+                }
+            });
+        }
+        try {
+            return fetchCommand.call();
+        } catch (GitAPIException e) {
+            log.error("While Fetching[SSH] from the remote repository to local repository with branchName[{}],remote[{}] and privateKeyPath[{}],we occur exception:\n{}",
+                    branchName, remote, privateKeyPath, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git                 Git实例对象
+     * @param branchName          分支名称,若不指定或留空,则默认值为master
+     * @param remote              远程仓库别名,若不指定或留空,则默认值为origin
+     * @param privateKeyPath      本地私钥文件的存放路径
+     * @param removeDeletedRefs   是否删除已经不存在的引用,默认为true即删除
+     * @param checkFetchedObjects 接收之前是否先校验对象的有效性
+     * @param dryRun              开启dry-run模拟测试
+     */
+    //
+    public static FetchResult fetchWithSSH(Git git, String branchName, String remote, String privateKeyPath,
+                                           boolean removeDeletedRefs, boolean checkFetchedObjects, boolean dryRun) {
+        return fetchWithSSH(git, branchName, remote, privateKeyPath, removeDeletedRefs, checkFetchedObjects, dryRun, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git                 Git实例对象
+     * @param branchName          分支名称,若不指定或留空,则默认值为master
+     * @param remote              远程仓库别名,若不指定或留空,则默认值为origin
+     * @param privateKeyPath      本地私钥文件的存放路径
+     * @param removeDeletedRefs   是否删除已经不存在的引用,默认为true即删除
+     * @param checkFetchedObjects 接收之前是否先校验对象的有效性
+     */
+    //
+    public static FetchResult fetchWithSSH(Git git, String branchName, String remote, String privateKeyPath,
+                                           boolean removeDeletedRefs, boolean checkFetchedObjects) {
+        return fetchWithSSH(git, branchName, remote, privateKeyPath, removeDeletedRefs, checkFetchedObjects, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git               Git实例对象
+     * @param branchName        分支名称,若不指定或留空,则默认值为master
+     * @param remote            远程仓库别名,若不指定或留空,则默认值为origin
+     * @param privateKeyPath    本地私钥文件的存放路径
+     * @param removeDeletedRefs 是否删除已经不存在的引用,默认为true即删除
+     */
+    //
+    public static FetchResult fetchWithSSH(Git git, String branchName, String remote, String privateKeyPath,
+                                           boolean removeDeletedRefs) {
+        return fetchWithSSH(git, branchName, remote, privateKeyPath, removeDeletedRefs, false, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
+     * @param remote         远程仓库别名,若不指定或留空,则默认值为origin
+     * @param privateKeyPath 本地私钥文件的存放路径
+     */
+    //
+    public static FetchResult fetchWithSSH(Git git, String branchName, String remote, String privateKeyPath) {
+        return fetchWithSSH(git, branchName, remote, privateKeyPath, true, false, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git        Git实例对象
+     * @param branchName 分支名称,若不指定或留空,则默认值为master
+     * @param remote     远程仓库别名,若不指定或留空,则默认值为origin
+     */
+    //
+    public static FetchResult fetchWithSSH(Git git, String branchName, String remote) {
+        return fetchWithSSH(git, branchName, remote, null, true, false, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git        Git实例对象
+     * @param branchName 分支名称,若不指定或留空,则默认值为master
+     */
+    //
+    public static FetchResult fetchWithSSH(Git git, String branchName) {
+        return fetchWithSSH(git, branchName, null, null, true, false, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git Git实例对象
+     */
+    //
+    public static FetchResult fetchWithSSH(Git git) {
+        return fetchWithSSH(git, null, null, null, true, false, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git                 Git实例对象
+     * @param branchName          分支名称,若不指定或留空,则默认值为master
+     * @param remote              远程仓库别名,若不指定或留空,则默认值为origin
+     * @param githubUserName      Github登录账号
+     * @param githubPassword      Github登录密码
+     * @param removeDeletedRefs   是否删除已经不存在的引用,默认为true即删除
+     * @param checkFetchedObjects 接收之前是否先校验对象的有效性
+     * @param dryRun              开启dry-run模拟测试
+     * @param thinPack            是否开启Git的数据包瘦身优化,默认为true即开启
+     */
+    public static FetchResult fetchWithHttp(Git git, String branchName, String remote, String githubUserName, String githubPassword,
+                                            boolean removeDeletedRefs, boolean checkFetchedObjects, boolean dryRun, boolean thinPack) {
+        if (null == branchName || "".equals(branchName)) {
+            branchName = BRANCH_MASTER;
+        }
+        FetchCommand fetchCommand = git.fetch().setCheckFetchedObjects(checkFetchedObjects)
+                .setRemoveDeletedRefs(removeDeletedRefs)
+                .setDryRun(dryRun).setThin(thinPack);
+        if (null != remote && !"".equals(remote)) {
+            fetchCommand = fetchCommand.setRemote(remote);
+        }
+        RefSpec refSpec = new RefSpec(branchName + ":" + branchName);
+        fetchCommand = fetchCommand.setRefSpecs(refSpec);
+        if (null != githubUserName && !"".equals(githubUserName)) {
+            fetchCommand = fetchCommand.setCredentialsProvider(
+                    new UsernamePasswordCredentialsProvider(githubUserName, githubPassword));
+        }
+        try {
+            return fetchCommand.call();
+        } catch (GitAPIException e) {
+            log.error("While Fetching[Http] from the remote repository to local repository with branchName[{}],remote[{}] and githubUserName[{}],we occur exception:\n{}",
+                    branchName, remote, githubUserName, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git                 Git实例对象
+     * @param branchName          分支名称,若不指定或留空,则默认值为master
+     * @param remote              远程仓库别名,若不指定或留空,则默认值为origin
+     * @param githubUserName      Github登录账号
+     * @param githubPassword      Github登录密码
+     * @param removeDeletedRefs   是否删除已经不存在的引用,默认为true即删除
+     * @param checkFetchedObjects 接收之前是否先校验对象的有效性
+     * @param dryRun              开启dry-run模拟测试
+     */
+    public static FetchResult fetchWithHttp(Git git, String branchName, String remote, String githubUserName, String githubPassword,
+                                            boolean removeDeletedRefs, boolean checkFetchedObjects, boolean dryRun) {
+        return fetchWithHttp(git, branchName, remote, githubUserName, githubPassword, removeDeletedRefs, checkFetchedObjects, dryRun, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git                 Git实例对象
+     * @param branchName          分支名称,若不指定或留空,则默认值为master
+     * @param remote              远程仓库别名,若不指定或留空,则默认值为origin
+     * @param githubUserName      Github登录账号
+     * @param githubPassword      Github登录密码
+     * @param removeDeletedRefs   是否删除已经不存在的引用,默认为true即删除
+     * @param checkFetchedObjects 接收之前是否先校验对象的有效性
+     */
+    public static FetchResult fetchWithHttp(Git git, String branchName, String remote, String githubUserName, String githubPassword,
+                                            boolean removeDeletedRefs, boolean checkFetchedObjects) {
+        return fetchWithHttp(git, branchName, remote, githubUserName, githubPassword, removeDeletedRefs, checkFetchedObjects, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git               Git实例对象
+     * @param branchName        分支名称,若不指定或留空,则默认值为master
+     * @param remote            远程仓库别名,若不指定或留空,则默认值为origin
+     * @param githubUserName    Github登录账号
+     * @param githubPassword    Github登录密码
+     * @param removeDeletedRefs 是否删除已经不存在的引用,默认为true即删除
+     */
+    public static FetchResult fetchWithHttp(Git git, String branchName, String remote, String githubUserName, String githubPassword,
+                                            boolean removeDeletedRefs) {
+        return fetchWithHttp(git, branchName, remote, githubUserName, githubPassword, removeDeletedRefs, false, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
+     * @param remote         远程仓库别名,若不指定或留空,则默认值为origin
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     */
+    public static FetchResult fetchWithHttp(Git git, String branchName, String remote, String githubUserName, String githubPassword) {
+        return fetchWithHttp(git, branchName, remote, githubUserName, githubPassword, true, false, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     */
+    public static FetchResult fetchWithHttp(Git git, String branchName, String githubUserName, String githubPassword) {
+        return fetchWithHttp(git, branchName, null, githubUserName, githubPassword, true, false, false, true);
+    }
+
+    /**
+     * 从远程仓库拉取最新版本内容到本地仓库,但不自动合并,相当于git fetch命令
+     *
+     * @param git            Git实例对象
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     */
+    public static FetchResult fetchWithHttp(Git git, String githubUserName, String githubPassword) {
+        return fetchWithHttp(git, null, null, githubUserName, githubPassword, true, false, false, true);
+    }
+
+    /**
      * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
      *
      * @param git              Git实例对象
-     * @param remoteBranchName 远程分支名称,默认为master
-     * @param remote           远程仓库的别名
+     * @param remoteBranchName 远程分支名称,若不指定或留空,则默认值为master
+     * @param remote           远程仓库的别名,若不指定或留空,则默认值为origin
      * @param privateKeyPath   本地私钥文件的存放路径
      * @param mergeStrategy    文件合并策略,默认为RECURSIVE
      * @return
@@ -723,8 +988,8 @@ public class GithubUtil {
      * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
      *
      * @param git              Git实例对象
-     * @param remoteBranchName 远程分支名称,默认为master
-     * @param remote           远程仓库的别名
+     * @param remoteBranchName 远程分支名称,若不指定或留空,则默认值为master
+     * @param remote           远程仓库的别名,若不指定或留空,则默认值为origin
      * @param privateKeyPath   本地私钥文件的存放路径
      * @return
      */
@@ -737,8 +1002,8 @@ public class GithubUtil {
      * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
      *
      * @param git              Git实例对象
-     * @param remoteBranchName 远程分支名称,默认为master
-     * @param remote           远程仓库的别名
+     * @param remoteBranchName 远程分支名称,若不指定或留空,则默认值为master
+     * @param remote           远程仓库的别名,若不指定或留空,则默认值为origin
      * @return
      */
     public static PullResult pullWithSSH(Git git, String remoteBranchName, String remote) {
@@ -749,7 +1014,7 @@ public class GithubUtil {
      * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
      *
      * @param git              Git实例对象
-     * @param remoteBranchName 远程分支名称,默认为master
+     * @param remoteBranchName 远程分支名称,若不指定或留空,则默认值为master
      * @return
      */
     public static PullResult pullWithSSH(Git git, String remoteBranchName) {
@@ -770,8 +1035,8 @@ public class GithubUtil {
      * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
      *
      * @param git              Git实例对象
-     * @param remoteBranchName 远程分支名称,默认为master
-     * @param remote           远程仓库的别名
+     * @param remoteBranchName 远程分支名称,若不指定或留空,则默认值为master
+     * @param remote           远程仓库的别名,若不指定或留空,则默认值为origin
      * @param githubUserName   Github登录账号
      * @param githubPassword   Github登录密码
      * @param mergeStrategy    文件合并策略,默认为RECURSIVE
@@ -803,8 +1068,8 @@ public class GithubUtil {
      * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
      *
      * @param git              Git实例对象
-     * @param remoteBranchName 远程分支名称,默认为master
-     * @param remote           远程仓库的别名
+     * @param remoteBranchName 远程分支名称,若不指定或留空,则默认值为master
+     * @param remote           远程仓库的别名,若不指定或留空,则默认值为origin
      * @param githubUserName   Github登录账号
      * @param githubPassword   Github登录密码
      * @return
@@ -818,7 +1083,7 @@ public class GithubUtil {
      * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
      *
      * @param git              Git实例对象
-     * @param remoteBranchName 远程分支名称,默认为master
+     * @param remoteBranchName 远程分支名称,若不指定或留空,则默认值为master
      * @param githubUserName   Github登录账号
      * @param githubPassword   Github登录密码
      * @return
@@ -843,7 +1108,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param privateKeyPath 本地私钥文件的存放路径
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
      * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
@@ -887,7 +1152,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param privateKeyPath 本地私钥文件的存放路径
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
      * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
@@ -904,7 +1169,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param privateKeyPath 本地私钥文件的存放路径
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
      * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
@@ -920,7 +1185,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param privateKeyPath 本地私钥文件的存放路径
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
      * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
@@ -935,7 +1200,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param privateKeyPath 本地私钥文件的存放路径
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
      * @return
@@ -948,7 +1213,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param privateKeyPath 本地私钥文件的存放路径
      * @return
      */
@@ -960,7 +1225,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git        Git实例对象
-     * @param branchName 分支名称
+     * @param branchName 分支名称,若不指定或留空,则默认值为master
      * @return
      */
     public static Iterable<PushResult> pushWithSSH(Git git, String branchName) {
@@ -981,7 +1246,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param githubUserName Github登录账号
      * @param githubPassword Github登录密码
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
@@ -1022,7 +1287,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param githubUserName Github登录账号
      * @param githubPassword Github登录密码
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
@@ -1041,7 +1306,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param githubUserName Github登录账号
      * @param githubPassword Github登录密码
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
@@ -1058,7 +1323,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param githubUserName Github登录账号
      * @param githubPassword Github登录密码
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
@@ -1074,7 +1339,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param githubUserName Github登录账号
      * @param githubPassword Github登录密码
      * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
@@ -1089,7 +1354,7 @@ public class GithubUtil {
      * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
      *
      * @param git            Git实例对象
-     * @param branchName     分支名称
+     * @param branchName     分支名称,若不指定或留空,则默认值为master
      * @param githubUserName Github登录账号
      * @param githubPassword Github登录密码
      * @return
@@ -1109,6 +1374,9 @@ public class GithubUtil {
     public static Iterable<PushResult> pushWithHttp(Git git, String githubUserName, String githubPassword) {
         return pushWithHttp(git, null, githubUserName, githubPassword, true, false, false, false, false);
     }
+
+    //git fetch
+
 
     /**
      * 关闭Git实例,释放文件句柄资源
