@@ -1376,9 +1376,6 @@ public class GithubUtil {
         return pushWithHttp(git, null, githubUserName, githubPassword, true, false, false, false, false);
     }
 
-    //git fetch
-
-
     /**
      * 关闭Git实例,释放文件句柄资源
      *

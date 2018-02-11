@@ -60,13 +60,13 @@ public class MarkdownMoveHandler implements Handler<MarkdownMoveHandlerInput, Ma
             try {
                 String targetPath = null;
                 for (String directory : directories) {
-                    Files.move(Paths.get(wordPath + "/" + directory + ".md"),
-                            Paths.get(wordPath + "/" + directory + "/" + directory + ".md"), StandardCopyOption.REPLACE_EXISTING);
                     targetPath = wordPath + "/" + directory + "/" + directory + ".md";
+                    Files.move(Paths.get(wordPath + "/" + directory + ".md"),
+                            Paths.get(targetPath), StandardCopyOption.REPLACE_EXISTING);
                     output.getMarkdownFilePath().add(targetPath);
                 }
             } catch (IOException e) {
-                log.error("Moving the file from [wordPath] occured IOException");
+                log.error("Moving the file from [{}] occured IOException:\n{}", wordPath, e.getMessage());
             }
         }
     }
