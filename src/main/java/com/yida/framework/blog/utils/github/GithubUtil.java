@@ -11,6 +11,7 @@ import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.*;
@@ -55,6 +56,10 @@ public class GithubUtil {
 
         Git git = getGit(localRepositoryPath);
 
+        //git checkout master branch
+        Ref ref = checkout(git, "master");
+        System.out.println("ref:" + ref);
+
         //git add
         DirCache dirCache = add(git);
         System.out.println(dirCache);
@@ -62,6 +67,10 @@ public class GithubUtil {
         //git commit
         RevCommit revCommit = commit(git, "commit via jgit for Testing", "Lanxiaowei", "736031305@qq.com", true, false);
         System.out.println(revCommit);
+
+        //git pull
+        PullResult pullResult = pullWithSSH(git);
+        System.out.println("git pull:" + pullResult);
     }
 
     /**
@@ -169,7 +178,8 @@ public class GithubUtil {
                 cloneCommand = cloneCommand.setBranch("refs/heads/" + branchName);
             }
             if (null != githubUserName && !"".equals(githubUserName)) {
-                cloneCommand = cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubUserName, githubPassword));
+                cloneCommand = cloneCommand.setCredentialsProvider(
+                        new UsernamePasswordCredentialsProvider(githubUserName, githubPassword));
             }
             if (null != remote && !"".equals(remote)) {
                 //The default value for "remote" is [origin]
@@ -591,6 +601,162 @@ public class GithubUtil {
         return commit(git, null, null, null, true, false);
     }
 
+    /**
+     * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
+     *
+     * @param git              Git实例对象
+     * @param remoteBranchName 远程分支名称,默认为master
+     * @param remote           远程仓库的别名
+     * @param privateKeyPath   本地私钥文件的存放路径
+     * @param mergeStrategy    文件合并策略,默认为RECURSIVE
+     * @return
+     */
+    public static PullResult pullWithSSH(Git git, String remoteBranchName, String remote,
+                                         String privateKeyPath, MergeStrategy mergeStrategy) {
+        PullCommand pullCommand = git.pull()
+                .setRemote((null == remote || "".equals(remote)) ? "origin" : remote)
+                .setRemoteBranchName((null == remoteBranchName || "".equals(remoteBranchName)) ?
+                        "master" : remoteBranchName)
+                .setStrategy(null == mergeStrategy ? MergeStrategy.RECURSIVE : mergeStrategy);
+        SshSessionFactory sshSessionFactory = createSshSessionFactory(privateKeyPath);
+        if (null != sshSessionFactory) {
+            pullCommand = pullCommand.setTransportConfigCallback(new TransportConfigCallback() {
+                @Override
+                public void configure(Transport transport) {
+                    SshTransport sshTransport = (SshTransport) transport;
+                    sshTransport.setSshSessionFactory(sshSessionFactory);
+                }
+            });
+        }
+        try {
+            return pullCommand.call();
+        } catch (GitAPIException e) {
+            log.error("While pull from the remote repository with privateKeyPath[{}],we occur exception:\n{}",
+                    privateKeyPath, e.getMessage());
+            return null;
+        }
+    }
+
+
+    /**
+     * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
+     *
+     * @param git              Git实例对象
+     * @param remoteBranchName 远程分支名称,默认为master
+     * @param remote           远程仓库的别名
+     * @param privateKeyPath   本地私钥文件的存放路径
+     * @return
+     */
+    public static PullResult pullWithSSH(Git git, String remoteBranchName, String remote,
+                                         String privateKeyPath) {
+        return pullWithSSH(git, remoteBranchName, remote, privateKeyPath, null);
+    }
+
+    /**
+     * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
+     *
+     * @param git              Git实例对象
+     * @param remoteBranchName 远程分支名称,默认为master
+     * @param remote           远程仓库的别名
+     * @return
+     */
+    public static PullResult pullWithSSH(Git git, String remoteBranchName, String remote) {
+        return pullWithSSH(git, remoteBranchName, remote, null, null);
+    }
+
+    /**
+     * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
+     *
+     * @param git              Git实例对象
+     * @param remoteBranchName 远程分支名称,默认为master
+     * @return
+     */
+    public static PullResult pullWithSSH(Git git, String remoteBranchName) {
+        return pullWithSSH(git, remoteBranchName, null, null, null);
+    }
+
+    /**
+     * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
+     *
+     * @param git Git实例对象
+     * @return
+     */
+    public static PullResult pullWithSSH(Git git) {
+        return pullWithSSH(git, null, null, null, null);
+    }
+
+    /**
+     * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
+     *
+     * @param git              Git实例对象
+     * @param remoteBranchName 远程分支名称,默认为master
+     * @param remote           远程仓库的别名
+     * @param githubUserName   Github登录账号
+     * @param githubPassword   Github登录密码
+     * @param mergeStrategy    文件合并策略,默认为RECURSIVE
+     * @return
+     */
+    public static PullResult pullWithHttp(Git git, String remoteBranchName, String remote,
+                                          String githubUserName, String githubPassword,
+                                          MergeStrategy mergeStrategy) {
+        PullCommand pullCommand = git.pull()
+                .setRemote((null == remote || "".equals(remote)) ? "origin" : remote)
+                .setRemoteBranchName((null == remoteBranchName || "".equals(remoteBranchName)) ?
+                        "master" : remoteBranchName)
+                .setStrategy(null == mergeStrategy ? MergeStrategy.RECURSIVE : mergeStrategy);
+
+        if (null == githubUserName || "".equals(githubUserName)) {
+            pullCommand = pullCommand.setCredentialsProvider(
+                    new UsernamePasswordCredentialsProvider(githubUserName, githubPassword));
+        }
+        try {
+            return pullCommand.call();
+        } catch (GitAPIException e) {
+            log.error("While pull from the remote repository with githubUserName[{}],we occur exception:\n{}",
+                    githubUserName, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
+     *
+     * @param git              Git实例对象
+     * @param remoteBranchName 远程分支名称,默认为master
+     * @param remote           远程仓库的别名
+     * @param githubUserName   Github登录账号
+     * @param githubPassword   Github登录密码
+     * @return
+     */
+    public static PullResult pullWithHttp(Git git, String remoteBranchName, String remote,
+                                          String githubUserName, String githubPassword) {
+        return pullWithHttp(git, remoteBranchName, remote, githubUserName, githubPassword, null);
+    }
+
+    /**
+     * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
+     *
+     * @param git              Git实例对象
+     * @param remoteBranchName 远程分支名称,默认为master
+     * @param githubUserName   Github登录账号
+     * @param githubPassword   Github登录密码
+     * @return
+     */
+    public static PullResult pullWithHttp(Git git, String remoteBranchName, String githubUserName, String githubPassword) {
+        return pullWithHttp(git, remoteBranchName, null, githubUserName, githubPassword, null);
+    }
+
+    /**
+     * 从远程仓库拉取最新内容至本地仓库,相当于执行git pull命令
+     *
+     * @param git            Git实例对象
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     * @return
+     */
+    public static PullResult pullWithHttp(Git git, String githubUserName, String githubPassword) {
+        return pullWithHttp(git, null, null, githubUserName, githubPassword, null);
+    }
 
 
     /**

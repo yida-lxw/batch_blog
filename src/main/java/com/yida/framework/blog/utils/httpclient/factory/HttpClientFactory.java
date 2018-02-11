@@ -4,6 +4,7 @@ import com.yida.framework.blog.utils.httpclient.config.AbstractHttpClientConfigu
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.config.Registry;
@@ -70,6 +71,7 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
                 .setConnectionRequestTimeout(this.clientConfig.getHttpConnectionRequestTimeout())
                 .setConnectTimeout(this.clientConfig.getHttpConnectTimeout())
                 .setSocketTimeout(this.clientConfig.getHttpSocketTimeout())
+                .setCookieSpec(CookieSpecs.STANDARD)
                 .setStaleConnectionCheckEnabled(this.clientConfig.getHttpStaleConnectionCheckEnabled())
                 .build();
 
