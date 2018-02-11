@@ -9,6 +9,7 @@ import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -452,6 +453,65 @@ public class GithubUtil {
     }
 
     /**
+     * 检出某个分支到本地仓库,类似于执行git checkout命令
+     *
+     * @param git               Git实例对象
+     * @param branchName        分支名称,若不指定或留空,则默认会检出master分支至本地仓库
+     * @param createBranch      是否自动创建本地分支(当本地仓库不存在该分支时),默认为true
+     * @param setupUpstreamMode 自动创建本地分支时,自动与远程仓库的分支关联
+     * @return
+     */
+    public static Ref checkout(Git git, String branchName, boolean createBranch,
+                               CreateBranchCommand.SetupUpstreamMode setupUpstreamMode) {
+        String actualBranchName = (null == branchName || "".equals(branchName)) ? "master" : branchName;
+        try {
+            return git.checkout()
+                    .setCreateBranch(createBranch)
+                    .setForce(true)
+                    .setName(actualBranchName)
+                    .setStartPoint("origin/" + actualBranchName)
+                    .setUpstreamMode(null == setupUpstreamMode ? CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM : setupUpstreamMode).call();
+        } catch (GitAPIException e) {
+            log.error("While checkout a branch to the local repository with branchName[{}],we occur exception:\n{}",
+                    branchName, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 检出某个分支到本地仓库,类似于执行git checkout命令
+     *
+     * @param git          Git实例对象
+     * @param branchName   分支名称,若不指定或留空,则默认会检出master分支至本地仓库
+     * @param createBranch 是否自动创建本地分支(当本地仓库不存在该分支时),默认为true
+     * @return
+     */
+    public static Ref checkout(Git git, String branchName, boolean createBranch) {
+        return checkout(git, branchName, createBranch, null);
+    }
+
+    /**
+     * 检出某个分支到本地仓库,类似于执行git checkout命令
+     *
+     * @param git        Git实例对象
+     * @param branchName 分支名称,若不指定或留空,则默认会检出master分支至本地仓库
+     * @return
+     */
+    public static Ref checkout(Git git, String branchName) {
+        return checkout(git, branchName, true, null);
+    }
+
+    /**
+     * 检出某个分支到本地仓库,类似于执行git checkout命令
+     *
+     * @param git Git实例对象
+     * @return
+     */
+    public static Ref checkout(Git git) {
+        return checkout(git, null, true, null);
+    }
+
+    /**
      * git提交操作即将新增/更新/删除的文件提交到本地仓库
      *
      * @param git            Git实例对象
@@ -530,6 +590,8 @@ public class GithubUtil {
     public static RevCommit commit(Git git) {
         return commit(git, null, null, null, true, false);
     }
+
+
 
     /**
      * 关闭Git实例,释放文件句柄资源
