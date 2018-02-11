@@ -264,7 +264,6 @@ public class HttpClientUtil {
         try {
             httpResponse = closeHttpClient.execute(httpGet);
         } catch (IOException e) {
-            e.printStackTrace();
             log.error("An exception occurred while performing the HTTP get request with URL[{}]:\n{}.", httpGet.getURI().toString(), e.getMessage());
             return null;
         }
