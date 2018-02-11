@@ -627,9 +627,10 @@ public class GithubUtil {
             commitCommand = commitCommand.setAuthor(new PersonIdent(committerName, committerEmail));
             commitCommand = commitCommand.setCommitter(committerName, committerEmail);
         }
-        if (null != commitMessage && !"".equals(commitMessage)) {
-            commitCommand = commitCommand.setMessage(commitMessage);
+        if (null == commitMessage || "".equals(commitMessage)) {
+            commitMessage = "This is a default commitMessage if you don't give it which was required.";
         }
+        commitCommand = commitCommand.setMessage(commitMessage);
         try {
             return commitCommand.call();
         } catch (GitAPIException e) {
