@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -29,6 +30,8 @@ import java.util.Set;
  * @Description Github操作工具类, 基于JGit封装
  */
 public class GithubUtil {
+    public static final String BRANCH_MASTER = "master";
+
     private static Logger log = LogManager.getLogger(GithubUtil.class.getName());
 
     public static final String USER_HOME = fixedPathDelimiter(System.getProperty("user.home"));
@@ -57,7 +60,7 @@ public class GithubUtil {
         Git git = getGit(localRepositoryPath);
 
         //git checkout master branch
-        Ref ref = checkout(git, "master");
+        Ref ref = checkout(git, BRANCH_MASTER);
         System.out.println("ref:" + ref);
 
         //git add
@@ -71,6 +74,17 @@ public class GithubUtil {
         //git pull
         PullResult pullResult = pullWithSSH(git);
         System.out.println("git pull:" + pullResult);
+
+        //git push
+        Iterable<PushResult> pushResults = pushWithSSH(git);
+        Iterator<PushResult> pushResultIterator = pushResults.iterator();
+        PushResult pushResult = null;
+        RemoteRefUpdate.Status status = null;
+        while (pushResultIterator.hasNext()) {
+            pushResult = pushResultIterator.next();
+            status = pushResult.getRemoteUpdate("refs/heads/" + BRANCH_MASTER).getStatus();
+            System.out.println(status.toString());
+        }
     }
 
     /**
@@ -539,7 +553,7 @@ public class GithubUtil {
      */
     public static Ref checkout(Git git, String branchName, boolean createBranch,
                                CreateBranchCommand.SetupUpstreamMode setupUpstreamMode) {
-        String actualBranchName = (null == branchName || "".equals(branchName)) ? "master" : branchName;
+        String actualBranchName = (null == branchName || "".equals(branchName)) ? BRANCH_MASTER : branchName;
         try {
             return git.checkout()
                     .setCreateBranch(createBranch)
@@ -683,7 +697,7 @@ public class GithubUtil {
         PullCommand pullCommand = git.pull()
                 .setRemote((null == remote || "".equals(remote)) ? "origin" : remote)
                 .setRemoteBranchName((null == remoteBranchName || "".equals(remoteBranchName)) ?
-                        "master" : remoteBranchName)
+                        BRANCH_MASTER : remoteBranchName)
                 .setStrategy(null == mergeStrategy ? MergeStrategy.RECURSIVE : mergeStrategy);
         SshSessionFactory sshSessionFactory = createSshSessionFactory(privateKeyPath);
         if (null != sshSessionFactory) {
@@ -769,7 +783,7 @@ public class GithubUtil {
         PullCommand pullCommand = git.pull()
                 .setRemote((null == remote || "".equals(remote)) ? "origin" : remote)
                 .setRemoteBranchName((null == remoteBranchName || "".equals(remoteBranchName)) ?
-                        "master" : remoteBranchName)
+                        BRANCH_MASTER : remoteBranchName)
                 .setStrategy(null == mergeStrategy ? MergeStrategy.RECURSIVE : mergeStrategy);
 
         if (null == githubUserName || "".equals(githubUserName)) {
@@ -825,6 +839,276 @@ public class GithubUtil {
         return pullWithHttp(git, null, null, githubUserName, githubPassword, null);
     }
 
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param privateKeyPath 本地私钥文件的存放路径
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
+     * @param pushAll        是否推送所有分支至远程仓库,默认至推送当前所在分支
+     * @param atomic         是否开启原子推送
+     * @param dryRun         开启dry-run模拟测试
+     * @return
+     */
+    public static Iterable<PushResult> pushWithSSH(Git git, String branchName, String privateKeyPath, boolean thinPack,
+                                                   boolean force, boolean pushAll, boolean atomic, boolean dryRun) {
+        if (null == branchName || "".equals(branchName)) {
+            branchName = BRANCH_MASTER;
+        }
+        RefSpec refSpec = new RefSpec(branchName + ":" + branchName);
+        PushCommand pushCommand = git.push().setAtomic(atomic).setDryRun(dryRun)
+                .setPushAll().setForce(force).setThin(thinPack)
+                .setRefSpecs(refSpec);
+        if (pushAll) {
+            pushCommand = pushCommand.setPushAll();
+        }
+        SshSessionFactory sshSessionFactory = createSshSessionFactory(privateKeyPath);
+        if (null != sshSessionFactory) {
+            pushCommand = pushCommand.setTransportConfigCallback(new TransportConfigCallback() {
+                @Override
+                public void configure(Transport transport) {
+                    SshTransport sshTransport = (SshTransport) transport;
+                    sshTransport.setSshSessionFactory(sshSessionFactory);
+                }
+            });
+        }
+        try {
+            return pushCommand.call();
+        } catch (GitAPIException e) {
+            log.error("While push[SSH] the commit to the remote repository(BranchName)[{}],we occur exception:\n{}",
+                    branchName, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param privateKeyPath 本地私钥文件的存放路径
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
+     * @param pushAll        是否推送所有分支至远程仓库,默认只推送当前所在分支
+     * @param atomic         是否开启原子推送
+     * @return
+     */
+    public static Iterable<PushResult> pushWithSSH(Git git, String branchName, String privateKeyPath, boolean thinPack,
+                                                   boolean force, boolean pushAll, boolean atomic) {
+        return pushWithSSH(git, branchName, privateKeyPath, thinPack, force, pushAll, atomic, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param privateKeyPath 本地私钥文件的存放路径
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
+     * @param pushAll        是否推送所有分支至远程仓库,默认只推送当前所在分支
+     * @return
+     */
+    public static Iterable<PushResult> pushWithSSH(Git git, String branchName, String privateKeyPath, boolean thinPack,
+                                                   boolean force, boolean pushAll) {
+        return pushWithSSH(git, branchName, privateKeyPath, thinPack, force, pushAll, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param privateKeyPath 本地私钥文件的存放路径
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
+     * @return
+     */
+    public static Iterable<PushResult> pushWithSSH(Git git, String branchName, String privateKeyPath, boolean thinPack,
+                                                   boolean force) {
+        return pushWithSSH(git, branchName, privateKeyPath, thinPack, force, false, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param privateKeyPath 本地私钥文件的存放路径
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @return
+     */
+    public static Iterable<PushResult> pushWithSSH(Git git, String branchName, String privateKeyPath, boolean thinPack) {
+        return pushWithSSH(git, branchName, privateKeyPath, thinPack, false, false, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param privateKeyPath 本地私钥文件的存放路径
+     * @return
+     */
+    public static Iterable<PushResult> pushWithSSH(Git git, String branchName, String privateKeyPath) {
+        return pushWithSSH(git, branchName, privateKeyPath, true, false, false, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git        Git实例对象
+     * @param branchName 分支名称
+     * @return
+     */
+    public static Iterable<PushResult> pushWithSSH(Git git, String branchName) {
+        return pushWithSSH(git, branchName, null, true, false, false, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git Git实例对象
+     * @return
+     */
+    public static Iterable<PushResult> pushWithSSH(Git git) {
+        return pushWithSSH(git, null, null, true, false, false, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
+     * @param pushAll        是否推送所有分支至远程仓库,默认至推送当前所在分支
+     * @param atomic         是否开启原子推送
+     * @param dryRun         开启dry-run模拟测试
+     * @return
+     */
+    public static Iterable<PushResult> pushWithHttp(Git git, String branchName, String githubUserName, String githubPassword,
+                                                    boolean thinPack, boolean force, boolean pushAll,
+                                                    boolean atomic, boolean dryRun) {
+        if (null == branchName || "".equals(branchName)) {
+            branchName = BRANCH_MASTER;
+        }
+        RefSpec refSpec = new RefSpec(branchName + ":" + branchName);
+        PushCommand pushCommand = git.push().setAtomic(atomic).setDryRun(dryRun)
+                .setPushAll().setForce(force).setThin(thinPack)
+                .setRefSpecs(refSpec);
+        if (pushAll) {
+            pushCommand = pushCommand.setPushAll();
+        }
+        if (null == githubUserName || "".equals(githubUserName)) {
+            pushCommand = pushCommand.setCredentialsProvider(
+                    new UsernamePasswordCredentialsProvider(githubUserName, githubPassword)
+            );
+        }
+        try {
+            return pushCommand.call();
+        } catch (GitAPIException e) {
+            log.error("While push[Http] the commit to the remote repository with BranchName[{}] and GithubUserName[{}],we occur exception:\n{}",
+                    branchName, githubUserName, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
+     * @param pushAll        是否推送所有分支至远程仓库,默认至推送当前所在分支
+     * @param atomic         是否开启原子推送
+     * @return
+     */
+    public static Iterable<PushResult> pushWithHttp(Git git, String branchName, String githubUserName, String githubPassword,
+                                                    boolean thinPack, boolean force, boolean pushAll,
+                                                    boolean atomic) {
+        return pushWithHttp(git, branchName, githubUserName, githubPassword, thinPack, force, pushAll, atomic, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
+     * @param pushAll        是否推送所有分支至远程仓库,默认至推送当前所在分支
+     * @return
+     */
+    public static Iterable<PushResult> pushWithHttp(Git git, String branchName, String githubUserName, String githubPassword,
+                                                    boolean thinPack, boolean force, boolean pushAll) {
+        return pushWithHttp(git, branchName, githubUserName, githubPassword, thinPack, force, pushAll, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @param force          强制将本地仓库内容推送到远程仓库进行覆盖,即使远程仓库的内容版本更新
+     * @return
+     */
+    public static Iterable<PushResult> pushWithHttp(Git git, String branchName, String githubUserName, String githubPassword,
+                                                    boolean thinPack, boolean force) {
+        return pushWithHttp(git, branchName, githubUserName, githubPassword, thinPack, force, false, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     * @param thinPack       是否开启Git的数据包瘦身优化,默认为true即开启
+     * @return
+     */
+    public static Iterable<PushResult> pushWithHttp(Git git, String branchName, String githubUserName, String githubPassword,
+                                                    boolean thinPack) {
+        return pushWithHttp(git, branchName, githubUserName, githubPassword, thinPack, false, false, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param branchName     分支名称
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     * @return
+     */
+    public static Iterable<PushResult> pushWithHttp(Git git, String branchName, String githubUserName, String githubPassword) {
+        return pushWithHttp(git, branchName, githubUserName, githubPassword, true, false, false, false, false);
+    }
+
+    /**
+     * 将本地仓库的修改推送到Github远程仓库,相当于git push命令
+     *
+     * @param git            Git实例对象
+     * @param githubUserName Github登录账号
+     * @param githubPassword Github登录密码
+     * @return
+     */
+    public static Iterable<PushResult> pushWithHttp(Git git, String githubUserName, String githubPassword) {
+        return pushWithHttp(git, null, githubUserName, githubPassword, true, false, false, false, false);
+    }
 
     /**
      * 关闭Git实例,释放文件句柄资源
