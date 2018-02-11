@@ -463,6 +463,72 @@ public class GithubUtil {
     }
 
     /**
+     * 将文件从Git暂存区移除,相当于git rm命令
+     *
+     * @param git          Git实例对象
+     * @param filePatterns 需要删除的文件表达式,默认是相对本地仓库根目录
+     * @param cached       是否只是将文件从暂存区移除,但不真实将文件从本地仓库中删除,默认为false
+     * @return
+     */
+    public static DirCache rm(Git git, String[] filePatterns, boolean cached) {
+        if (null == filePatterns || filePatterns.length <= 0) {
+            return null;
+        }
+        RmCommand rmCommand = git.rm().setCached(cached);
+        Set<String> filePatternSet = new HashSet<String>(Arrays.asList(filePatterns));
+        for (String filePattern : filePatternSet) {
+            if (null == filePattern || "".equals(filePattern)) {
+                continue;
+            }
+            rmCommand = rmCommand.addFilepattern(filePattern);
+        }
+        try {
+            return rmCommand.call();
+        } catch (GitAPIException e) {
+            log.error("While remove File from the local repository with filePatterns[{}],we occur exception:\n{}",
+                    filePatterns, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 将文件从Git暂存区移除,相当于git rm命令
+     *
+     * @param git          Git实例对象
+     * @param filePatterns 需要删除的文件表达式,默认是相对本地仓库根目录
+     * @return
+     */
+    public static DirCache rm(Git git, String[] filePatterns) {
+        return rm(git, filePatterns, false);
+    }
+
+    /**
+     * 将文件从Git暂存区移除,相当于git rm命令
+     *
+     * @param git         Git实例对象
+     * @param filePattern 需要删除的文件表达式,默认是相对本地仓库根目录
+     * @param cached      是否只是将文件从暂存区移除,但不真实将文件从本地仓库中删除,默认为false
+     * @return
+     */
+    public static DirCache rm(Git git, String filePattern, boolean cached) {
+        if (null == filePattern || "".equals(filePattern)) {
+            return null;
+        }
+        return rm(git, new String[]{filePattern}, cached);
+    }
+
+    /**
+     * 将文件从Git暂存区移除,相当于git rm命令
+     *
+     * @param git         Git实例对象
+     * @param filePattern 需要删除的文件表达式,默认是相对本地仓库根目录
+     * @return
+     */
+    public static DirCache rm(Git git, String filePattern) {
+        return rm(git, filePattern, false);
+    }
+
+    /**
      * 检出某个分支到本地仓库,类似于执行git checkout命令
      *
      * @param git               Git实例对象
@@ -535,6 +601,7 @@ public class GithubUtil {
                                    String committerName, String committerEmail,
                                    boolean allowEmpty, boolean amend) {
         CommitCommand commitCommand = git.commit()
+                .setAll(true)
                 .setAllowEmpty(allowEmpty)
                 .setAmend(amend);
         if ((null != committerName && !"".equals(committerName)) ||
