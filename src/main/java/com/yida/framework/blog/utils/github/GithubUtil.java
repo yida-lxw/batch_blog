@@ -786,7 +786,7 @@ public class GithubUtil {
                         BRANCH_MASTER : remoteBranchName)
                 .setStrategy(null == mergeStrategy ? MergeStrategy.RECURSIVE : mergeStrategy);
 
-        if (null == githubUserName || "".equals(githubUserName)) {
+        if (null != githubUserName && !"".equals(githubUserName)) {
             pullCommand = pullCommand.setCredentialsProvider(
                     new UsernamePasswordCredentialsProvider(githubUserName, githubPassword));
         }
@@ -1004,7 +1004,7 @@ public class GithubUtil {
         if (pushAll) {
             pushCommand = pushCommand.setPushAll();
         }
-        if (null == githubUserName || "".equals(githubUserName)) {
+        if (null != githubUserName && !"".equals(githubUserName)) {
             pushCommand = pushCommand.setCredentialsProvider(
                     new UsernamePasswordCredentialsProvider(githubUserName, githubPassword)
             );
