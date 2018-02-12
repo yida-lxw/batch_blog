@@ -8,6 +8,7 @@
   "blog_send_dates": "20180207",
   "github_local_repo_path": "G:/git-local",
   "github_remote_repo_path": "git@github.com:yida-lxw/blog.git",
+  "github_blog_branch_name": "master",
   "github_local_code_dir": "G:/git-local/blog/",
   "github_private_key_path": "",
   "github_username": "yida-lxw",

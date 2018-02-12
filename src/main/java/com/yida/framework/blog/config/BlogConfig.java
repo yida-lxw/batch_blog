@@ -21,6 +21,7 @@ public class BlogConfig {
     private static final String GITHUB_PRIVATE_KEY_PATH = "github_private_key_path";
     private static final String GITHUB_LOCAL_REPO_PATH = "github_local_repo_path";
     private static final String GITHUB_REMOTE_REPO_PATH = "github_remote_repo_path";
+    private static final String GITHUB_BLOG_BRANCH_NAME = "github_blog_branch_name";
     private static final String GITHUB_LOCAL_CODE_DIR = "github_local_code_dir";
     private static final String GITHUB_AUTHOR_NAME = "github_author_name";
     private static final String GITHUB_AUTHOR_EMAIL = "github_author_email";
@@ -66,6 +67,11 @@ public class BlogConfig {
      * Github的远程仓库URL
      */
     private String githubRemoteRepoPath;
+
+    /**
+     * Github博客的远程分支名称
+     */
+    private String githubBlogBranchName;
 
     /**
      * 本地项目代码的存放目录
@@ -135,6 +141,7 @@ public class BlogConfig {
         this.githubPrivateKeyPath = ConfigContext.getStringProperty(GITHUB_PRIVATE_KEY_PATH);
         this.githubLocalRepoPath = ConfigContext.getStringProperty(GITHUB_LOCAL_REPO_PATH);
         this.githubRemoteRepoPath = ConfigContext.getStringProperty(GITHUB_REMOTE_REPO_PATH);
+        this.githubBlogBranchName = ConfigContext.getStringProperty(GITHUB_BLOG_BRANCH_NAME);
         this.githubLocalCodeDir = ConfigContext.getStringProperty(GITHUB_LOCAL_CODE_DIR);
         this.githubAuthorName = ConfigContext.getStringProperty(GITHUB_AUTHOR_NAME);
         this.githubAuthorEmail = ConfigContext.getStringProperty(GITHUB_AUTHOR_EMAIL);
@@ -152,6 +159,7 @@ public class BlogConfig {
         stringBuilder.append("Github Private Key: " + getGithubPrivateKeyPath() + "\n");
         stringBuilder.append("Github Local Repository Path: " + getGithubLocalRepoPath() + "\n");
         stringBuilder.append("Github Remote Repository Path: " + getGithubRemoteRepoPath() + "\n");
+        stringBuilder.append("Github Blog Remote Branch Name: " + getGithubBlogBranchName() + "\n");
         stringBuilder.append("Github Local Code directory: " + getGithubLocalCodeDir() + "\n");
         stringBuilder.append("Github Author/Committer Name: " + getGithubAuthorName() + "\n");
         stringBuilder.append("Github Author/Committer Email: " + getGithubAuthorEmail());
@@ -228,6 +236,14 @@ public class BlogConfig {
 
     public void setGithubRemoteRepoPath(String githubRemoteRepoPath) {
         this.githubRemoteRepoPath = githubRemoteRepoPath;
+    }
+
+    public String getGithubBlogBranchName() {
+        return githubBlogBranchName;
+    }
+
+    public void setGithubBlogBranchName(String githubBlogBranchName) {
+        this.githubBlogBranchName = githubBlogBranchName;
     }
 
     public String getGithubLocalCodeDir() {

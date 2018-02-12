@@ -8,6 +8,10 @@ import com.yida.framework.blog.publish.BlogPublishParam;
  * @Description 发布博客至Github所需的参数定义
  */
 public class GithubBlogPublishParam extends BlogPublishParam {
+    /**
+     * 待提交到Github的文件的路径表达式,支持相对路径,默认相对本地仓库根目录
+     */
+    private String[] filePatterns;
 
     /**
      * Github本地仓库目录
@@ -48,6 +52,14 @@ public class GithubBlogPublishParam extends BlogPublishParam {
      * Github中的作者以及提交者的Email信息
      */
     private String githubAuthorEmail;
+
+    public String[] getFilePatterns() {
+        return filePatterns;
+    }
+
+    public void setFilePatterns(String[] filePatterns) {
+        this.filePatterns = filePatterns;
+    }
 
     public String getGithubLocalRepositoryPath() {
         this.githubLocalRepositoryPath = this.config.getGithubLocalRepoPath();
