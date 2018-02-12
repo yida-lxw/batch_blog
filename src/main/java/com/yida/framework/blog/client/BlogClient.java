@@ -6,5 +6,5 @@ package com.yida.framework.blog.client;
  * @Description 博客发布工具的客户端接口
  */
 public interface BlogClient {
-    void send();
+    void go();
 }

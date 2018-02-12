@@ -9,7 +9,7 @@ import java.util.List;
  * @Date 2018-02-12 12:12
  * @Description 博客发布工具的客户端接口抽象实现类
  */
-public abstract class AbstractBlogClient {
+public abstract class AbstractBlogClient implements BlogClient {
     /**
      * 博客待发布的博客平台列表,比如:Github,ITeye,CSDN,OSChina,CNBlog,简书等等
      */
@@ -28,6 +28,7 @@ public abstract class AbstractBlogClient {
     /**
      * 博客发布工具的启动入口
      */
+    @Override
     public void go() {
         beforeBlogSend();
         prepareBlogPlatform();
