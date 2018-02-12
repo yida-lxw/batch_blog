@@ -29,6 +29,7 @@ public abstract class AbstractBlogClient {
      * 博客发布工具的启动入口
      */
     public void go() {
+        beforeBlogSend();
         prepareBlogPlatform();
         findTargetMarkdowns();
         blogSend();

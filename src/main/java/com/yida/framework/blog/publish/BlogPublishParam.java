@@ -1,11 +1,31 @@
 package com.yida.framework.blog.publish;
 
+import com.yida.framework.blog.config.DefaultConfigurable;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @Author Lanxiaowei
  * @Date 2018-02-12 10:52
  * @Description 博客发布所需的公共参数
  */
-public abstract class BlogPublishParam {
+public abstract class BlogPublishParam extends DefaultConfigurable {
+    /**
+     * 本地Word文档存放根目录
+     */
+    private String wordBasePath;
+
+    /**
+     * 博客发布日期,多个日期采用分号分割
+     */
+    private String blogSendDate;
+
+    /**
+     * 博客发布日期,多个日期采用分号分割
+     */
+    private List<String> blogSendDates;
+
     /**
      * 博客内容
      */
@@ -25,6 +45,40 @@ public abstract class BlogPublishParam {
      * 博客平台的登录密码
      */
     private String password;
+
+    public String getWordBasePath() {
+        this.wordBasePath = this.config.getWordBasePath();
+        return this.wordBasePath;
+    }
+
+    public void setWordBasePath(String wordBasePath) {
+        this.wordBasePath = wordBasePath;
+    }
+
+    public String getBlogSendDate() {
+        this.blogSendDate = this.config.getBlogSendDate();
+        return this.blogSendDate;
+    }
+
+    public void setBlogSendDate(String blogSendDate) {
+        this.blogSendDate = blogSendDate;
+    }
+
+    public List<String> getBlogSendDates() {
+        this.blogSendDates = this.config.getBlogSendDates();
+        if (null == this.blogSendDates || this.blogSendDates.size() <= 0) {
+            String sendDate = getBlogSendDate();
+            if (null == sendDate || "".equals(sendDate)) {
+                this.blogSendDates = new ArrayList<>(1);
+                blogSendDates.set(0, sendDate);
+            }
+        }
+        return this.blogSendDates;
+    }
+
+    public void setBlogSendDates(List<String> blogSendDates) {
+        this.blogSendDates = blogSendDates;
+    }
 
     public String getBlogContent() {
         return blogContent;

@@ -5,7 +5,7 @@ package com.yida.framework.blog.publish;
  * @Date 2018-02-12 10:43
  * @Description 博客发布接口
  */
-public interface BlogPublisher {
+public interface BlogPublisher<T extends BlogPublishParam> {
     //发布博客
-    String publish(BlogPublishParam blogPublishParam);
+    String publish(T blogPublishParam);
 }
