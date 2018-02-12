@@ -32,6 +32,11 @@ import java.util.Map;
  * @Author Lanxiaowei
  * @Date 2018-02-09 16:44
  * @Description HttpClient操作工具类, 基于Apache HttpClient-4.5.5版本封装的
+ *              使用HttpClientUtil的同时请启动HttpConnectionCleanScheduleTask定时任务
+ *              来清理空闲和过期的Http Connection.使用示例如下所示：
+ *              HttpConnectionCleanScheduleTask httpConnectionCleanScheduleTask =
+ *                  HttpConnectionCleanScheduleTask.getInstance();
+ *              httpConnectionCleanScheduleTask.start();
  */
 public class HttpClientUtil {
     private static Logger log = LogManager.getLogger(HttpClientUtil.class.getName());
