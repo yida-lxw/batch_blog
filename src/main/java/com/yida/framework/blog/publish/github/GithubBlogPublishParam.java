@@ -1,6 +1,7 @@
 package com.yida.framework.blog.publish.github;
 
 import com.yida.framework.blog.publish.BlogPublishParam;
+import org.eclipse.jgit.api.Git;
 
 /**
  * @Author Lanxiaowei
@@ -22,6 +23,11 @@ public class GithubBlogPublishParam extends BlogPublishParam {
      * Github博客远程仓库的访问URL:有Https和SSH两种协议格式,选择其中任意一种即可
      */
     private String githubRemoteRepositoryPath;
+
+    /**
+     * Github博客的远程分支名称
+     */
+    private String githubBlogBranchName;
 
     /**
      * Github博客在本地仓库中的目录位置
@@ -53,6 +59,13 @@ public class GithubBlogPublishParam extends BlogPublishParam {
      */
     private String githubAuthorEmail;
 
+    private Git git;
+
+    /**
+     * 远程仓库URL是SSH格式还是HTTPS格式,true表示SSH,false表示https
+     */
+    private boolean sshOrHttps;
+
     public String[] getFilePatterns() {
         return filePatterns;
     }
@@ -77,6 +90,15 @@ public class GithubBlogPublishParam extends BlogPublishParam {
 
     public void setGithubRemoteRepositoryPath(String githubRemoteRepositoryPath) {
         this.githubRemoteRepositoryPath = githubRemoteRepositoryPath;
+    }
+
+    public String getGithubBlogBranchName() {
+        this.githubBlogBranchName = this.config.getGithubBlogBranchName();
+        return githubBlogBranchName;
+    }
+
+    public void setGithubBlogBranchName(String githubBlogBranchName) {
+        this.githubBlogBranchName = githubBlogBranchName;
     }
 
     public String getGithubBlogLocalDirectory() {
@@ -131,5 +153,32 @@ public class GithubBlogPublishParam extends BlogPublishParam {
 
     public void setGithubAuthorEmail(String githubAuthorEmail) {
         this.githubAuthorEmail = githubAuthorEmail;
+    }
+
+    public Git getGit() {
+        return git;
+    }
+
+    public void setGit(Git git) {
+        this.git = git;
+    }
+
+    public boolean isSshOrHttps() {
+        if (null == this.githubRemoteRepositoryPath || "".equals(this.githubRemoteRepositoryPath)) {
+            sshOrHttps = false;
+        } else {
+            if (this.githubRemoteRepositoryPath.startsWith("https://")) {
+                sshOrHttps = false;
+            } else if (this.githubRemoteRepositoryPath.startsWith("git@")) {
+                sshOrHttps = true;
+            } else {
+                sshOrHttps = false;
+            }
+        }
+        return sshOrHttps;
+    }
+
+    public void setSshOrHttps(boolean sshOrHttps) {
+        this.sshOrHttps = sshOrHttps;
     }
 }
