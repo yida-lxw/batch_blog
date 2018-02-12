@@ -29,6 +29,8 @@ public class HttpClientConfig {
     private static final String HTTP_CONNECTION_POOL_MAX_TOTAL = "http.connection.pool.max.total";
     private static final String HTTP_CONNECTION_POOL_MAX_PER_ROUTE = "http.connection.pool.max.per.route";
     private static final String HTTP_CONNECTION_IDLE_MAX_TIME = "http.connection.idle.max.time";
+    private static final String HTTP_CONNECTION_EVICTOR_SLEEP_TIME = "http.connection.evictor.sleep.time";
+
     private static final String HTTP_CONNECTION_TIME_TO_LIVE = "http.connection.time.to.live";
     private static final String HTTP_CONNECTION_POOL_VALIDATE_AFTER_INACTIVITY = "http.connection.pool.validate.after.inactivity";
     private static final String HTTP_STATE_CONNECTION_CHECK_ENABLED = "http.stale.connection.check.enabled";
@@ -91,12 +93,14 @@ public class HttpClientConfig {
     private static final Boolean DEFAULT_HTTP_SSL_VERIFY_IGNORE = true;
     private static final Long DEFAULT_HTTP_CONNECTION_TIME_TO_LIVE = 1200000L;
     private static final Long DEFAULT_HTTP_CONNECTION_IDLE_MAX_TIME = 300000L;
+    private static final Long DEFAULT_HTTP_CONNECTION_EVICTOR_SLEEP_TIME = 900000L;
 
     //Property
     private Integer httpRedirectMaxTimes;
     private Boolean httpSslVerifyIgnore;
     private Long httpConnectionTimeToLive;
     private Long httpConnectionIdleMaxTime;
+    private Long httpConnectionEvictorSleepTime;
     private String httpUserAgent;
     private String httpAcceptCharset;
     private String httpAcceptLanguage;
@@ -166,6 +170,7 @@ public class HttpClientConfig {
         this.httpConnectionPoolMaxPerRoute = HttpClientConfigLoader.getIntProperty(HTTP_CONNECTION_POOL_MAX_PER_ROUTE, DEFAULT_HTTP_CONNECTION_POOL_MAX_PER_ROUTE);
         this.httpConnectionTimeToLive = HttpClientConfigLoader.getLongProperty(HTTP_CONNECTION_TIME_TO_LIVE, DEFAULT_HTTP_CONNECTION_TIME_TO_LIVE);
         this.httpConnectionIdleMaxTime = HttpClientConfigLoader.getLongProperty(HTTP_CONNECTION_IDLE_MAX_TIME, DEFAULT_HTTP_CONNECTION_IDLE_MAX_TIME);
+        this.httpConnectionEvictorSleepTime = HttpClientConfigLoader.getLongProperty(HTTP_CONNECTION_EVICTOR_SLEEP_TIME, DEFAULT_HTTP_CONNECTION_EVICTOR_SLEEP_TIME);
         this.httpConnectionPoolValidateAfterInactivity = HttpClientConfigLoader.getIntProperty(HTTP_CONNECTION_POOL_VALIDATE_AFTER_INACTIVITY, DEFAULT_HTTP_CONNECTION_POOL_VALIDATE_AFTER_INACTIVITY);
         this.httpStaleConnectionCheckEnabled = HttpClientConfigLoader.getBooleanProperty(HTTP_STATE_CONNECTION_CHECK_ENABLED, DEFAULT_HTTP_STATE_CONNECTION_CHECK_ENABLED);
         this.socketAddressReuse = HttpClientConfigLoader.getBooleanProperty(SOCKET_ADDRESS_REUSE, DEFAULT_SOCKET_ADDRESS_REUSE);
@@ -221,6 +226,14 @@ public class HttpClientConfig {
 
     public void setHttpConnectionIdleMaxTime(Long httpConnectionIdleMaxTime) {
         this.httpConnectionIdleMaxTime = httpConnectionIdleMaxTime;
+    }
+
+    public Long getHttpConnectionEvictorSleepTime() {
+        return httpConnectionEvictorSleepTime;
+    }
+
+    public void setHttpConnectionEvictorSleepTime(Long httpConnectionEvictorSleepTime) {
+        this.httpConnectionEvictorSleepTime = httpConnectionEvictorSleepTime;
     }
 
     public Integer getHttpConnectionRequestTimeout() {

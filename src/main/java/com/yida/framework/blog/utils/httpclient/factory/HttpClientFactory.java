@@ -176,7 +176,8 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
         ThreadFactory threadFactory = new CustomThreadFactory("IdleConnectionEvictorThread_");
         if (null == this.idleConnectionEvictor) {
             this.idleConnectionEvictor = new IdleConnectionEvictor(
-                    poolingHttpClientConnectionManager, threadFactory, 15, TimeUnit.MINUTES,
+                    poolingHttpClientConnectionManager, threadFactory,
+                    this.clientConfig.getHttpConnectionEvictorSleepTime(), TimeUnit.MILLISECONDS,
                     this.clientConfig.getHttpConnectionIdleMaxTime(), TimeUnit.MILLISECONDS
             );
             this.idleConnectionEvictor.start();
