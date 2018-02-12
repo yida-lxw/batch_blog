@@ -1,5 +1,6 @@
 package com.yida.framework.blog.utils.httpclient.factory;
 
+import com.yida.framework.blog.utils.ThreadFacotry.CustomThreadFactory;
 import com.yida.framework.blog.utils.httpclient.config.AbstractHttpClientConfigurable;
 import org.apache.http.Consts;
 import org.apache.http.Header;
@@ -15,6 +16,7 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.IdleConnectionEvictor;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClientBuilder;
 import org.apache.http.impl.client.cache.CachingHttpClients;
@@ -33,6 +35,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,6 +49,8 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
     private Logger log = LogManager.getLogger(HttpClientFactory.class.getName());
 
     private CloseableHttpClient httpClient;
+
+    private IdleConnectionEvictor idleConnectionEvictor;
 
     private HttpClientFactory() {
         initialize();
@@ -166,6 +171,16 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
                             this.getClientConfig().getProxySchema()));
         }
         this.httpClient = httpClientBuilder.build();
+
+        //start the IdleConnectionEvictor to clean the idle connection with the damon thread
+        ThreadFactory threadFactory = new CustomThreadFactory("IdleConnectionEvictorThread_");
+        if (null == this.idleConnectionEvictor) {
+            this.idleConnectionEvictor = new IdleConnectionEvictor(
+                    poolingHttpClientConnectionManager, threadFactory, 15, TimeUnit.MINUTES,
+                    this.clientConfig.getHttpConnectionIdleMaxTime(), TimeUnit.MILLISECONDS
+            );
+            this.idleConnectionEvictor.start();
+        }
     }
 
     public CloseableHttpClient getHttpClient() {
@@ -195,5 +210,9 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
         };
         sslContext.init(null, new TrustManager[]{trustManager}, null);
         return sslContext;
+    }
+
+    public IdleConnectionEvictor getIdleConnectionEvictor() {
+        return idleConnectionEvictor;
     }
 }

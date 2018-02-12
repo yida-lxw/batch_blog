@@ -6,11 +6,10 @@ package com.yida.framework.blog.utils.httpclient.config;
  * @Description HttpClient相关配置
  */
 public class HttpClientConfig {
+    //Keys
     private static final String HTTP_REDIRECT_MAX_TIMES = "http.redirect.max.times";
     private static final String HTTP_SSL_VERIFY_IGNORE = "http.ssl.verify.ignore";
     private static final String CACHE_ASYN_WORKER_MAX_SIZE = "cache.asyn.worker.max.size";
-
-    //Keys
     private static final String HTTP_USER_AGENT = "http.user_agent";
     private static final String HTTP_ACCEPT_CHARSET = "http.accept.charset";
     private static final String HTTP_ACCEPT_LANGUAGE = "http.accept.language";
@@ -29,6 +28,7 @@ public class HttpClientConfig {
     private static final String HTTP_CONNECTION_BUFFER_SIZE = "http.connection.buffer.size";
     private static final String HTTP_CONNECTION_POOL_MAX_TOTAL = "http.connection.pool.max.total";
     private static final String HTTP_CONNECTION_POOL_MAX_PER_ROUTE = "http.connection.pool.max.per.route";
+    private static final String HTTP_CONNECTION_IDLE_MAX_TIME = "http.connection.idle.max.time";
     private static final String HTTP_CONNECTION_TIME_TO_LIVE = "http.connection.time.to.live";
     private static final String HTTP_CONNECTION_POOL_VALIDATE_AFTER_INACTIVITY = "http.connection.pool.validate.after.inactivity";
     private static final String HTTP_STATE_CONNECTION_CHECK_ENABLED = "http.stale.connection.check.enabled";
@@ -48,8 +48,6 @@ public class HttpClientConfig {
     private static final String CACHE_ASYN_WORKER_CORE_SIZE = "cache.asyn.worker.core.size";
     private static final String PROXY_SCHEMA = "proxy.schema";
     private static final String CACHE_FOR_HTTP_ENABLED = "cache.for.http.enabled";
-
-
 
 
     //Default values
@@ -92,13 +90,13 @@ public class HttpClientConfig {
     private static final Integer DEFAULT_HTTP_REDIRECT_MAX_TIMES = 5;
     private static final Boolean DEFAULT_HTTP_SSL_VERIFY_IGNORE = true;
     private static final Long DEFAULT_HTTP_CONNECTION_TIME_TO_LIVE = 1200000L;
+    private static final Long DEFAULT_HTTP_CONNECTION_IDLE_MAX_TIME = 300000L;
 
-
-
+    //Property
     private Integer httpRedirectMaxTimes;
     private Boolean httpSslVerifyIgnore;
     private Long httpConnectionTimeToLive;
-
+    private Long httpConnectionIdleMaxTime;
     private String httpUserAgent;
     private String httpAcceptCharset;
     private String httpAcceptLanguage;
@@ -167,6 +165,7 @@ public class HttpClientConfig {
         this.httpConnectionPoolMaxTotal = HttpClientConfigLoader.getIntProperty(HTTP_CONNECTION_POOL_MAX_TOTAL, DEFAULT_HTTP_CONNECTION_POOL_MAX_TOTAL);
         this.httpConnectionPoolMaxPerRoute = HttpClientConfigLoader.getIntProperty(HTTP_CONNECTION_POOL_MAX_PER_ROUTE, DEFAULT_HTTP_CONNECTION_POOL_MAX_PER_ROUTE);
         this.httpConnectionTimeToLive = HttpClientConfigLoader.getLongProperty(HTTP_CONNECTION_TIME_TO_LIVE, DEFAULT_HTTP_CONNECTION_TIME_TO_LIVE);
+        this.httpConnectionIdleMaxTime = HttpClientConfigLoader.getLongProperty(HTTP_CONNECTION_IDLE_MAX_TIME, DEFAULT_HTTP_CONNECTION_IDLE_MAX_TIME);
         this.httpConnectionPoolValidateAfterInactivity = HttpClientConfigLoader.getIntProperty(HTTP_CONNECTION_POOL_VALIDATE_AFTER_INACTIVITY, DEFAULT_HTTP_CONNECTION_POOL_VALIDATE_AFTER_INACTIVITY);
         this.httpStaleConnectionCheckEnabled = HttpClientConfigLoader.getBooleanProperty(HTTP_STATE_CONNECTION_CHECK_ENABLED, DEFAULT_HTTP_STATE_CONNECTION_CHECK_ENABLED);
         this.socketAddressReuse = HttpClientConfigLoader.getBooleanProperty(SOCKET_ADDRESS_REUSE, DEFAULT_SOCKET_ADDRESS_REUSE);
@@ -190,6 +189,38 @@ public class HttpClientConfig {
         this.proxyHostName = HttpClientConfigLoader.getStringProperty(PROXY_HOSTNAME, DEFAULT_PROXY_HOSTNAME);
         this.proxyPort = HttpClientConfigLoader.getIntProperty(PROXY_PORT, DEFAULT_PROXY_PORT);
         this.proxySchema = HttpClientConfigLoader.getStringProperty(PROXY_SCHEMA, DEFAULT_PROXY_SCHEMA);
+    }
+
+    public Integer getHttpRedirectMaxTimes() {
+        return httpRedirectMaxTimes;
+    }
+
+    public void setHttpRedirectMaxTimes(Integer httpRedirectMaxTimes) {
+        this.httpRedirectMaxTimes = httpRedirectMaxTimes;
+    }
+
+    public Boolean getHttpSslVerifyIgnore() {
+        return httpSslVerifyIgnore;
+    }
+
+    public void setHttpSslVerifyIgnore(Boolean httpSslVerifyIgnore) {
+        this.httpSslVerifyIgnore = httpSslVerifyIgnore;
+    }
+
+    public Long getHttpConnectionTimeToLive() {
+        return httpConnectionTimeToLive;
+    }
+
+    public void setHttpConnectionTimeToLive(Long httpConnectionTimeToLive) {
+        this.httpConnectionTimeToLive = httpConnectionTimeToLive;
+    }
+
+    public Long getHttpConnectionIdleMaxTime() {
+        return httpConnectionIdleMaxTime;
+    }
+
+    public void setHttpConnectionIdleMaxTime(Long httpConnectionIdleMaxTime) {
+        this.httpConnectionIdleMaxTime = httpConnectionIdleMaxTime;
     }
 
     public Integer getHttpConnectionRequestTimeout() {
@@ -260,8 +291,8 @@ public class HttpClientConfig {
         this.httpConnection = httpConnection;
     }
 
-    public Integer getHttpRedirectMaxTimes() {
-        return httpRedirectMaxTimes;
+    public Integer getCacheAsynWorkerMaxSize() {
+        return cacheAsynWorkerMaxSize;
     }
 
     public void setHttpConnectionRequestTimeout(Integer httpConnectionRequestTimeout) {
@@ -292,16 +323,16 @@ public class HttpClientConfig {
         this.httpRedirectsEnabled = httpRedirectsEnabled;
     }
 
-    public void setHttpRedirectMaxTimes(Integer httpRedirectMaxTimes) {
-        this.httpRedirectMaxTimes = httpRedirectMaxTimes;
+    public void setCacheAsynWorkerMaxSize(Integer cacheAsynWorkerMaxSize) {
+        this.cacheAsynWorkerMaxSize = cacheAsynWorkerMaxSize;
     }
 
-    public Boolean getHttpSslVerifyIgnore() {
-        return httpSslVerifyIgnore;
+    public String getProxyHostName() {
+        return proxyHostName;
     }
 
-    public void setHttpSslVerifyIgnore(Boolean httpSslVerifyIgnore) {
-        this.httpSslVerifyIgnore = httpSslVerifyIgnore;
+    public void setProxyHostName(String proxyHostName) {
+        this.proxyHostName = proxyHostName;
     }
 
     public Integer getHttpConnectionBufferSize() {
@@ -316,8 +347,8 @@ public class HttpClientConfig {
         this.httpSslProtocolVersion = httpSslProtocolVersion;
     }
 
-    public Long getHttpConnectionTimeToLive() {
-        return httpConnectionTimeToLive;
+    public Integer getProxyPort() {
+        return proxyPort;
     }
 
     public void setHttpConnectionBufferSize(Integer httpConnectionBufferSize) {
@@ -340,8 +371,8 @@ public class HttpClientConfig {
         this.httpConnectionPoolMaxPerRoute = httpConnectionPoolMaxPerRoute;
     }
 
-    public void setHttpConnectionTimeToLive(Long httpConnectionTimeToLive) {
-        this.httpConnectionTimeToLive = httpConnectionTimeToLive;
+    public void setProxyPort(Integer proxyPort) {
+        this.proxyPort = proxyPort;
     }
 
     public Integer getCacheUpdateRetryMaxTimes() {
@@ -428,12 +459,12 @@ public class HttpClientConfig {
         this.socketSendBufferSize = socketSendBufferSize;
     }
 
-    public void setCacheUpdateRetryMaxTimes(Integer cacheUpdateRetryMaxTimes) {
-        this.cacheUpdateRetryMaxTimes = cacheUpdateRetryMaxTimes;
+    private static class SingletonHolder {
+        private static final HttpClientConfig INSTANCE = new HttpClientConfig();
     }
 
-    public Integer getCacheAsynWorkerMaxSize() {
-        return cacheAsynWorkerMaxSize;
+    public void setCacheUpdateRetryMaxTimes(Integer cacheUpdateRetryMaxTimes) {
+        this.cacheUpdateRetryMaxTimes = cacheUpdateRetryMaxTimes;
     }
 
     public Integer getCacheEntryMaxSize() {
@@ -476,26 +507,6 @@ public class HttpClientConfig {
         this.cacheAsynWorkerCoreSize = cacheAsynWorkerCoreSize;
     }
 
-    public void setCacheAsynWorkerMaxSize(Integer cacheAsynWorkerMaxSize) {
-        this.cacheAsynWorkerMaxSize = cacheAsynWorkerMaxSize;
-    }
-
-    public String getProxyHostName() {
-        return proxyHostName;
-    }
-
-    public void setProxyHostName(String proxyHostName) {
-        this.proxyHostName = proxyHostName;
-    }
-
-    public Integer getProxyPort() {
-        return proxyPort;
-    }
-
-    public void setProxyPort(Integer proxyPort) {
-        this.proxyPort = proxyPort;
-    }
-
     public String getProxySchema() {
         return proxySchema;
     }
@@ -510,9 +521,5 @@ public class HttpClientConfig {
 
     public void setCacheForHttpEnabled(Boolean cacheForHttpEnabled) {
         this.cacheForHttpEnabled = cacheForHttpEnabled;
-    }
-
-    private static class SingletonHolder {
-        private static final HttpClientConfig INSTANCE = new HttpClientConfig();
     }
 }
