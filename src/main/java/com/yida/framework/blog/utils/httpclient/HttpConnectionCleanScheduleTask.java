@@ -58,7 +58,7 @@ public class HttpConnectionCleanScheduleTask extends AbstractHttpClientConfigura
         public void run() {
             PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
                     HttpClientFactory.getInstance().getPoolingHttpClientConnectionManager();
-            log.info("The cleanup task thread[{}] beginning performing...", thread.getName());
+            log.info("The cleanup task thread[{}-{}] beginning performing...", thread.getThreadGroup().getName(), thread.getName());
             try {
                 if (!Thread.currentThread().isInterrupted()) {
                     poolingHttpClientConnectionManager.closeExpiredConnections();
@@ -68,10 +68,11 @@ public class HttpConnectionCleanScheduleTask extends AbstractHttpClientConfigura
                     }
                 }
             } catch (Exception e) {
-                log.error("The cleanup task thread[{}] performs an exception during execution:\n{}.",
-                        Thread.currentThread().getName(), e.getMessage());
+                log.error("The cleanup task thread[{}-{}] performs an exception during execution:\n{}.",
+                        thread.getThreadGroup().getName(), thread.getName(), e.getMessage());
             }
-            log.info("The cleanup task thread[{}] have finished the current perform,wait for the next round.", thread.getName());
+            log.info("The cleanup task thread[{}-{}] have finished the current perform,wait for the next round.",
+                    thread.getThreadGroup().getName(), thread.getName());
         }
     }
 }
