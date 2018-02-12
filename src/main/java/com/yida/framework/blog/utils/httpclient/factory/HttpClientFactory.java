@@ -1,6 +1,5 @@
 package com.yida.framework.blog.utils.httpclient.factory;
 
-import com.yida.framework.blog.utils.ThreadFacotry.CustomThreadFactory;
 import com.yida.framework.blog.utils.httpclient.config.AbstractHttpClientConfigurable;
 import org.apache.http.Consts;
 import org.apache.http.Header;
@@ -16,7 +15,6 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.IdleConnectionEvictor;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClientBuilder;
 import org.apache.http.impl.client.cache.CachingHttpClients;
@@ -35,7 +33,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,7 +47,9 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
 
     private CloseableHttpClient httpClient;
 
-    private IdleConnectionEvictor idleConnectionEvictor;
+    private PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
+
+    //private IdleConnectionEvictor idleConnectionEvictor;
 
     private HttpClientFactory() {
         initialize();
@@ -128,7 +127,7 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
             defaultHeaders.add(new BasicHeader("Accept-Ranges", this.clientConfig.getHttpAcceptRanges()));
         }
         socketFactoryRegistry = registryBuilder.build();
-        PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
+        poolingHttpClientConnectionManager =
                 new PoolingHttpClientConnectionManager(socketFactoryRegistry, null, null, null,
                         this.clientConfig.getHttpConnectionTimeToLive(), TimeUnit.MILLISECONDS);
         poolingHttpClientConnectionManager.setDefaultMaxPerRoute(this.clientConfig.getHttpConnectionPoolMaxPerRoute());
@@ -152,15 +151,14 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
                 .setSoTimeout(this.clientConfig.getSocketTimeout())
                 .setTcpNoDelay(this.clientConfig.getSocketTcpNodelay())
                 .build();
-        poolingHttpClientConnectionManager.setDefaultSocketConfig(socketConfig);
-
+        this.poolingHttpClientConnectionManager.setDefaultSocketConfig(socketConfig);
 
         httpClientBuilder = (CachingHttpClientBuilder) httpClientBuilder
                 .setConnectionTimeToLive(this.clientConfig.getHttpConnectionTimeToLive(), TimeUnit.MILLISECONDS)
                 .setDefaultConnectionConfig(ConnectionConfig.custom().setBufferSize(this.clientConfig.getHttpConnectionBufferSize()).build())
                 .setDefaultCookieStore(new BasicCookieStore())
                 .setDefaultHeaders(defaultHeaders)
-                .setConnectionManager(poolingHttpClientConnectionManager);
+                .setConnectionManager(this.poolingHttpClientConnectionManager);
 
         //Http Proxy Config
         String proxyHostName = this.clientConfig.getProxyHostName();
@@ -173,7 +171,7 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
         this.httpClient = httpClientBuilder.build();
 
         //start the IdleConnectionEvictor to clean the idle connection with the damon thread
-        ThreadFactory threadFactory = new CustomThreadFactory("IdleConnectionEvictorThread_");
+        /*ThreadFactory threadFactory = new CustomThreadFactory("IdleConnectionEvictorThread_");
         if (null == this.idleConnectionEvictor) {
             this.idleConnectionEvictor = new IdleConnectionEvictor(
                     poolingHttpClientConnectionManager, threadFactory,
@@ -182,7 +180,7 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
             );
             this.idleConnectionEvictor.start();
             log.info("Starting the IdleConnectionEvictor for cleaning the idle and expired http connection......");
-        }
+        }*/
     }
 
     public CloseableHttpClient getHttpClient() {
@@ -214,7 +212,15 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
         return sslContext;
     }
 
-    public IdleConnectionEvictor getIdleConnectionEvictor() {
+    /*public IdleConnectionEvictor getIdleConnectionEvictor() {
         return idleConnectionEvictor;
+    }*/
+
+    public PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
+        return poolingHttpClientConnectionManager;
+    }
+
+    public void setPoolingHttpClientConnectionManager(PoolingHttpClientConnectionManager poolingHttpClientConnectionManager) {
+        this.poolingHttpClientConnectionManager = poolingHttpClientConnectionManager;
     }
 }
