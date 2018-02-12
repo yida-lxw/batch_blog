@@ -181,6 +181,7 @@ public class HttpClientFactory extends AbstractHttpClientConfigurable {
                     this.clientConfig.getHttpConnectionIdleMaxTime(), TimeUnit.MILLISECONDS
             );
             this.idleConnectionEvictor.start();
+            log.info("Starting the IdleConnectionEvictor for cleaning the idle and expired http connection......");
         }
     }
 
