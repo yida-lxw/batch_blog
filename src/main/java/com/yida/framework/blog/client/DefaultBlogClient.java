@@ -42,7 +42,19 @@ public class DefaultBlogClient extends AbstractBlogClient {
 
     @Override
     protected void prepareBlogPlatform() {
+        if (null != this.blogPublisherKeyList && this.blogPublisherKeyList.size() > 0) {
+            if (null != this.blogPublisherClassNames && this.blogPublisherClassNames.size() > 0) {
+                for (String blogPublisherKey : blogPublisherKeyList) {
+                    String fileName = null;
+                    String blogPublisherClassPath = null;
+                    for (String blogPublisherClassName : blogPublisherClassNames) {
+                        blogPublisherClassPath = blogPublisherClassName.replaceAll("/", ".");
+                        fileName = FileUtil.getFileName(blogPublisherClassName);
 
+                    }
+                }
+            }
+        }
     }
 
     @Override

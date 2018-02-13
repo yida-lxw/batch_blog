@@ -1825,17 +1825,28 @@ public class StringUtil {
      * 将路径字符串里的\\转换成/
      *
      * @param path
+     * @param appendBackslash    是否默认追加反斜杠
      * @return
      */
-    public static String fixedPathDelimiter(String path) {
+    public static String fixedPathDelimiter(String path, boolean appendBackslash) {
         if (null == path || "".equals(path)) {
             return path;
         }
         path = path.replaceAll("\\\\", "/");
-        if (!path.endsWith("/")) {
+        if (appendBackslash && !path.endsWith("/")) {
             path = path + "/";
         }
         return path;
+    }
+
+    /**
+     * 将路径字符串里的\\转换成/
+     *
+     * @param path
+     * @return
+     */
+    public static String fixedPathDelimiter(String path) {
+        return fixedPathDelimiter(path, true);
     }
 
     public static void main(String[] args) {

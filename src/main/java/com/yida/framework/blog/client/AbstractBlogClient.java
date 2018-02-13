@@ -2,6 +2,7 @@ package com.yida.framework.blog.client;
 
 import com.yida.framework.blog.config.DefaultConfigurable;
 import com.yida.framework.blog.publish.BlogPublisher;
+import com.yida.framework.blog.utils.common.StringUtil;
 import com.yida.framework.blog.utils.io.FileUtil;
 import org.eclipse.jgit.api.Git;
 
@@ -114,6 +115,8 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
             this.blogBasePaths.add(wordBasePath + blogSendDate + "/");
             this.blogLocalRepoBasePaths.add(blogLocalRepoBasePath + blogSendDate + "/");
         }
+        this.blogPublisherKeyList = this.config.getBlogPlatformSupportedList();
+
         //Scan all BlogPublisher implements
         scanBlogPublisherClasses();
     }
@@ -144,7 +147,7 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
         }
         this.blogPublisherClassNames = new ArrayList<>(javaFiles.size());
         for (String javaFile : javaFiles) {
-            this.blogPublisherClassNames.add(javaFile);
+            this.blogPublisherClassNames.add(StringUtil.fixedPathDelimiter(javaFile, false));
         }
     }
 
