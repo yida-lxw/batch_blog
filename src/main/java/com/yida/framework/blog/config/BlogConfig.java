@@ -4,6 +4,7 @@ import com.yida.framework.blog.utils.Constant;
 import com.yida.framework.blog.utils.common.DateUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class BlogConfig {
     private static final String GITHUB_LOCAL_CODE_DIR = "github_local_code_dir";
     private static final String GITHUB_AUTHOR_NAME = "github_author_name";
     private static final String GITHUB_AUTHOR_EMAIL = "github_author_email";
+    private static final String BLOG_PLATFORM_SUPPORTED = "blog_platform_supported";
 
     /**
      * Pandoc的安装目录
@@ -94,6 +96,11 @@ public class BlogConfig {
      */
     private String githubPrivateKeyPath;
 
+    /**
+     * 支持的所有博客平台列表,多个请采用分号;进行分割
+     */
+    private String blogPlatformSupported;
+
 
     private BlogConfig() {
         initialize();
@@ -139,6 +146,8 @@ public class BlogConfig {
                 this.blogSendDates = ConfigContext.getStringListProperty(BLOG_SEND_DATE);
             }
         }
+        this.blogPlatformSupported = ConfigContext.getStringProperty(BLOG_PLATFORM_SUPPORTED);
+
         this.githubUserName = ConfigContext.getStringProperty(GITHUB_USERNAME);
         this.githubPassword = ConfigContext.getStringProperty(GITHUB_PASSWORD);
         this.githubPrivateKeyPath = ConfigContext.getStringProperty(GITHUB_PRIVATE_KEY_PATH);
@@ -157,6 +166,7 @@ public class BlogConfig {
         stringBuilder.append("Word BasePath: " + getWordBasePath() + "\n");
         stringBuilder.append("Markdown BasePath: " + getMarkdownBasePath() + "\n");
         stringBuilder.append("Blog SendDate: " + getBlogSendDate() + "\n");
+        stringBuilder.append("Blog Platform Supported List: " + getBlogPlatformSupported() + "\n");
         stringBuilder.append("Github UserName: " + getGithubUserName() + "\n");
         stringBuilder.append("Github Password: " + getGithubPassword() + "\n");
         stringBuilder.append("Github Private Key: " + getGithubPrivateKeyPath() + "\n");
@@ -286,6 +296,23 @@ public class BlogConfig {
 
     public void setGithubPrivateKeyPath(String githubPrivateKeyPath) {
         this.githubPrivateKeyPath = githubPrivateKeyPath;
+    }
+
+    public String getBlogPlatformSupported() {
+        return blogPlatformSupported;
+    }
+
+    public void setBlogPlatformSupported(String blogPlatformSupported) {
+        this.blogPlatformSupported = blogPlatformSupported;
+    }
+
+    public List<String> getBlogPlatformSupportedList() {
+        if (null == this.blogPlatformSupported || "".equals(this.blogPlatformSupported)) {
+            return null;
+        }
+        this.blogPlatformSupported = this.blogPlatformSupported.replaceAll("; ", ";");
+        String[] array = this.blogPlatformSupported.split(";");
+        return Arrays.asList(array);
     }
 
     private String adjustPath(String path) {

@@ -20,7 +20,12 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
     protected Git git;
 
     /**
-     * 博客待发布的博客平台列表,比如:Github,ITeye,CSDN,OSChina,CNBlog,简书等等
+     * 配置文件中配置的当前支持的博客平台的key列表
+     */
+    protected List<String> blogPublisherKeyList;
+
+    /**
+     * 博客待发布的博客平台对应的实现类列表,比如:Github,ITeye,CSDN,OSChina,CNBlog,简书等等
      */
     protected List<BlogPublisher> blogPublisherList;
 

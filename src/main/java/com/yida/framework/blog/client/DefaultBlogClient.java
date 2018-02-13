@@ -96,6 +96,4 @@ public class DefaultBlogClient extends AbstractBlogClient {
         //关闭Git
         GithubUtil.closeGit(this.git);
     }
-
-
 }
