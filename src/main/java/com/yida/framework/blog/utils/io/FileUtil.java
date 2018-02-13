@@ -46,7 +46,15 @@ public class FileUtil {
         }
     }
 
-    public static void copyFile(String srcpath, String filename, String destpath) {
+    /**
+     * 文件复制
+     *
+     * @param srcpath      文件源路径
+     * @param filename     文件名称
+     * @param destpath     文件目标路径
+     * @param deleteSource 复制完成之后是否删除源文件
+     */
+    public static void copyFile(String srcpath, String filename, String destpath, boolean deleteSource) {
         if (!srcpath.endsWith("/")) {
             srcpath = srcpath.replaceAll("\\\\", "/");
             srcpath += "/";
@@ -107,8 +115,48 @@ public class FileUtil {
 
             //删除之前需要先回收ByteBuffer占用的资源,否则文件无法被删除
             cleanByteBuffer(mappedByteBuffer);
-            //文件复制完成后，删除源文件
-            source.getAbsoluteFile().delete();
+            if (deleteSource) {
+                //文件复制完成后，删除源文件
+                source.getAbsoluteFile().delete();
+            }
+        }
+    }
+
+    /**
+     * 文件复制
+     *
+     * @param srcpath  文件源路径
+     * @param filename 文件名称
+     * @param destpath 文件目标路径
+     */
+    public static void copyFile(String srcpath, String filename, String destpath) {
+        copyFile(srcpath, filename, destpath, false);
+    }
+
+    /**
+     * 目录复制
+     *
+     * @param srcPath        待复制的目录
+     * @param targetPath     目录下的所有文件和文件夹复制到哪里
+     * @param filenameFilter 文件名称过滤器
+     * @param deleteSource   是否复制完成之后删除源文件
+     */
+    public static void copyDirectory(String srcPath, String targetPath, FilenameFilter filenameFilter, boolean deleteSource) {
+        if (!targetPath.endsWith("/")) {
+            targetPath = targetPath.replaceAll("\\\\", "/");
+            targetPath += "/";
+        }
+        parseDir(srcPath, targetPath);
+        File f = new File(srcPath);
+        File[] fileList = f.listFiles(filenameFilter);
+        for (File f1 : fileList) {
+            if (f1.isFile()) {
+                copyFile(srcPath, f1.getName(), targetPath, deleteSource);
+            }
+            //判断是否是目录
+            if (f1.isDirectory()) {
+                copyDirectory(f1.getPath().toString(), targetPath + f1.getName(), filenameFilter, deleteSource);
+            }
         }
     }
 
@@ -120,22 +168,17 @@ public class FileUtil {
      * @param filenameFilter 文件名称过滤器
      */
     public static void copyDirectory(String srcPath, String targetPath, FilenameFilter filenameFilter) {
-        if (!targetPath.endsWith("/")) {
-            targetPath = targetPath.replaceAll("\\\\", "/");
-            targetPath += "/";
-        }
-        parseDir(srcPath, targetPath);
-        File f = new File(srcPath);
-        File[] fileList = f.listFiles(filenameFilter);
-        for (File f1 : fileList) {
-            if (f1.isFile()) {
-                copyFile(srcPath, f1.getName(), targetPath);
-            }
-            //判断是否是目录
-            if (f1.isDirectory()) {
-                copyDirectory(f1.getPath().toString(), targetPath + f1.getName(), filenameFilter);
-            }
-        }
+        copyDirectory(srcPath, targetPath, filenameFilter, false);
+    }
+
+    /**
+     * 目录复制
+     *
+     * @param srcPath    待复制的目录
+     * @param targetPath 目录下的所有文件和文件夹复制到哪里
+     */
+    public static void copyDirectory(String srcPath, String targetPath) {
+        copyDirectory(srcPath, targetPath, null, false);
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.yida.framework.blog;
 
 import com.yida.framework.blog.utils.io.FileUtil;
-import com.yida.framework.blog.utils.io.ImageFilenameFilter;
 
 /**
  * @Author Lanxiaowei
@@ -10,8 +9,8 @@ import com.yida.framework.blog.utils.io.ImageFilenameFilter;
  */
 public class FileCopyTest {
     public static void main(String[] args) {
-        String srcpath = "G:\\zip\\word\\media\\";
-        String targetpath = "G:\\zip\\images\\";
-        FileUtil.copyDirectory(srcpath, targetpath, new ImageFilenameFilter());
+        String srcpath = "C:/myblog/20180207/";
+        String targetpath = "G:/test4/20180207/";
+        FileUtil.copyDirectory(srcpath, targetpath, null, false);
     }
 }

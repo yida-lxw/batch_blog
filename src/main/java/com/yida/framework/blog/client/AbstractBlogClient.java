@@ -1,6 +1,8 @@
 package com.yida.framework.blog.client;
 
+import com.yida.framework.blog.config.DefaultConfigurable;
 import com.yida.framework.blog.publish.BlogPublisher;
+import org.eclipse.jgit.api.Git;
 
 import java.util.List;
 
@@ -9,7 +11,9 @@ import java.util.List;
  * @Date 2018-02-12 12:12
  * @Description 博客发布工具的客户端接口抽象实现类
  */
-public abstract class AbstractBlogClient implements BlogClient {
+public abstract class AbstractBlogClient extends DefaultConfigurable implements BlogClient {
+    protected Git git;
+
     /**
      * 博客待发布的博客平台列表,比如:Github,ITeye,CSDN,OSChina,CNBlog,简书等等
      */
@@ -67,4 +71,8 @@ public abstract class AbstractBlogClient implements BlogClient {
      * 避免下次发布时重复发布
      */
     protected abstract void afterBlogSend();
+
+    public Git getGit() {
+        return git;
+    }
 }
