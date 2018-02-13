@@ -24,5 +24,7 @@ public class FileRename2IgnoreTest {
         //rename file
         FileUtil.renameFile(fileDir1, fileName1, "[ignore]" + fileName1);
         FileUtil.renameFile(fileDir2, fileName2, "[ignore]" + fileName2);
+
+
     }
 }

@@ -1,11 +1,16 @@
 package com.yida.framework.blog.client;
 
 import com.yida.framework.blog.utils.Constant;
+import com.yida.framework.blog.utils.common.StringUtil;
 import com.yida.framework.blog.utils.github.GithubUtil;
 import com.yida.framework.blog.utils.io.FileUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.lib.Ref;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.List;
 
 /**
  * @Author Lanxiaowei
@@ -56,9 +61,41 @@ public class DefaultBlogClient extends AbstractBlogClient {
     @Override
     protected void afterBlogSend() {
         //为已经发布的文档添加[ignore]前缀标记
-
-
+        if (null != this.blogBasePaths && this.blogBasePaths.size() > 0) {
+            for (String blogBasePath : this.blogBasePaths) {
+                List<String> files = FileUtil.listFiles(blogBasePath, new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        String orignalName = name;
+                        name = name.toLowerCase();
+                        if (name.endsWith(".md") || name.endsWith(".markdown")
+                                || name.endsWith(".docx")) {
+                            if (name.startsWith(Constant.IGNORE_MARK)) {
+                                return false;
+                            }
+                            return new File(dir + "/" + orignalName).isFile();
+                        }
+                        return false;
+                    }
+                }, true);
+                if (null != files && files.size() > 0) {
+                    String pureFileName = null;
+                    String fileDir = null;
+                    for (String file : files) {
+                        pureFileName = FileUtil.getFileName(file);
+                        //已经有[ignore]标记的文件直接跳过不处理
+                        if (pureFileName.startsWith(Constant.IGNORE_MARK)) {
+                            continue;
+                        }
+                        fileDir = StringUtil.fixedPathDelimiter(FileUtil.getFileDir(file));
+                        FileUtil.renameFile(fileDir, pureFileName, Constant.IGNORE_MARK + pureFileName);
+                    }
+                }
+            }
+        }
         //关闭Git
         GithubUtil.closeGit(this.git);
     }
+
+
 }

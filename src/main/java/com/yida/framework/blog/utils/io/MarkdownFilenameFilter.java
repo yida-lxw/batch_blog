@@ -1,5 +1,7 @@
 package com.yida.framework.blog.utils.io;
 
+import com.yida.framework.blog.utils.Constant;
+
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -11,10 +13,13 @@ import java.io.FilenameFilter;
 public class MarkdownFilenameFilter implements FilenameFilter {
     @Override
     public boolean accept(File dir, String name) {
+        String orignalName = name;
         name = name.toLowerCase();
-        if (name.endsWith(".md") || name.endsWith(".markdown")
-                || name.endsWith(".MD") || name.endsWith(".MARKDOWN")) {
-            return new File(dir + "/" + name).isFile();
+        if (name.endsWith(".md") || name.endsWith(".markdown")) {
+            if (name.startsWith(Constant.IGNORE_MARK)) {
+                return false;
+            }
+            return new File(dir + "/" + orignalName).isFile();
         }
         return false;
     }
