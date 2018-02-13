@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -40,57 +39,6 @@ public class GithubUtil {
 
     private static final ThreadLocal<SshSessionFactory> sshSessionFactoryThreadLocal = new ThreadLocal<>();
 
-    public static void main(String[] args) throws IOException {
-        String localRepositoryPath = "G:/git4test/blog";
-        String remoteRepoSSHUrl = "git@github.com:yida-lxw/blog.git";
-        String remoteRepoHttpUrl = "https://github.com/yida-lxw/blog.git";
-        String githubUserName = "yida-lxw";
-        String githubPassword = "你猜";
-
-        //Git git = getGit(localRepositoryPath);
-
-
-        //git clone via http url
-        //Git git = cloneRepositoryWithHttpAuth(remoteRepoHttpUrl, localRepositoryPath, githubUserName, githubPassword);
-        //System.out.println("git clone via http:" + git);
-
-        //git clone via ssh url
-        //Git git = cloneRepositoryWithSSHAuth(remoteRepoSSHUrl, localRepositoryPath);
-        //System.out.println("git clone via ssh:" + git);
-
-        Git git = getGit(localRepositoryPath);
-
-        //git checkout master branch
-        Ref ref = checkout(git, BRANCH_MASTER);
-        System.out.println("ref:" + ref);
-
-        //git add
-        DirCache dirCache = add(git);
-        System.out.println(dirCache);
-
-        //git commit
-        RevCommit revCommit = commit(git, "commit via jgit for Testing", "Lanxiaowei", "736031305@qq.com", true, false);
-        System.out.println(revCommit);
-
-        //git pull
-        PullResult pullResult = pullWithSSH(git);
-        System.out.println("git pull:" + pullResult);
-
-        //git push
-        Iterable<PushResult> pushResults = pushWithSSH(git);
-        Iterator<PushResult> pushResultIterator = pushResults.iterator();
-        PushResult pushResult = null;
-        RemoteRefUpdate.Status status = null;
-        while (pushResultIterator.hasNext()) {
-            pushResult = pushResultIterator.next();
-            status = pushResult.getRemoteUpdate("refs/heads/" + BRANCH_MASTER).getStatus();
-            System.out.println(status.toString());
-        }
-
-
-        //git close only after a sort of operation of git
-        git.close();
-    }
 
     /**
      * 判断一个本地仓库是否存在,即本地仓库目录下是否拥有一个名称为.git的隐藏文件夹
