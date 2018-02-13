@@ -17,7 +17,8 @@ import java.util.List;
  * @Description 博客发布工具的客户端接口抽象实现类
  */
 public abstract class AbstractBlogClient extends DefaultConfigurable implements BlogClient {
-    private static final String BASE_PACKAGE = "com.yida.framework.blog.publish";
+    protected static final String BASE_PACKAGE = "com.yida.framework.blog.publish";
+
     protected Git git;
 
     /**
@@ -54,6 +55,11 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
      * 需要发布的Markdown文件对应的内容
      */
     protected List<String> markdownFileContents;
+
+    /**
+     * Claspath值
+     */
+    private String classPath;
 
     /**
      * 博客发布工具的启动入口
@@ -129,6 +135,7 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
     private void scanBlogPublisherClasses() {
         String classpath = AbstractBlogClient.class.getResource("/").getPath();
         classpath = classpath.replaceFirst("/", "");
+        this.classPath = classpath;
         String basePackage = BASE_PACKAGE;
         basePackage = basePackage.replace(".", "/");
         //combine the classpath and basePackage
@@ -153,5 +160,9 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
 
     public Git getGit() {
         return git;
+    }
+
+    protected String getClassPath() {
+        return classPath;
     }
 }

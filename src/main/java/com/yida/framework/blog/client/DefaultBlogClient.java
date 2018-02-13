@@ -1,6 +1,8 @@
 package com.yida.framework.blog.client;
 
+import com.yida.framework.blog.publish.BlogPublisher;
 import com.yida.framework.blog.utils.Constant;
+import com.yida.framework.blog.utils.common.ReflectionUtil;
 import com.yida.framework.blog.utils.common.StringUtil;
 import com.yida.framework.blog.utils.github.GithubUtil;
 import com.yida.framework.blog.utils.io.FileUtil;
@@ -10,6 +12,7 @@ import org.eclipse.jgit.lib.Ref;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,17 +43,34 @@ public class DefaultBlogClient extends AbstractBlogClient {
         }
     }
 
+    /**
+     * 根据配置文件配置的支持的博客平台列表,加载对应的博客平台的发布实现类
+     */
     @Override
     protected void prepareBlogPlatform() {
         if (null != this.blogPublisherKeyList && this.blogPublisherKeyList.size() > 0) {
             if (null != this.blogPublisherClassNames && this.blogPublisherClassNames.size() > 0) {
+                if (null == this.blogPublisherList) {
+                    this.blogPublisherList = new ArrayList<>();
+                }
                 for (String blogPublisherKey : blogPublisherKeyList) {
                     String fileName = null;
                     String blogPublisherClassPath = null;
+                    String fileNamePrefix = null;
+                    BlogPublisher blogPublisher = null;
                     for (String blogPublisherClassName : blogPublisherClassNames) {
-                        blogPublisherClassPath = blogPublisherClassName.replaceAll("/", ".");
+                        blogPublisherClassPath = blogPublisherClassName.replace(this.getClassPath(), "")
+                                .replaceAll("/", ".");
                         fileName = FileUtil.getFileName(blogPublisherClassName);
-
+                        fileNamePrefix = fileName.replace("BlogPublisher", "").toLowerCase();
+                        if (!fileNamePrefix.equalsIgnoreCase(blogPublisherKey)) {
+                            continue;
+                        }
+                        blogPublisher = ReflectionUtil.createInstance(blogPublisherClassPath);
+                        if (null == blogPublisher) {
+                            continue;
+                        }
+                        this.blogPublisherList.add(blogPublisher);
                     }
                 }
             }
