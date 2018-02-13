@@ -140,8 +140,9 @@ public class FileUtil {
      * @param targetPath     目录下的所有文件和文件夹复制到哪里
      * @param filenameFilter 文件名称过滤器
      * @param deleteSource   是否复制完成之后删除源文件
+     * @param prefix         过滤掉指定后缀的文件或目录
      */
-    public static void copyDirectory(String srcPath, String targetPath, FilenameFilter filenameFilter, boolean deleteSource) {
+    public static void copyDirectory(String srcPath, String targetPath, FilenameFilter filenameFilter, boolean deleteSource, String prefix) {
         if (!targetPath.endsWith("/")) {
             targetPath = targetPath.replaceAll("\\\\", "/");
             targetPath += "/";
@@ -149,13 +150,21 @@ public class FileUtil {
         parseDir(srcPath, targetPath);
         File f = new File(srcPath);
         File[] fileList = f.listFiles(filenameFilter);
+        String fileName = null;
+        boolean checkPrefix = (null != prefix && !"".equals(prefix));
         for (File f1 : fileList) {
+            if (checkPrefix) {
+                fileName = f1.getName();
+                if (prefix.startsWith(fileName)) {
+                    continue;
+                }
+            }
             if (f1.isFile()) {
                 copyFile(srcPath, f1.getName(), targetPath, deleteSource);
             }
             //判断是否是目录
             if (f1.isDirectory()) {
-                copyDirectory(f1.getPath().toString(), targetPath + f1.getName(), filenameFilter, deleteSource);
+                copyDirectory(f1.getPath().toString(), targetPath + f1.getName(), filenameFilter, deleteSource, prefix);
             }
         }
     }
@@ -166,9 +175,21 @@ public class FileUtil {
      * @param srcPath        待复制的目录
      * @param targetPath     目录下的所有文件和文件夹复制到哪里
      * @param filenameFilter 文件名称过滤器
+     * @param deleteSource   是否复制完成之后删除源文件
+     */
+    public static void copyDirectory(String srcPath, String targetPath, FilenameFilter filenameFilter, boolean deleteSource) {
+        copyDirectory(srcPath, targetPath, filenameFilter, deleteSource, null);
+    }
+
+    /**
+     * 目录复制
+     *
+     * @param srcPath        待复制的目录
+     * @param targetPath     目录下的所有文件和文件夹复制到哪里
+     * @param filenameFilter 文件名称过滤器
      */
     public static void copyDirectory(String srcPath, String targetPath, FilenameFilter filenameFilter) {
-        copyDirectory(srcPath, targetPath, filenameFilter, false);
+        copyDirectory(srcPath, targetPath, filenameFilter, false, null);
     }
 
     /**
@@ -178,7 +199,7 @@ public class FileUtil {
      * @param targetPath 目录下的所有文件和文件夹复制到哪里
      */
     public static void copyDirectory(String srcPath, String targetPath) {
-        copyDirectory(srcPath, targetPath, null, false);
+        copyDirectory(srcPath, targetPath, null, false, null);
     }
 
     /**

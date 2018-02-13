@@ -2,8 +2,11 @@ package com.yida.framework.blog.client;
 
 import com.yida.framework.blog.config.DefaultConfigurable;
 import com.yida.framework.blog.publish.BlogPublisher;
+import com.yida.framework.blog.utils.io.FileUtil;
 import org.eclipse.jgit.api.Git;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +16,7 @@ import java.util.List;
  * @Description 博客发布工具的客户端接口抽象实现类
  */
 public abstract class AbstractBlogClient extends DefaultConfigurable implements BlogClient {
+    private static final String BASE_PACKAGE = "com.yida.framework.blog.publish";
     protected Git git;
 
     /**
@@ -21,9 +25,19 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
     protected List<BlogPublisher> blogPublisherList;
 
     /**
+     * 所有已实现的博客平台发布实现类的名称列表
+     */
+    protected List<String> blogPublisherClassNames;
+
+    /**
      * 博客文档按日期存放的根目录,比如C:/myblog/20180212,C:/myblog/20180213,C:/myblog/20180214
      */
     protected List<String> blogBasePaths;
+
+    /**
+     * 博客文档在Github本地仓库按日期存放的根目录,比如C:/git-local/blog/20180212,C:/git-local/blog/20180213,C:/git-local/blog/20180214
+     */
+    protected List<String> blogLocalRepoBasePaths;
 
     /**
      * 需要发布的Markdown文件的存放路径
@@ -82,13 +96,50 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
      * 构建所需的参数信息
      */
     protected void buildParams() {
-        String wordBasePath = this.config.getWordBasePath();
         List<String> blogSendDates = this.config.getBlogSendDates();
         if (null == this.blogBasePaths) {
             this.blogBasePaths = new ArrayList<>();
         }
+        if (null == this.blogLocalRepoBasePaths) {
+            this.blogLocalRepoBasePaths = new ArrayList<>();
+        }
+        String wordBasePath = this.config.getWordBasePath();
+        String blogLocalRepoBasePath = this.config.getGithubLocalCodeDir();
         for (String blogSendDate : blogSendDates) {
             this.blogBasePaths.add(wordBasePath + blogSendDate + "/");
+            this.blogLocalRepoBasePaths.add(blogLocalRepoBasePath + blogSendDate + "/");
+        }
+        //Scan all BlogPublisher implements
+        scanBlogPublisherClasses();
+    }
+
+    /**
+     * 扫描出所有以实现的BlogPublisher实现类
+     *
+     * @return
+     */
+    private void scanBlogPublisherClasses() {
+        String classpath = AbstractBlogClient.class.getResource("/").getPath();
+        classpath = classpath.replaceFirst("/", "");
+        String basePackage = BASE_PACKAGE;
+        basePackage = basePackage.replace(".", "/");
+        //combine the classpath and basePackage
+        String searchPath = classpath + basePackage;
+        List<String> javaFiles = FileUtil.listFiles(searchPath, new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if ("BlogPublisher.class".equals(name)) {
+                    return false;
+                }
+                return name.endsWith("BlogPublisher.class");
+            }
+        }, true);
+        if (null == javaFiles || javaFiles.size() <= 0) {
+            return;
+        }
+        this.blogPublisherClassNames = new ArrayList<>(javaFiles.size());
+        for (String javaFile : javaFiles) {
+            this.blogPublisherClassNames.add(javaFile);
         }
     }
 

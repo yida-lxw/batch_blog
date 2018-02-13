@@ -26,6 +26,8 @@ public class Constant {
     public static final String SYSTEM_TEMP_DIR = "C:\\\\Users\\\\ADMINI\\~1\\\\AppData\\\\Local\\\\Temp\\\\";
     public static final String SYSTEM_TEMP_DIR_IN_JDK = System.getProperty("java.io.tmpdir");
 
+    public static final String IGNORE_MARK = "[ignore]";
+
     public static final String[] PATTERNS = new String[]{
             "yyyy-MM-dd",
             "yyyy-MM-dd HH:mm",

@@ -170,6 +170,7 @@ public class BlogConfig {
     }
 
     public String getPandocHome() {
+        pandocHome = adjustPath(pandocHome);
         return pandocHome;
     }
 
@@ -178,12 +179,7 @@ public class BlogConfig {
     }
 
     public String getWordBasePath() {
-        if (wordBasePath.endsWith("\\")) {
-            wordBasePath = wordBasePath.replaceAll("\\\\", "/");
-        }
-        if (!wordBasePath.endsWith("/")) {
-            wordBasePath = wordBasePath + "/";
-        }
+        wordBasePath = adjustPath(wordBasePath);
         return wordBasePath;
     }
 
@@ -192,6 +188,7 @@ public class BlogConfig {
     }
 
     public String getMarkdownBasePath() {
+        markdownBasePath = adjustPath(markdownBasePath);
         return markdownBasePath;
     }
 
@@ -232,6 +229,7 @@ public class BlogConfig {
     }
 
     public String getGithubLocalRepoPath() {
+        githubLocalRepoPath = adjustPath(githubLocalRepoPath);
         return githubLocalRepoPath;
     }
 
@@ -240,6 +238,7 @@ public class BlogConfig {
     }
 
     public String getGithubRemoteRepoPath() {
+        githubRemoteRepoPath = adjustPath(githubRemoteRepoPath);
         return githubRemoteRepoPath;
     }
 
@@ -256,6 +255,7 @@ public class BlogConfig {
     }
 
     public String getGithubLocalCodeDir() {
+        githubLocalCodeDir = adjustPath(githubLocalCodeDir);
         return githubLocalCodeDir;
     }
 
@@ -280,10 +280,21 @@ public class BlogConfig {
     }
 
     public String getGithubPrivateKeyPath() {
+        githubPrivateKeyPath = adjustPath(githubPrivateKeyPath);
         return githubPrivateKeyPath;
     }
 
     public void setGithubPrivateKeyPath(String githubPrivateKeyPath) {
         this.githubPrivateKeyPath = githubPrivateKeyPath;
+    }
+
+    private String adjustPath(String path) {
+        if (path.endsWith("\\")) {
+            path = path.replaceAll("\\\\", "/");
+        }
+        if (!path.endsWith("/")) {
+            path = path + "/";
+        }
+        return path;
     }
 }

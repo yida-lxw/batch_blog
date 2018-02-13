@@ -2,6 +2,7 @@ package com.yida.framework.blog.handler;
 
 import com.yida.framework.blog.handler.input.WordImageCopyHandlerInput;
 import com.yida.framework.blog.handler.output.WordImageCopyHandlerOutput;
+import com.yida.framework.blog.utils.Constant;
 import com.yida.framework.blog.utils.io.FileUtil;
 import com.yida.framework.blog.utils.io.ImageFilenameFilter;
 
@@ -67,7 +68,7 @@ public class WordImageCopyHandler implements Handler<WordImageCopyHandlerInput, 
                         imagesPerMarkdown.add(imagesNewPath + imageFileName);
                     }
                     //开始图片复制操作
-                    FileUtil.copyDirectory(actualImagePath, imagesNewPath, this.imageFilenameFilter);
+                    FileUtil.copyDirectory(actualImagePath, imagesNewPath, this.imageFilenameFilter, true, Constant.IGNORE_MARK);
                     imagesMap.put(imagesNewPath, imagesPerMarkdown);
                 } else {
                     //若找不到图片
