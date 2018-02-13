@@ -144,6 +144,9 @@ public class BlogConfig {
             //若用户配置了多个日期，则表示用户需要一次性发布多天的博客
             if (-1 != this.blogSendDate.indexOf(";")) {
                 this.blogSendDates = ConfigContext.getStringListProperty(BLOG_SEND_DATE);
+            } else {
+                this.blogSendDates = new ArrayList<>(1);
+                this.blogSendDates.add(this.blogSendDate);
             }
         }
         this.blogPlatformSupported = ConfigContext.getStringProperty(BLOG_PLATFORM_SUPPORTED);

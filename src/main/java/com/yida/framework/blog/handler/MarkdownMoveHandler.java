@@ -66,6 +66,7 @@ public class MarkdownMoveHandler implements Handler<MarkdownMoveHandlerInput, Ma
                     output.getMarkdownFilePath().add(targetPath);
                 }
             } catch (IOException e) {
+                e.printStackTrace();
                 log.error("Moving the file from [{}] occured IOException:\n{}", wordPath, e.getMessage());
             }
         }

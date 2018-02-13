@@ -62,7 +62,7 @@ public class Word2MarkdownHandler implements Handler<Word2MarkdownHandlerInput, 
         String mdFileName = getMarkdownFileName(wordFileName);
         //获取Pandoc安装目录所在盘符
         String drive = pandocHome.substring(0, 1);
-        return String.format("cmd /c %s: && cd %s && pandoc -o %s %s", drive, pandocHome, mdFileName, wordFileName);
+        return String.format("cmd /c %s: && cd \"%s\" && pandoc -o \"%s\" \"%s\"", drive, pandocHome, mdFileName, wordFileName);
     }
 
     /**

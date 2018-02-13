@@ -34,12 +34,13 @@ public class DefaultBlogClient extends AbstractBlogClient {
      */
     @Override
     protected void beforeBlogSend() {
+        super.transform();
         super.buildParams();
         //将本地的指定的日期目录下的所有博客文档复制到Github的本地仓库中等待上传
         if (null != this.blogBasePaths && this.blogBasePaths.size() > 0) {
             int index = 0;
             for (String blogBasePath : this.blogBasePaths) {
-                FileUtil.copyDirectory(blogBasePath, this.blogLocalRepoBasePaths.get(index++), null, true, Constant.IGNORE_MARK);
+                FileUtil.copyDirectory(blogBasePath, this.blogLocalRepoBasePaths.get(index++), null, false, Constant.IGNORE_MARK);
             }
             //初始化Git实例对象
             this.git = GithubUtil.getGit(this.config.getGithubLocalRepoPath());

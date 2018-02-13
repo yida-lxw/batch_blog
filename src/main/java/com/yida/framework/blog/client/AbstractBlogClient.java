@@ -1,9 +1,12 @@
 package com.yida.framework.blog.client;
 
 import com.yida.framework.blog.config.DefaultConfigurable;
+import com.yida.framework.blog.handler.*;
+import com.yida.framework.blog.handler.input.HandlerChainInput;
+import com.yida.framework.blog.handler.output.HandlerChainOutput;
 import com.yida.framework.blog.publish.BlogPublisher;
 import com.yida.framework.blog.utils.common.StringUtil;
-import com.yida.framework.blog.utils.io.FileUtil;
+import com.yida.framework.blog.utils.io.*;
 import org.eclipse.jgit.api.Git;
 
 import java.io.File;
@@ -139,6 +142,9 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
      */
     private void scanBlogPublisherClasses() {
         String classpath = AbstractBlogClient.class.getResource("/").getPath();
+        if (classpath.contains("test-classes")) {
+            classpath = classpath.replace("test-classes", "classes");
+        }
         classpath = classpath.replaceFirst("/", "");
         this.classPath = classpath;
         String basePackage = BASE_PACKAGE;
@@ -161,6 +167,37 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
         for (String javaFile : javaFiles) {
             this.blogPublisherClassNames.add(StringUtil.fixedPathDelimiter(javaFile, false));
         }
+    }
+
+    /**
+     * Word文档转换成Markdown文件的相关处理工作,附带解决图片引用问题
+     */
+    protected void transform() {
+        //todo:这部分代码有待重构
+        MarkdownFilenameFilter markdownFilenameFilter = new MarkdownFilenameFilter();
+        ImageFilenameFilter imageFilenameFilter = new ImageFilenameFilter();
+        ZipArchiverFileFilter zipArchiverFileFilter = new ZipArchiverFileFilter();
+        DocxFilenameFilter docxFilenameFilter = new DocxFilenameFilter();
+
+        WordFilterHandler wordFilterHandler = new WordFilterHandler(docxFilenameFilter);
+        WordUnzipHandler wordUnzipHandler = new WordUnzipHandler(wordFilterHandler, zipArchiverFileFilter);
+
+        Word2MarkdownHandler word2MarkdownHandler = new Word2MarkdownHandler(wordFilterHandler);
+        WordImageCopyHandler wordImageCopyHandler = new WordImageCopyHandler(wordUnzipHandler, imageFilenameFilter);
+        MarkdownMoveHandler markdownMoveHandler = new MarkdownMoveHandler();
+        MarkdownFixHandler markdownFixHandler = new MarkdownFixHandler(markdownFilenameFilter);
+
+        //add handlers to List<Handler>
+        List<Handler> handlers = new ArrayList<Handler>();
+        handlers.add(word2MarkdownHandler);
+        handlers.add(wordImageCopyHandler);
+        handlers.add(markdownMoveHandler);
+        handlers.add(markdownFixHandler);
+
+        //Create HandlerChain instance
+        HandlerChain handlerChain = new HandlerChain();
+        handlerChain.addHandlers(handlers);
+        handlerChain.handle(new HandlerChainInput(), new HandlerChainOutput());
     }
 
     public Git getGit() {
