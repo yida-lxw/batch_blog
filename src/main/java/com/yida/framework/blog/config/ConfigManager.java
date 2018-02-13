@@ -103,6 +103,9 @@ public class ConfigManager {
                 if (GerneralUtil.isEmptyString(line) || line.startsWith("#")) {
                     continue;
                 }
+                if (line.contains("http://") || line.contains("https://")) {
+                    line = line.replaceAll("http://", "http:##").replaceAll("https://", "https:##");
+                }
                 line = line.replaceAll("\\/\\/[^\\n]*|\\/\\*([^\\*^\\/]*|[\\*^\\/*]*|[^\\**\\/]*)*\\*+\\/", "").trim();
                 if (GerneralUtil.isEmptyString(line)) {
                     continue;
@@ -111,6 +114,9 @@ public class ConfigManager {
                     line = line.substring(0, line.lastIndexOf("\" ,") + 3);
                 } else if (-1 != line.lastIndexOf("\",") && line.lastIndexOf("\",") == line.indexOf("\",")) {
                     line = line.substring(0, line.lastIndexOf("\",") + 2);
+                }
+                if (line.contains("http:##") || line.contains("https:##")) {
+                    line = line.replaceAll("http:##", "http://").replaceAll("https:##", "https://");
                 }
                 builder.append(line).append("\n");
             }

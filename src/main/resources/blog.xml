@@ -14,7 +14,7 @@
 	<!-- Github的本地仓库目录 -->
 	<entry key="github_local_repo_path">G:/git-local</entry>
 	<!-- Github的远程仓库的URL -->
-	<entry key="github_remote_repo_path">git@github.com:yida-lxw/blog.git</entry>
+	<entry key="github_remote_repo_path">https://github.com/yida-lxw/blog.git</entry>
 	<!-- Github博客的远程分支名称 -->
 	<entry key="github_blog_branch_name">master</entry>
 	<!-- 本地项目代码存放目录-->

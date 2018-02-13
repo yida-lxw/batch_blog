@@ -318,7 +318,17 @@ public class BlogConfig {
         return Arrays.asList(array);
     }
 
+    public boolean isSSH() {
+        if (null == this.githubRemoteRepoPath || "".equalsIgnoreCase(this.githubRemoteRepoPath)) {
+            return false;
+        }
+        return this.githubRemoteRepoPath.startsWith("git@");
+    }
+
     private String adjustPath(String path) {
+        if (null == path || "".equals(path)) {
+            return path;
+        }
         if (path.endsWith("\\")) {
             path = path.replaceAll("\\\\", "/");
         }

@@ -11,6 +11,8 @@ import com.yida.framework.blog.utils.io.MarkdownFilenameFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.transport.PushResult;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -18,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -43,7 +46,7 @@ public class DefaultBlogClient extends AbstractBlogClient {
                 FileUtil.copyDirectory(blogBasePath, this.blogLocalRepoBasePaths.get(index++), null, false, Constant.IGNORE_MARK);
             }
             //初始化Git实例对象
-            this.git = GithubUtil.getGit(this.config.getGithubLocalRepoPath());
+            this.git = GithubUtil.getGit(this.config.getGithubLocalCodeDir());
             Ref ref = GithubUtil.checkout(this.git, this.config.getGithubBlogBranchName());
             log.info("the return of git checkout:" + ref);
         }
@@ -66,8 +69,8 @@ public class DefaultBlogClient extends AbstractBlogClient {
                     BlogPublisher blogPublisher = null;
                     for (String blogPublisherClassName : blogPublisherClassNames) {
                         blogPublisherClassPath = blogPublisherClassName.replace(this.getClassPath(), "")
-                                .replaceAll("/", ".");
-                        fileName = FileUtil.getFileName(blogPublisherClassName);
+                                .replaceAll("/", ".").replace(".class", "");
+                        fileName = FileUtil.getPureFileName(blogPublisherClassName);
                         fileNamePrefix = fileName.replace("BlogPublisher", "").toLowerCase();
                         if (!fileNamePrefix.equalsIgnoreCase(blogPublisherKey)) {
                             continue;
@@ -119,12 +122,15 @@ public class DefaultBlogClient extends AbstractBlogClient {
                 blogPublisherClassPath = blogPublisher.getClass().getName();
                 blogPublisherClassPath = blogPublisherClassPath + "Param";
                 blogPublishParam = ReflectionUtil.createInstance(blogPublisherClassPath);
+                ReflectionUtil.setFieldValue(blogPublishParam, "git", this.git);
+                ReflectionUtil.setFieldValue(blogPublishParam, "filePatterns", getFilePatterns());
                 if (null == blogPublishParam) {
                     continue;
                 }
                 try {
                     blogPublisher.publish(blogPublishParam);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     log.error("There was an exception occured when the nethod[blogSend] was called in class[{}] for a blog post.",
                             blogPublisher.getClass().getName(), e.getMessage());
                 }
@@ -170,7 +176,11 @@ public class DefaultBlogClient extends AbstractBlogClient {
                 }
             }
         }
-        //关闭Git
+
+        //git push
+        gitPush();
+
+        //close git
         GithubUtil.closeGit(this.git);
     }
 
@@ -204,6 +214,10 @@ public class DefaultBlogClient extends AbstractBlogClient {
     private void buildFilePatterns() {
         if (null != this.markdownFilePaths && this.markdownFilePaths.size() > 0) {
             List<String> filePatternList = new ArrayList<>();
+            String imagesPath = null;
+            String markdownDir = null;
+            String wordDir = null;
+            String wordFilePattern = null;
             for (String markdownFilePath : this.markdownFilePaths) {
                 markdownFilePath = StringUtil.fixedPathDelimiter(markdownFilePath, false);
                 markdownFilePath = markdownFilePath.replace(
@@ -211,11 +225,42 @@ public class DefaultBlogClient extends AbstractBlogClient {
                 if (null == markdownFilePath || "".equalsIgnoreCase(markdownFilePath)) {
                     continue;
                 }
+                markdownDir = markdownFilePath.substring(0, markdownFilePath.lastIndexOf("/") + 1);
+                imagesPath = markdownDir + "images/*";
                 filePatternList.add(markdownFilePath);
+                filePatternList.add(imagesPath);
+                if (markdownDir.endsWith("/")) {
+                    markdownDir = markdownDir.substring(0, markdownDir.lastIndexOf("/"));
+                }
+                wordDir = markdownDir.substring(0, markdownDir.lastIndexOf("/") + 1);
+                wordFilePattern = wordDir + "*.docx";
+                if (!filePatternList.contains(wordFilePattern)) {
+                    filePatternList.add(wordFilePattern);
+                }
             }
             if (null != filePatternList && filePatternList.size() > 0) {
                 this.setFilePatterns(filePatternList.toArray(new String[]{}));
             }
+        }
+    }
+
+    private void gitPush() {
+        Iterable<PushResult> pushResults = null;
+        if (this.config.isSSH()) {
+            pushResults = GithubUtil.pushWithSSH(this.git, this.config.getGithubPrivateKeyPath(),
+                    this.config.getGithubBlogBranchName());
+        } else {
+            pushResults = GithubUtil.pushWithHttp(this.git, this.config.getGithubBlogBranchName(),
+                    this.config.getGithubUserName(), this.config.getGithubPassword());
+        }
+
+        Iterator<PushResult> pushResultIterator = pushResults.iterator();
+        PushResult pushResult = null;
+        RemoteRefUpdate.Status status = null;
+        while (pushResultIterator.hasNext()) {
+            pushResult = pushResultIterator.next();
+            status = pushResult.getRemoteUpdate("refs/heads/" + GithubUtil.BRANCH_MASTER).getStatus();
+            System.out.println(status.toString());
         }
     }
 }

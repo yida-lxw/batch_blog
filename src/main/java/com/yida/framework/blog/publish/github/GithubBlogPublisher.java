@@ -35,7 +35,7 @@ public class GithubBlogPublisher implements BlogPublisher<GithubBlogPublisherPar
         if (ssh) {
             pullResult = GithubUtil.pullWithSSH(git, blogPublishParam.getGithubBlogBranchName(), null,
                     blogPublishParam.getGithubPrivateKeyPath());
-        } else if (remoteRepoPath.startsWith("git@")) {
+        } else if (remoteRepoPath.startsWith("https://") || remoteRepoPath.startsWith("http://")) {
             pullResult = GithubUtil.pullWithHttp(git, blogPublishParam.getGithubBlogBranchName(),
                     blogPublishParam.getGithubUserName(), blogPublishParam.getGithubPassword());
         } else {
