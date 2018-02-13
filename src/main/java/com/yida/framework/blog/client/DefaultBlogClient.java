@@ -1,5 +1,6 @@
 package com.yida.framework.blog.client;
 
+import com.yida.framework.blog.publish.BlogPublishParam;
 import com.yida.framework.blog.publish.BlogPublisher;
 import com.yida.framework.blog.utils.Constant;
 import com.yida.framework.blog.utils.common.ReflectionUtil;
@@ -100,6 +101,7 @@ public class DefaultBlogClient extends AbstractBlogClient {
                 }
             }
             readMarkdownFileContent();
+            buildFilePatterns();
         }
     }
 
@@ -109,7 +111,24 @@ public class DefaultBlogClient extends AbstractBlogClient {
     @Override
     protected void blogSend() {
         //默认会首先将博客发布至Github上
-
+        if (null != this.blogPublisherList && this.blogPublisherList.size() > 0) {
+            String blogPublisherClassPath = null;
+            BlogPublishParam blogPublishParam = null;
+            for (BlogPublisher blogPublisher : this.blogPublisherList) {
+                blogPublisherClassPath = blogPublisher.getClass().getName();
+                blogPublisherClassPath = blogPublisherClassPath + "Param";
+                blogPublishParam = ReflectionUtil.createInstance(blogPublisherClassPath);
+                if (null == blogPublishParam) {
+                    continue;
+                }
+                try {
+                    blogPublisher.publish(blogPublishParam);
+                } catch (Exception e) {
+                    log.error("There was an exception occured when the nethod[blogSend] was called in class[{}] for a blog post.",
+                            blogPublisher.getClass().getName(), e.getMessage());
+                }
+            }
+        }
     }
 
     /**
@@ -160,7 +179,6 @@ public class DefaultBlogClient extends AbstractBlogClient {
     private void readMarkdownFileContent() {
         if (null != this.markdownFilePaths && this.markdownFilePaths.size() > 0) {
             byte[] byteArray = null;
-            String fileContent = null;
             if (null == this.markdownFileContents) {
                 this.markdownFileContents = new ArrayList<>();
             }
@@ -175,6 +193,27 @@ public class DefaultBlogClient extends AbstractBlogClient {
                     continue;
                 }
                 this.markdownFileContents.add(new String(byteArray, StandardCharsets.UTF_8));
+            }
+        }
+    }
+
+    /**
+     * 构建需要push到Github远程仓库的文件的表达式,默认是相对github_local_code_dir
+     */
+    private void buildFilePatterns() {
+        if (null != this.markdownFilePaths && this.markdownFilePaths.size() > 0) {
+            List<String> filePatternList = new ArrayList<>();
+            for (String markdownFilePath : this.markdownFilePaths) {
+                markdownFilePath = StringUtil.fixedPathDelimiter(markdownFilePath, false);
+                markdownFilePath = markdownFilePath.replace(
+                        StringUtil.fixedPathDelimiter(this.config.getWordBasePath(), true), "");
+                if (null == markdownFilePath || "".equalsIgnoreCase(markdownFilePath)) {
+                    continue;
+                }
+                filePatternList.add(markdownFilePath);
+            }
+            if (null != filePatternList && filePatternList.size() > 0) {
+                this.setFilePatterns(filePatternList.toArray(new String[]{}));
             }
         }
     }

@@ -62,6 +62,11 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
     private String classPath;
 
     /**
+     * 待提交到Github的文件的路径表达式,支持相对路径,默认相对本地仓库根目录
+     */
+    private String[] filePatterns;
+
+    /**
      * 博客发布工具的启动入口
      */
     @Override
@@ -164,5 +169,13 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
 
     protected String getClassPath() {
         return classPath;
+    }
+
+    public String[] getFilePatterns() {
+        return filePatterns;
+    }
+
+    public void setFilePatterns(String[] filePatterns) {
+        this.filePatterns = filePatterns;
     }
 }

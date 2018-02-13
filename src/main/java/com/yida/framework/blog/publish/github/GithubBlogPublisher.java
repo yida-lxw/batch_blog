@@ -14,11 +14,15 @@ import org.eclipse.jgit.revwalk.RevCommit;
  * @Date 2018-02-12 17:02
  * @Description Github博客发布接口实现
  */
-public class GithubBlogPublisher implements BlogPublisher<GithubBlogPublishParam> {
+public class GithubBlogPublisher implements BlogPublisher<GithubBlogPublisherParam> {
     private Logger log = LogManager.getLogger(GithubBlogPublisher.class.getName());
 
+    public static void main(String[] args) {
+        System.out.println(GithubBlogPublisher.class.getName());
+    }
+
     @Override
-    public String publish(GithubBlogPublishParam blogPublishParam) {
+    public String publish(GithubBlogPublisherParam blogPublishParam) {
         //Git git = GithubUtil.getGit(blogPublishParam.getGithubLocalRepositoryPath());
         //Ref ref = GithubUtil.checkout(git, blogPublishParam.getGithubBlogBranchName());
         //log.info("the return of git checkout:" + ref);

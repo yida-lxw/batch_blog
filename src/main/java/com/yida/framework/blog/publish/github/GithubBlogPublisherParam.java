@@ -8,7 +8,7 @@ import org.eclipse.jgit.api.Git;
  * @Date 2018-02-12 17:03
  * @Description 发布博客至Github所需的参数定义
  */
-public class GithubBlogPublishParam extends BlogPublishParam {
+public class GithubBlogPublisherParam extends BlogPublishParam {
     /**
      * 待提交到Github的文件的路径表达式,支持相对路径,默认相对本地仓库根目录
      */
