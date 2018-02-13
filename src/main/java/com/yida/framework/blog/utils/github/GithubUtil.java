@@ -3,6 +3,7 @@ package com.yida.framework.blog.utils.github;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.yida.framework.blog.utils.common.StringUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.*;
@@ -34,7 +35,7 @@ public class GithubUtil {
 
     private static Logger log = LogManager.getLogger(GithubUtil.class.getName());
 
-    public static final String USER_HOME = fixedPathDelimiter(System.getProperty("user.home"));
+    public static final String USER_HOME = StringUtil.fixedPathDelimiter(System.getProperty("user.home"));
     public static final String PRIVATE_KEY = USER_HOME + "/.ssh/id_rsa";
 
     private static final ThreadLocal<SshSessionFactory> sshSessionFactoryThreadLocal = new ThreadLocal<>();
@@ -98,7 +99,7 @@ public class GithubUtil {
      * @return
      */
     public static boolean isLocalRepoExists(String localRepositoryPath) {
-        localRepositoryPath = fixedPathDelimiter(localRepositoryPath);
+        localRepositoryPath = StringUtil.fixedPathDelimiter(localRepositoryPath);
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder()
                 .setGitDir(new File(localRepositoryPath + ".git"))
                 .setMustExist(false);
@@ -120,7 +121,7 @@ public class GithubUtil {
      * @return
      */
     public static Git initLocalRepo(String localRepositoryPath) {
-        localRepositoryPath = fixedPathDelimiter(localRepositoryPath);
+        localRepositoryPath = StringUtil.fixedPathDelimiter(localRepositoryPath);
         Git git = null;
         try {
             git = Git.init()
@@ -141,7 +142,7 @@ public class GithubUtil {
      * @return
      */
     public static Git openLocalRepo(String localRepositoryPath) {
-        localRepositoryPath = fixedPathDelimiter(localRepositoryPath);
+        localRepositoryPath = StringUtil.fixedPathDelimiter(localRepositoryPath);
         Git git = null;
         try {
             return Git.open(new File(localRepositoryPath));
@@ -1426,23 +1427,6 @@ public class GithubUtil {
      */
     private static SshSessionFactory createSshSessionFactory() {
         return createSshSessionFactory(null);
-    }
-
-    /**
-     * 将路径字符串里的\\转换成/
-     *
-     * @param path
-     * @return
-     */
-    private static String fixedPathDelimiter(String path) {
-        if (null == path || "".equals(path)) {
-            return path;
-        }
-        path = path.replaceAll("\\\\", "/");
-        if (!path.endsWith("/")) {
-            path = path + "/";
-        }
-        return path;
     }
 
     /**Commit*/

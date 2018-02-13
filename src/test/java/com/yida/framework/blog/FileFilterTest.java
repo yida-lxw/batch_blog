@@ -11,7 +11,7 @@ import java.io.File;
  */
 public class FileFilterTest {
     public static void main(String[] args) {
-        String basePath = "C:/使用Java提交代码至Github";
+        String basePath = "C:/myblog/20180207";
         File file = new File(basePath);
         String[] files = file.list(new DefaultArchiverFileFilter());
         for (String fileName : files) {

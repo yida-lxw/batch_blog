@@ -450,6 +450,91 @@ public class FileUtil {
     }
 
     /**
+     * 递归遍历过滤指定文件夹下的所有文件和目录(返回数组形式)
+     *
+     * @param directoryPath 指定目录路径
+     * @param filter        文件名称过滤器
+     * @param recurse       是否开启递归查找,默认不开启递归查找,即默认为false
+     * @return
+     */
+    public static String[] listFilesAsArray(String directoryPath, FilenameFilter filter, boolean recurse) {
+        List<String> files = listFiles(directoryPath, filter, recurse);
+        return files.toArray(new String[]{});
+    }
+
+    /**
+     * 递归遍历过滤指定文件夹下的所有文件和目录(返回数组形式)
+     *
+     * @param directoryPath 指定目录路径
+     * @param filter        文件名称过滤器
+     * @return
+     */
+    public static String[] listFilesAsArray(String directoryPath, FilenameFilter filter) {
+        return listFilesAsArray(directoryPath, filter, false);
+    }
+
+    /**
+     * 递归遍历过滤指定文件夹下的所有文件和目录(返回数组形式)
+     *
+     * @param directoryPath 指定目录路径
+     * @return
+     */
+    public static String[] listFilesAsArray(String directoryPath) {
+        return listFilesAsArray(directoryPath, null, false);
+    }
+
+    /**
+     * 递归遍历过滤指定文件夹下的所有文件和目录(返回List集合形式)
+     *
+     * @param directoryPath 指定目录路径
+     * @param filter        文件名称过滤器
+     * @param recurse       是否开启递归查找,默认不开启递归查找,即默认为false
+     * @return
+     */
+    public static List<String> listFiles(String directoryPath, FilenameFilter filter, boolean recurse) {
+        List<String> files = new ArrayList<>();
+        File directory = new File(directoryPath);
+        File[] entries = directory.listFiles();
+
+        // Go over entries
+        try {
+            for (File entry : entries) {
+                if (null == filter || filter.accept(directory, entry.getName())) {
+                    files.add(entry.getCanonicalPath());
+                }
+                if (recurse && entry.isDirectory()) {
+                    files.addAll(listFiles(entry.getCanonicalPath(), filter, recurse));
+                }
+            }
+        } catch (Exception e) {
+            log.error("list files in the directory[{}] with fileNameFilter[{}] occur exception:\n{}", directoryPath,
+                    filter.getClass().getName(), e.getMessage());
+        }
+        return files;
+    }
+
+    /**
+     * 递归遍历过滤指定文件夹下的所有文件和目录(返回List集合形式)
+     *
+     * @param directoryPath 指定目录路径
+     * @param filter        文件名称过滤器
+     * @return
+     */
+    public static List<String> listFiles(String directoryPath, FilenameFilter filter) {
+        return listFiles(directoryPath, filter, false);
+    }
+
+    /**
+     * 递归遍历过滤指定文件夹下的所有文件和目录(返回List集合形式)
+     *
+     * @param directoryPath 指定目录路径
+     * @return
+     */
+    public static List<String> listFiles(String directoryPath) {
+        return listFiles(directoryPath, null, false);
+    }
+
+    /**
      * 文件重命名
      *
      * @param path    文件的存放路径

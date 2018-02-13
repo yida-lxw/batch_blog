@@ -4,6 +4,7 @@ import com.yida.framework.blog.config.DefaultConfigurable;
 import com.yida.framework.blog.publish.BlogPublisher;
 import org.eclipse.jgit.api.Git;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +19,11 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
      * 博客待发布的博客平台列表,比如:Github,ITeye,CSDN,OSChina,CNBlog,简书等等
      */
     protected List<BlogPublisher> blogPublisherList;
+
+    /**
+     * 博客文档按日期存放的根目录,比如C:/myblog/20180212,C:/myblog/20180213,C:/myblog/20180214
+     */
+    protected List<String> blogBasePaths;
 
     /**
      * 需要发布的Markdown文件的存放路径
@@ -71,6 +77,20 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
      * 避免下次发布时重复发布
      */
     protected abstract void afterBlogSend();
+
+    /**
+     * 构建所需的参数信息
+     */
+    protected void buildParams() {
+        String wordBasePath = this.config.getWordBasePath();
+        List<String> blogSendDates = this.config.getBlogSendDates();
+        if (null == this.blogBasePaths) {
+            this.blogBasePaths = new ArrayList<>();
+        }
+        for (String blogSendDate : blogSendDates) {
+            this.blogBasePaths.add(wordBasePath + blogSendDate + "/");
+        }
+    }
 
     public Git getGit() {
         return git;

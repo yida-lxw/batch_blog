@@ -12,12 +12,7 @@ import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1824,6 +1819,23 @@ public class StringUtil {
             }
         }
         return regex;
+    }
+
+    /**
+     * 将路径字符串里的\\转换成/
+     *
+     * @param path
+     * @return
+     */
+    public static String fixedPathDelimiter(String path) {
+        if (null == path || "".equals(path)) {
+            return path;
+        }
+        path = path.replaceAll("\\\\", "/");
+        if (!path.endsWith("/")) {
+            path = path + "/";
+        }
+        return path;
     }
 
     public static void main(String[] args) {

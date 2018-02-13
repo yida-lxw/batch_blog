@@ -3,6 +3,7 @@ package com.yida.framework.blog.config;
 import com.yida.framework.blog.utils.Constant;
 import com.yida.framework.blog.utils.common.DateUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -130,6 +131,8 @@ public class BlogConfig {
         if (null == this.blogSendDate || "".equals(this.blogSendDate)) {
             //若用户未在配置文件中配置[blog_send_dates]这项，则默认会获取当前时间作为博客发送时间
             this.blogSendDate = DateUtil.format(new Date(), Constant.DEFAULT_DATE_PATTERN);
+            this.blogSendDates = new ArrayList<>(1);
+            this.blogSendDates.add(this.blogSendDate);
         } else {
             //若用户配置了多个日期，则表示用户需要一次性发布多天的博客
             if (-1 != this.blogSendDate.indexOf(";")) {
@@ -175,6 +178,12 @@ public class BlogConfig {
     }
 
     public String getWordBasePath() {
+        if (wordBasePath.endsWith("\\")) {
+            wordBasePath = wordBasePath.replaceAll("\\\\", "/");
+        }
+        if (!wordBasePath.endsWith("/")) {
+            wordBasePath = wordBasePath + "/";
+        }
         return wordBasePath;
     }
 

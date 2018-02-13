@@ -12,7 +12,8 @@ public class DefaultBlogClient extends AbstractBlogClient {
      */
     @Override
     protected void beforeBlogSend() {
-
+        //将本地的博客文档复制到Github的本地仓库中等待上传
+        //FileUtil.copyDirectory(srcpath, targetpath, null, false);
     }
 
     @Override
