@@ -6,12 +6,16 @@ import com.yida.framework.blog.utils.common.ReflectionUtil;
 import com.yida.framework.blog.utils.common.StringUtil;
 import com.yida.framework.blog.utils.github.GithubUtil;
 import com.yida.framework.blog.utils.io.FileUtil;
+import com.yida.framework.blog.utils.io.MarkdownFilenameFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.lib.Ref;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,13 +81,34 @@ public class DefaultBlogClient extends AbstractBlogClient {
         }
     }
 
+    /**
+     * 查找所有需要发布为博客的Markdown文件
+     *
+     * @return
+     */
     @Override
     protected void findTargetMarkdowns() {
-
+        if (null != this.blogBasePaths && this.blogBasePaths.size() > 0) {
+            List<String> markdownFileList = null;
+            if (null == this.markdownFilePaths) {
+                this.markdownFilePaths = new ArrayList<>();
+            }
+            for (String blogBasePath : this.blogBasePaths) {
+                markdownFileList = FileUtil.listFiles(blogBasePath, new MarkdownFilenameFilter(), true);
+                if (null != markdownFileList && markdownFileList.size() > 0) {
+                    this.markdownFilePaths.addAll(markdownFileList);
+                }
+            }
+            readMarkdownFileContent();
+        }
     }
 
+    /**
+     * 发布博客内容至配置的各博客平台
+     */
     @Override
     protected void blogSend() {
+        //默认会首先将博客发布至Github上
 
     }
 
@@ -127,5 +152,30 @@ public class DefaultBlogClient extends AbstractBlogClient {
         }
         //关闭Git
         GithubUtil.closeGit(this.git);
+    }
+
+    /**
+     * 读取待发布的Markdown文件的内容
+     */
+    private void readMarkdownFileContent() {
+        if (null != this.markdownFilePaths && this.markdownFilePaths.size() > 0) {
+            byte[] byteArray = null;
+            String fileContent = null;
+            if (null == this.markdownFileContents) {
+                this.markdownFileContents = new ArrayList<>();
+            }
+            for (String markdownFilePath : this.markdownFilePaths) {
+                markdownFilePath = StringUtil.fixedPathDelimiter(markdownFilePath, false);
+                try {
+                    byteArray = Files.readAllBytes(Paths.get(markdownFilePath));
+                } catch (Exception e) {
+                    log.error("While reading content from the file[{}],we occur Exception:\n{}", markdownFilePath, e.getMessage());
+                }
+                if (null == byteArray || byteArray.length <= 0) {
+                    continue;
+                }
+                this.markdownFileContents.add(new String(byteArray, StandardCharsets.UTF_8));
+            }
+        }
     }
 }
