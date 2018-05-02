@@ -17,10 +17,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 public class GithubBlogPublisher implements BlogPublisher<GithubBlogPublisherParam> {
     private Logger log = LogManager.getLogger(GithubBlogPublisher.class.getName());
 
-    public static void main(String[] args) {
-        System.out.println(GithubBlogPublisher.class.getName());
-    }
-
     @Override
     public String publish(GithubBlogPublisherParam blogPublishParam) {
         //Git git = GithubUtil.getGit(blogPublishParam.getGithubLocalRepositoryPath());

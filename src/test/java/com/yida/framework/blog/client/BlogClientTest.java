@@ -9,7 +9,5 @@ public class BlogClientTest {
     public static void main(String[] args) {
         BlogClient blogClient = new DefaultBlogClient();
         blogClient.go();
-
-
     }
 }

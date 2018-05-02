@@ -7,6 +7,7 @@ import com.yida.framework.blog.utils.common.ReflectionUtil;
 import com.yida.framework.blog.utils.common.StringUtil;
 import com.yida.framework.blog.utils.github.GithubUtil;
 import com.yida.framework.blog.utils.io.FileUtil;
+import com.yida.framework.blog.utils.io.ImageFilenameFilter;
 import com.yida.framework.blog.utils.io.MarkdownFilenameFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -122,16 +123,17 @@ public class DefaultBlogClient extends AbstractBlogClient {
                 blogPublisherClassPath = blogPublisher.getClass().getName();
                 blogPublisherClassPath = blogPublisherClassPath + "Param";
                 blogPublishParam = ReflectionUtil.createInstance(blogPublisherClassPath);
-                ReflectionUtil.setFieldValue(blogPublishParam, "git", this.git);
-                ReflectionUtil.setFieldValue(blogPublishParam, "filePatterns", getFilePatterns());
                 if (null == blogPublishParam) {
                     continue;
                 }
+                ReflectionUtil.setFieldValue(blogPublishParam, "git", this.git);
+                ReflectionUtil.setFieldValue(blogPublishParam, "filePatterns", getFilePatterns());
+
                 try {
                     blogPublisher.publish(blogPublishParam);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    log.error("There was an exception occured when the nethod[blogSend] was called in class[{}] for a blog post.",
+                    log.error("There was an exception occured when the method[blogSend] was called in class[{}] for a blog post.",
                             blogPublisher.getClass().getName(), e.getMessage());
                 }
             }
@@ -215,9 +217,12 @@ public class DefaultBlogClient extends AbstractBlogClient {
         if (null != this.markdownFilePaths && this.markdownFilePaths.size() > 0) {
             List<String> filePatternList = new ArrayList<>();
             String imagesPath = null;
+            String relative_image_path = null;
             String markdownDir = null;
             String wordDir = null;
             String wordFilePattern = null;
+            File imgFilesPath = null;
+            String[] imageFiles = null;
             for (String markdownFilePath : this.markdownFilePaths) {
                 markdownFilePath = StringUtil.fixedPathDelimiter(markdownFilePath, false);
                 markdownFilePath = markdownFilePath.replace(
@@ -226,9 +231,25 @@ public class DefaultBlogClient extends AbstractBlogClient {
                     continue;
                 }
                 markdownDir = markdownFilePath.substring(0, markdownFilePath.lastIndexOf("/") + 1);
-                imagesPath = markdownDir + "images/*";
+                if (this.getConfig().getGithubLocalCodeDir().endsWith("/")) {
+                    imagesPath = this.getConfig().getGithubLocalCodeDir() + markdownDir + "images/";
+                } else if (this.getConfig().getGithubLocalCodeDir().endsWith("\\")) {
+                    imagesPath = StringUtil.fixedPathDelimiter(this.getConfig().getGithubLocalCodeDir() + markdownDir + "images/");
+                } else {
+                    imagesPath = this.getConfig().getGithubLocalCodeDir() + "/" + markdownDir + "images/";
+                }
+                relative_image_path = markdownDir + "images/";
+                imgFilesPath = new File(imagesPath);
+                if (imgFilesPath.exists() && imgFilesPath.isDirectory()) {
+                    imageFiles = imgFilesPath.list(new ImageFilenameFilter());
+                    if (null != imageFiles && imageFiles.length > 0) {
+                        for (String imageFile : imageFiles) {
+                            filePatternList.add(relative_image_path + imageFile);
+                        }
+                    }
+                }
                 filePatternList.add(markdownFilePath);
-                filePatternList.add(imagesPath);
+                //filePatternList.add(imagesPath);
                 if (markdownDir.endsWith("/")) {
                     markdownDir = markdownDir.substring(0, markdownDir.lastIndexOf("/"));
                 }
@@ -254,13 +275,15 @@ public class DefaultBlogClient extends AbstractBlogClient {
                     this.config.getGithubUserName(), this.config.getGithubPassword());
         }
 
-        Iterator<PushResult> pushResultIterator = pushResults.iterator();
-        PushResult pushResult = null;
-        RemoteRefUpdate.Status status = null;
-        while (pushResultIterator.hasNext()) {
-            pushResult = pushResultIterator.next();
-            status = pushResult.getRemoteUpdate("refs/heads/" + GithubUtil.BRANCH_MASTER).getStatus();
-            System.out.println(status.toString());
+        if (null != pushResults) {
+            Iterator<PushResult> pushResultIterator = pushResults.iterator();
+            PushResult pushResult = null;
+            RemoteRefUpdate.Status status = null;
+            while (pushResultIterator.hasNext()) {
+                pushResult = pushResultIterator.next();
+                status = pushResult.getRemoteUpdate("refs/heads/" + GithubUtil.BRANCH_MASTER).getStatus();
+                System.out.println(status.toString());
+            }
         }
     }
 }

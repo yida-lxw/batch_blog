@@ -109,11 +109,18 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
                         if (null == line) {
                             continue;
                         }
+                        line = line.trim();
                         if (line.startsWith(tempDirDemo)) {
                             //如果makedown里引用了系统临时文件夹里的图片文件
                             String picPath = line.substring(line.indexOf("[") + 1, line.indexOf("]"));
                             line = line.replace(picPath, "");
                             nextSkip = true;
+                        }
+                        if (line.contains("![](media")) {
+                            line = line.replaceAll("\\s+", "");
+                            if (line.contains("!")) {
+                                line = line.substring(line.indexOf("!"));
+                            }
                         }
                         if (line.startsWith("![](media")) {
                             line = line.substring(0, line.indexOf("{"));
