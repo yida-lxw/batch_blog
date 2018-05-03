@@ -337,16 +337,4 @@ public class BlogConfig {
         }
         return path;
     }
-
-    public static void main(String[] args) {
-        int a = 200;
-        Integer c = new Integer(200);
-
-
-        System.out.println("a == c:" + (a == c));
-        System.out.println("c == a:" + (c == a));
-        System.out.println("a equals c:" + (c.equals(a)));
-
-
-    }
 }
