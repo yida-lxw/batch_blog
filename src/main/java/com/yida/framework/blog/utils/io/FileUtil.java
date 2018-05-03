@@ -150,6 +150,9 @@ public class FileUtil {
         parseDir(srcPath, targetPath);
         File f = new File(srcPath);
         File[] fileList = f.listFiles(filenameFilter);
+        if (null == fileList) {
+            return;
+        }
         String fileName = null;
         boolean checkPrefix = (null != prefix && !"".equals(prefix));
         for (File f1 : fileList) {
