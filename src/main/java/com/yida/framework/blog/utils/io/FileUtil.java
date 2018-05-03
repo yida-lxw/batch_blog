@@ -519,7 +519,11 @@ public class FileUtil {
         List<String> files = new ArrayList<>();
         File directory = new File(directoryPath);
         File[] entries = directory.listFiles();
+        if (null == entries) {
+            return null;
+        }
 
+        List<String> flist = null;
         // Go over entries
         try {
             for (File entry : entries) {
@@ -527,7 +531,10 @@ public class FileUtil {
                     files.add(entry.getCanonicalPath());
                 }
                 if (recurse && entry.isDirectory()) {
-                    files.addAll(listFiles(entry.getCanonicalPath(), filter, recurse));
+                    flist = listFiles(entry.getCanonicalPath(), filter, recurse);
+                    if (null != flist && flist.size() > 0) {
+                        files.addAll(flist);
+                    }
                 }
             }
         } catch (Exception e) {
