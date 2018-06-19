@@ -125,7 +125,7 @@ public class CMDUtil {
                         callback[0].stdoutResponse(inSr.toString());
                     }
                 } catch (IOException e) {
-
+                    e.printStackTrace();
                     callback[0].ontherResponse(new Exception("读取输入流出现问题："
                             + e.getMessage()));
                 } finally {
@@ -159,6 +159,7 @@ public class CMDUtil {
                     // callback[0].onFailed(e);
                     callback[0].onTimeout();
                     no_timeout = false;
+                    e.printStackTrace();
                 }
                 if (process[0] != null) {
                     process[0].destroy();

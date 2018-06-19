@@ -46,15 +46,7 @@ public class FileUtil {
         }
     }
 
-    /**
-     * 文件复制
-     *
-     * @param srcpath      文件源路径
-     * @param filename     文件名称
-     * @param destpath     文件目标路径
-     * @param deleteSource 复制完成之后是否删除源文件
-     */
-    public static void copyFile(String srcpath, String filename, String destpath, boolean deleteSource) {
+    public static void copyFile(String srcpath, String filename, String destpath, boolean deleteSource, boolean overwrite) {
         if (!srcpath.endsWith("/")) {
             srcpath = srcpath.replaceAll("\\\\", "/");
             srcpath += "/";
@@ -66,6 +58,9 @@ public class FileUtil {
         File source = new File(srcpath + filename);
         FileChannel fileChannel = null;
         File dest = new File(destpath + filename);
+        if (overwrite && dest.isFile() && dest.exists()) {
+            dest.delete();
+        }
         RandomAccessFile randomAccessFile = null;
         FileChannel outChannel = null;
         FileOutputStream fos = null;
@@ -120,6 +115,18 @@ public class FileUtil {
                 source.getAbsoluteFile().delete();
             }
         }
+    }
+
+    /**
+     * 文件复制
+     *
+     * @param srcpath      文件源路径
+     * @param filename     文件名称
+     * @param destpath     文件目标路径
+     * @param deleteSource 复制完成之后是否删除源文件
+     */
+    public static void copyFile(String srcpath, String filename, String destpath, boolean deleteSource) {
+        copyFile(srcpath, filename, destpath, false, true);
     }
 
     /**

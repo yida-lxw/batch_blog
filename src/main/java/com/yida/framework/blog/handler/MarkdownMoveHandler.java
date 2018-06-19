@@ -2,6 +2,7 @@ package com.yida.framework.blog.handler;
 
 import com.yida.framework.blog.handler.input.MarkdownMoveHandlerInput;
 import com.yida.framework.blog.handler.output.MarkdownMoveHandlerOutput;
+import com.yida.framework.blog.utils.common.StringUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,8 +27,13 @@ public class MarkdownMoveHandler implements Handler<MarkdownMoveHandlerInput, Ma
     @Override
     public void handle(MarkdownMoveHandlerInput input, MarkdownMoveHandlerOutput output) {
         String wordBasePath = input.getWordBasePath();
-        if (!wordBasePath.endsWith("/") && !wordBasePath.endsWith("\\")) {
-            wordBasePath += "/";
+        if (StringUtil.isEmpty(wordBasePath)) {
+            return;
+        }
+        if (StringUtil.isNotEmpty(wordBasePath)) {
+            if (!wordBasePath.endsWith("/") && !wordBasePath.endsWith("\\")) {
+                wordBasePath += "/";
+            }
         }
         List<String> blogSendDates = input.getBlogSendDates();
         if (null == blogSendDates || blogSendDates.size() <= 0) {

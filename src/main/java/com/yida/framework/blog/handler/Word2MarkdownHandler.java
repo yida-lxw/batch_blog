@@ -36,15 +36,18 @@ public class Word2MarkdownHandler implements Handler<Word2MarkdownHandlerInput, 
         boolean invokeResult = false;
         int successCount = 0;
         List<String> markdownFilesPath = output.getMarkdownFilesPath();
-        //遍历处理每个Word文档(todo:后续再考虑采用多线程去处理)
-        for (String wordFileName : wordFilesName) {
-            command = buildCommand(pandocHome, wordFileName);
-            invokeResult = cmdUtil.execute(command);
-            if (invokeResult) {
-                markdownFilesPath.add(getMarkdownFileName(wordFileName));
-                successCount++;
-                if (!output.isSuccessful()) {
-                    output.setSuccessful(invokeResult);
+
+        if (null != wordFilesName && wordFilesName.size() > 0) {
+            //遍历处理每个Word文档(todo:后续再考虑采用多线程去处理)
+            for (String wordFileName : wordFilesName) {
+                command = buildCommand(pandocHome, wordFileName);
+                invokeResult = cmdUtil.execute(command);
+                if (invokeResult) {
+                    markdownFilesPath.add(getMarkdownFileName(wordFileName));
+                    successCount++;
+                    if (!output.isSuccessful()) {
+                        output.setSuccessful(invokeResult);
+                    }
                 }
             }
         }

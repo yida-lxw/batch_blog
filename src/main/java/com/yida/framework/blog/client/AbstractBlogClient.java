@@ -125,9 +125,14 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
         }
         String wordBasePath = this.config.getWordBasePath();
         String blogLocalRepoBasePath = this.config.getGithubLocalCodeDir();
+
         for (String blogSendDate : blogSendDates) {
-            this.blogBasePaths.add(wordBasePath + blogSendDate + "/");
-            this.blogLocalRepoBasePaths.add(blogLocalRepoBasePath + blogSendDate + "/");
+            if (StringUtil.isNotEmpty(wordBasePath)) {
+                this.blogBasePaths.add(wordBasePath + blogSendDate + "/");
+            }
+            if (StringUtil.isNotEmpty(blogLocalRepoBasePath)) {
+                this.blogLocalRepoBasePaths.add(blogLocalRepoBasePath + blogSendDate + "/");
+            }
         }
         this.blogPublisherKeyList = this.config.getBlogPlatformSupportedList();
 
@@ -185,14 +190,18 @@ public abstract class AbstractBlogClient extends DefaultConfigurable implements 
         Word2MarkdownHandler word2MarkdownHandler = new Word2MarkdownHandler(wordFilterHandler);
         WordImageCopyHandler wordImageCopyHandler = new WordImageCopyHandler(wordUnzipHandler, imageFilenameFilter);
         MarkdownMoveHandler markdownMoveHandler = new MarkdownMoveHandler();
+        VNoteHandler vNoteHandler = new VNoteHandler();
         MarkdownFixHandler markdownFixHandler = new MarkdownFixHandler(markdownFilenameFilter);
+        HexoHandler hexoHandler = new HexoHandler(markdownFilenameFilter);
 
         //add handlers to List<Handler>
         List<Handler> handlers = new ArrayList<Handler>();
         handlers.add(word2MarkdownHandler);
         handlers.add(wordImageCopyHandler);
         handlers.add(markdownMoveHandler);
+        handlers.add(vNoteHandler);
         handlers.add(markdownFixHandler);
+        handlers.add(hexoHandler);
 
         //Create HandlerChain instance
         HandlerChain handlerChain = new HandlerChain();

@@ -69,6 +69,14 @@
 		</dependency>
 		<!-- FastJSON end -->
 
+		<!-- commons-exec begin -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-exec</artifactId>
+			<version>1.3</version>
+		</dependency>
+		<!-- commons-exec end -->
+
 		<!-- LOG begin -->
 		<dependency>
 			<groupId>commons-logging</groupId>

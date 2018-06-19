@@ -2,6 +2,7 @@ package com.yida.framework.blog.handler;
 
 import com.yida.framework.blog.handler.input.WordFilterHandlerInput;
 import com.yida.framework.blog.handler.output.WordFilterHandlerOutput;
+import com.yida.framework.blog.utils.common.StringUtil;
 import com.yida.framework.blog.utils.io.DocxFilenameFilter;
 
 import java.io.File;
@@ -23,9 +24,12 @@ public class WordFilterHandler implements Handler<WordFilterHandlerInput, WordFi
     @Override
     public void handle(WordFilterHandlerInput input, WordFilterHandlerOutput output) {
         String wordBasePath = input.getWordBasePath();
-        if (!wordBasePath.endsWith("/") && !wordBasePath.endsWith("\\")) {
-            wordBasePath += "/";
+        if (StringUtil.isNotEmpty(wordBasePath)) {
+            if (!wordBasePath.endsWith("/") && !wordBasePath.endsWith("\\")) {
+                wordBasePath += "/";
+            }
         }
+
         List<String> blogSendDates = input.getBlogSendDates();
         if (null == blogSendDates || blogSendDates.size() <= 0) {
             String blogSendDate = input.getBlogSendDate();

@@ -40,12 +40,46 @@ public class DefaultBlogClient extends AbstractBlogClient {
     protected void beforeBlogSend() {
         super.transform();
         super.buildParams();
+        String markdownBasePath = this.getConfig().getMarkdownBasePath();
         //将本地的指定的日期目录下的所有博客文档复制到Github的本地仓库中等待上传
         if (null != this.blogBasePaths && this.blogBasePaths.size() > 0) {
             int index = 0;
             for (String blogBasePath : this.blogBasePaths) {
                 FileUtil.copyDirectory(blogBasePath, this.blogLocalRepoBasePaths.get(index++), null, false, Constant.IGNORE_MARK);
             }
+            //初始化Git实例对象
+            this.git = GithubUtil.getGit(this.config.getGithubLocalCodeDir());
+            Ref ref = GithubUtil.checkout(this.git, this.config.getGithubBlogBranchName());
+            log.info("the return of git checkout:" + ref);
+        } else if (StringUtil.isNotEmpty(markdownBasePath)) {
+            String blogBasePath = null;
+            if (!markdownBasePath.endsWith("/")) {
+                if (!markdownBasePath.endsWith("\\")) {
+                    markdownBasePath = markdownBasePath + "/";
+                }
+            }
+            int index = 0;
+            String blogLocalRepoBasePath = null;
+            for (String blogSendDate : this.getConfig().getBlogSendDates()) {
+                blogLocalRepoBasePath = this.blogLocalRepoBasePaths.get(index++);
+                blogBasePath = markdownBasePath + blogSendDate;
+                FileUtil.copyDirectory(blogBasePath, blogLocalRepoBasePath, null, false, Constant.IGNORE_MARK);
+                FileUtil.deleteFile(blogLocalRepoBasePath + "_vnote.json");
+                File file = new File(blogLocalRepoBasePath);
+                String[] vswps = file.list(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        File tempFile = new File(dir.getAbsolutePath() + "/" + name);
+                        return tempFile.isFile() && name.endsWith(".vswp");
+                    }
+                });
+                if (null != vswps && vswps.length > 0) {
+                    for (String vswp : vswps) {
+                        FileUtil.deleteFile(blogLocalRepoBasePath + vswp);
+                    }
+                }
+            }
+
             //初始化Git实例对象
             this.git = GithubUtil.getGit(this.config.getGithubLocalCodeDir());
             Ref ref = GithubUtil.checkout(this.git, this.config.getGithubBlogBranchName());
@@ -107,6 +141,28 @@ public class DefaultBlogClient extends AbstractBlogClient {
             }
             readMarkdownFileContent();
             buildFilePatterns();
+        } else {
+            String markdownBasePath = this.getConfig().getMarkdownBasePath();
+            if (!markdownBasePath.endsWith("/")) {
+                if (!markdownBasePath.endsWith("\\")) {
+                    markdownBasePath = markdownBasePath + "/";
+                }
+            }
+
+            String blogBasePath = null;
+            List<String> markdownFileList = null;
+            if (null == this.markdownFilePaths) {
+                this.markdownFilePaths = new ArrayList<>();
+            }
+            for (String blogSendDate : this.getConfig().getBlogSendDates()) {
+                blogBasePath = markdownBasePath + blogSendDate;
+                markdownFileList = FileUtil.listFiles(blogBasePath, new MarkdownFilenameFilter(), true);
+                if (null != markdownFileList && markdownFileList.size() > 0) {
+                    this.markdownFilePaths.addAll(markdownFileList);
+                }
+            }
+            readMarkdownFileContent();
+            buildFilePatterns();
         }
     }
 
@@ -126,8 +182,11 @@ public class DefaultBlogClient extends AbstractBlogClient {
                 if (null == blogPublishParam) {
                     continue;
                 }
-                ReflectionUtil.setFieldValue(blogPublishParam, "git", this.git);
-                ReflectionUtil.setFieldValue(blogPublishParam, "filePatterns", getFilePatterns());
+                if ("GithubBlogPublisher".equals(blogPublisher.getClass().getSimpleName())) {
+                    ReflectionUtil.setFieldValue(blogPublishParam, "git", this.git);
+                    ReflectionUtil.setFieldValue(blogPublishParam, "filePatterns", getFilePatterns());
+                }
+
 
                 try {
                     blogPublisher.publish(blogPublishParam);
@@ -223,21 +282,42 @@ public class DefaultBlogClient extends AbstractBlogClient {
             String wordFilePattern = null;
             File imgFilesPath = null;
             String[] imageFiles = null;
+            String markdownBasePath = this.config.getMarkdownBasePath();
+            if (StringUtil.isNotEmpty(markdownBasePath) && !markdownBasePath.endsWith("/")) {
+                if (!markdownBasePath.endsWith("\\")) {
+                    markdownBasePath = markdownBasePath + "/";
+                }
+            }
             for (String markdownFilePath : this.markdownFilePaths) {
                 markdownFilePath = StringUtil.fixedPathDelimiter(markdownFilePath, false);
-                markdownFilePath = markdownFilePath.replace(
-                        StringUtil.fixedPathDelimiter(this.config.getWordBasePath(), true), "");
-                if (null == markdownFilePath || "".equalsIgnoreCase(markdownFilePath)) {
-                    continue;
+
+                if (StringUtil.isNotEmpty(this.config.getWordBasePath())) {
+                    markdownFilePath = markdownFilePath.replace(
+                            StringUtil.fixedPathDelimiter(this.config.getWordBasePath(), true), "");
+                    if (null == markdownFilePath || "".equalsIgnoreCase(markdownFilePath)) {
+                        continue;
+                    }
+                    markdownDir = markdownFilePath.substring(0, markdownFilePath.lastIndexOf("/") + 1);
+                    if (this.getConfig().getGithubLocalCodeDir().endsWith("/")) {
+                        imagesPath = this.getConfig().getGithubLocalCodeDir() + markdownDir + "images/";
+                    } else if (this.getConfig().getGithubLocalCodeDir().endsWith("\\")) {
+                        imagesPath = StringUtil.fixedPathDelimiter(this.getConfig().getGithubLocalCodeDir() + markdownDir + "images/");
+                    } else {
+                        imagesPath = this.getConfig().getGithubLocalCodeDir() + "/" + markdownDir + "images/";
+                    }
+                } else if (StringUtil.isNotEmpty(markdownBasePath)) {
+                    markdownFilePath = markdownFilePath.replace(
+                            StringUtil.fixedPathDelimiter(markdownBasePath, true), "");
+                    markdownDir = markdownFilePath.substring(0, markdownFilePath.lastIndexOf("/") + 1);
+                    if (this.getConfig().getGithubLocalCodeDir().endsWith("/")) {
+                        imagesPath = this.getConfig().getGithubLocalCodeDir() + markdownDir + "images/";
+                    } else if (this.getConfig().getGithubLocalCodeDir().endsWith("\\")) {
+                        imagesPath = StringUtil.fixedPathDelimiter(this.getConfig().getGithubLocalCodeDir() + markdownDir + "images/");
+                    } else {
+                        imagesPath = this.getConfig().getGithubLocalCodeDir() + "/" + markdownDir + "images/";
+                    }
                 }
-                markdownDir = markdownFilePath.substring(0, markdownFilePath.lastIndexOf("/") + 1);
-                if (this.getConfig().getGithubLocalCodeDir().endsWith("/")) {
-                    imagesPath = this.getConfig().getGithubLocalCodeDir() + markdownDir + "images/";
-                } else if (this.getConfig().getGithubLocalCodeDir().endsWith("\\")) {
-                    imagesPath = StringUtil.fixedPathDelimiter(this.getConfig().getGithubLocalCodeDir() + markdownDir + "images/");
-                } else {
-                    imagesPath = this.getConfig().getGithubLocalCodeDir() + "/" + markdownDir + "images/";
-                }
+
                 relative_image_path = markdownDir + "images/";
                 imgFilesPath = new File(imagesPath);
                 if (imgFilesPath.exists() && imgFilesPath.isDirectory()) {
@@ -253,10 +333,14 @@ public class DefaultBlogClient extends AbstractBlogClient {
                 if (markdownDir.endsWith("/")) {
                     markdownDir = markdownDir.substring(0, markdownDir.lastIndexOf("/"));
                 }
-                wordDir = markdownDir.substring(0, markdownDir.lastIndexOf("/") + 1);
-                wordFilePattern = wordDir + "*.docx";
-                if (!filePatternList.contains(wordFilePattern)) {
-                    filePatternList.add(wordFilePattern);
+
+                if (StringUtil.isNotEmpty(this.config.getWordBasePath()) &&
+                        StringUtil.isEmpty(markdownBasePath)) {
+                    wordDir = markdownDir.substring(0, markdownDir.lastIndexOf("/") + 1);
+                    wordFilePattern = wordDir + "*.docx";
+                    if (!filePatternList.contains(wordFilePattern)) {
+                        filePatternList.add(wordFilePattern);
+                    }
                 }
             }
             if (null != filePatternList && filePatternList.size() > 0) {

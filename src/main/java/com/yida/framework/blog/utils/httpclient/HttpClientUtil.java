@@ -424,7 +424,7 @@ public class HttpClientUtil {
 
                     Reader reader = new InputStreamReader(instream, charset);
                     CharArrayBuffer buffer = new CharArrayBuffer(capacity);
-                    char[] tmp = new char[1024];
+                    char[] tmp = new char[4896];
 
                     int l;
                     while ((l = reader.read(tmp)) != -1) {
@@ -483,10 +483,6 @@ public class HttpClientUtil {
             returnVal = null;
         }
         return returnVal;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(getHost("http://spring.io"));
     }
 
     /** Post Json Parameters Sample code

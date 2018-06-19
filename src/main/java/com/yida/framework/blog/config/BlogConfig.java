@@ -17,6 +17,8 @@ public class BlogConfig {
     private static final String PANDOC_HOME = "pandoc_home";
     private static final String WORD_BASEPATH = "word_basepath";
     private static final String MARKDOWN_BASEPATH = "markdown_basepath";
+    private static final String HEXO_BASEPATH = "hexo_basepath";
+    private static final String VNOTE_BLOGPATH = "vnote_blog_path";
     private static final String BLOG_SEND_DATE = "blog_send_dates";
     private static final String GITHUB_USERNAME = "github_username";
     private static final String GITHUB_PASSWORD = "github_pwd";
@@ -42,6 +44,18 @@ public class BlogConfig {
      * 此时不需要进行Word文档到Markdown之间的文件格式转换
      */
     private String markdownBasePath;
+
+    /**
+     * 使用Vnote软件编写Markdown文件时，Markdown文件的存放目录
+     * 之所以选择Vnote,是因为它支持直接系统剪切板复制图片到Markdown文件中,
+     * 极大提高了编写Markdown文档的效率
+     */
+    private String vnoteBlogpath;
+
+    /**
+     * Hexo的安装根目录
+     */
+    private String hexoBasePath;
     /**
      * 博客发送日期
      */
@@ -149,6 +163,8 @@ public class BlogConfig {
                 this.blogSendDates.add(this.blogSendDate);
             }
         }
+        this.vnoteBlogpath = ConfigContext.getStringProperty(VNOTE_BLOGPATH);
+        this.hexoBasePath = ConfigContext.getStringProperty(HEXO_BASEPATH);
         this.blogPlatformSupported = ConfigContext.getStringProperty(BLOG_PLATFORM_SUPPORTED);
 
         this.githubUserName = ConfigContext.getStringProperty(GITHUB_USERNAME);
@@ -168,6 +184,8 @@ public class BlogConfig {
         stringBuilder.append("Pandoc Home: " + getPandocHome() + "\n");
         stringBuilder.append("Word BasePath: " + getWordBasePath() + "\n");
         stringBuilder.append("Markdown BasePath: " + getMarkdownBasePath() + "\n");
+        stringBuilder.append("VNote Blog Path: " + getVnoteBlogpath() + "\n");
+        stringBuilder.append("Hexo BasePath: " + getHexoBasePath() + "\n");
         stringBuilder.append("Blog SendDate: " + getBlogSendDate() + "\n");
         stringBuilder.append("Blog Platform Supported List: " + getBlogPlatformSupported() + "\n");
         stringBuilder.append("Github UserName: " + getGithubUserName() + "\n");
@@ -203,6 +221,24 @@ public class BlogConfig {
     public String getMarkdownBasePath() {
         markdownBasePath = adjustPath(markdownBasePath);
         return markdownBasePath;
+    }
+
+    public String getVnoteBlogpath() {
+        vnoteBlogpath = adjustPath(vnoteBlogpath);
+        return vnoteBlogpath;
+    }
+
+    public void setVnoteBlogpath(String vnoteBlogpath) {
+        this.vnoteBlogpath = vnoteBlogpath;
+    }
+
+    public String getHexoBasePath() {
+        hexoBasePath = adjustPath(hexoBasePath);
+        return hexoBasePath;
+    }
+
+    public void setHexoBasePath(String hexoBasePath) {
+        this.hexoBasePath = hexoBasePath;
     }
 
     public void setMarkdownBasePath(String markdownBasePath) {

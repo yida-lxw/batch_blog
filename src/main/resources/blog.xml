@@ -6,10 +6,14 @@
 	<entry key="word_basepath">G:/git-local/blog/</entry>
 	<!-- Markdown文档的存储根目录,当你的博客是直接采用Markdown格式编写的,此时你可以配置此参数,它与word_basepath参数二选一即可 -->
 	<entry key="markdown_basepath">G:/git-local/blog/</entry>
+	<!-- VNote笔记存放目录 -->
+	<entry key="vnote_blog_path">G:/VNote_Data/GO</entry>
+	<!-- Hexo安装根目录 -->
+	<entry key="hexo_basepath">G:/hexo</entry>
 	<!-- 多个日期请使用分号;进行分割 -->
 	<entry key="blog_send_dates">20180117</entry>
 	<!-- 当前博客发布工具支持的博客平台,多个博客平台名称请使用分号;进行分割 -->
-	<entry key="blog_platform_supported">github;CSDN</entry>
+	<entry key="blog_platform_supported">github;hexo;CSDN</entry>
 
 	<!-- Github的本地仓库目录 -->
 	<entry key="github_local_repo_path">G:/git-local</entry>

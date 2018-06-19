@@ -23,11 +23,31 @@ public abstract class HandlerInput extends DefaultConfigurable {
         return this.config.getWordBasePath();
     }
 
+    public String getMarkdownBasePath() {
+        return this.config.getMarkdownBasePath();
+    }
+
     public String getBlogSendDate() {
         return this.config.getBlogSendDate();
     }
 
     public List<String> getBlogSendDates() {
         return this.config.getBlogSendDates();
+    }
+
+    public String getGithubRemoteRepoPath() {
+        return this.config.getGithubRemoteRepoPath();
+    }
+
+    public String getGithubBlogBranchName() {
+        return this.config.getGithubBlogBranchName();
+    }
+
+    public String getVnoteBlogpath() {
+        return this.config.getVnoteBlogpath();
+    }
+
+    public String getHexoBasePath() {
+        return this.config.getHexoBasePath();
     }
 }

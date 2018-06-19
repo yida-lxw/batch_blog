@@ -3,6 +3,7 @@ package com.yida.framework.blog.handler;
 import com.yida.framework.blog.handler.input.MarkdownFixHandlerInput;
 import com.yida.framework.blog.handler.output.MarkdownFixHandlerOutput;
 import com.yida.framework.blog.utils.Constant;
+import com.yida.framework.blog.utils.common.StringUtil;
 import com.yida.framework.blog.utils.io.MarkdownFilenameFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,8 +34,10 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
     public void handle(MarkdownFixHandlerInput input, MarkdownFixHandlerOutput output) {
         List<String> markdownParentPath = null;
         String wordBasePath = input.getWordBasePath();
-        if (!wordBasePath.endsWith("/") && !wordBasePath.endsWith("\\")) {
-            wordBasePath += "/";
+        if (StringUtil.isNotEmpty(wordBasePath)) {
+            if (!wordBasePath.endsWith("/") && !wordBasePath.endsWith("\\")) {
+                wordBasePath += "/";
+            }
         }
         List<String> blogSendDates = input.getBlogSendDates();
         if (null == blogSendDates || blogSendDates.size() <= 0) {
@@ -52,24 +55,44 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
         File file = null;
         String wordPath = null;
         markdownParentPath = new ArrayList<String>();
-        for (String blogSendDate : blogSendDates) {
-            wordPath = wordBasePath + blogSendDate;
-            file = new File(wordPath);
-            String[] directories = file.list(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    File tempFile = new File(dir.getAbsolutePath() + "/" + name);
-                    return tempFile.isDirectory();
+        if (StringUtil.isNotEmpty(wordBasePath)) {
+            for (String blogSendDate : blogSendDates) {
+                wordPath = wordBasePath + blogSendDate;
+                file = new File(wordPath);
+                String[] directories = file.list(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        File tempFile = new File(dir.getAbsolutePath() + "/" + name);
+                        return tempFile.isDirectory();
+                    }
+                });
+                if (null == directories || directories.length <= 0) {
+                    continue;
                 }
-            });
-            if (null == directories || directories.length <= 0) {
-                continue;
-            }
-            for (String directory : directories) {
-                markdownParentPath.add(wordPath + "/" + directory);
+                for (String directory : directories) {
+                    markdownParentPath.add(wordPath + "/" + directory);
+                }
             }
         }
 
+        String markdownBasePath = input.getMarkdownBasePath();
+        if ((null == markdownParentPath || markdownParentPath.size() <= 0) &&
+                StringUtil.isNotEmpty(markdownBasePath)) {
+            if (null == markdownParentPath) {
+                markdownParentPath = new ArrayList<>(10);
+            }
+            String markdownsubPath = null;
+            for (String blogSendDate : blogSendDates) {
+                if (markdownBasePath.endsWith("\\\\") || markdownBasePath.endsWith("\\")) {
+                    markdownsubPath = markdownBasePath + blogSendDate + "\\";
+                } else if (markdownBasePath.endsWith("/")) {
+                    markdownsubPath = markdownBasePath + blogSendDate + "/";
+                } else {
+                    markdownsubPath = markdownBasePath + "/" + blogSendDate + "/";
+                }
+                markdownParentPath.add(markdownsubPath);
+            }
+        }
 
         if (null == markdownParentPath || markdownParentPath.size() <= 0) {
             return;
@@ -78,6 +101,11 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
         String[] markdowns = null;
         List<String> lines = null;
         String tempDirDemo = String.format("![%s", Constant.SYSTEM_TEMP_DIR);
+
+        String githubRemoteRepoPath = input.getGithubRemoteRepoPath();
+        String vnoteBlogpath = input.getVnoteBlogpath();
+        boolean fix2HttpfulUrl = StringUtil.isNotEmpty(vnoteBlogpath);
+        githubRemoteRepoPath = githubRemoteRepoPath.replace(".git", "");
         for (String parentPath : markdownParentPath) {
             file = new File(parentPath);
             if (!file.exists() || !file.isDirectory()) {
@@ -93,6 +121,9 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
                     parentPath += "/";
                 }
             }
+            String impageHttpPrefix = githubRemoteRepoPath + "blob/" +
+                    input.getGithubBlogBranchName() + "/" +
+                    parentPath.replace(markdownBasePath, "") + "images";
             String markdownPath = null;
             StringBuilder builder = new StringBuilder();
             try {
@@ -123,8 +154,26 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
                             }
                         }
                         if (line.startsWith("![](media")) {
-                            line = line.substring(0, line.indexOf("{"));
-                            line = line.replace("(media/", "(images/");
+                            if (-1 != line.indexOf("{")) {
+                                line = line.substring(0, line.indexOf("{"));
+                            }
+
+                            //line = line.replace("(media/", "(images/");
+                            line = line.replace("(media/", "(" + impageHttpPrefix + "/");
+                            builder.append(line).append("\n");
+                            nextSkip = true;
+                            continue;
+                        } else if (fix2HttpfulUrl && line.contains("(images/")) {
+                            line = line.replaceAll("(.*\\!\\[[^\\]]*\\]\\()(images)(\\/[\\_0-9a-zA-Z]+\\.[png|jpg|jpeg|gif]+\\))", "$1" + impageHttpPrefix + "$3");
+                            if (line.contains(".jpg")) {
+                                line = line.replace(".jpg)", ".jpg?raw=true)");
+                            } else if (line.contains(".jpeg")) {
+                                line = line.replace(".jpeg)", ".jpeg?raw=true)");
+                            } else if (line.contains(".png")) {
+                                line = line.replace(".png)", ".png?raw=true)");
+                            } else if (line.contains(".gif")) {
+                                line = line.replace(".gif)", ".gif?raw=true)");
+                            }
                             builder.append(line).append("\n");
                             nextSkip = true;
                             continue;
