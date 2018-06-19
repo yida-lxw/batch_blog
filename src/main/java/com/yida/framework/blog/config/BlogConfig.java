@@ -31,6 +31,10 @@ public class BlogConfig {
     private static final String GITHUB_AUTHOR_EMAIL = "github_author_email";
     private static final String BLOG_PLATFORM_SUPPORTED = "blog_platform_supported";
 
+
+    private static final String CSDN_USERNAME = "csdn_username";
+    private static final String CSDN_PASSWORD = "csdn_password";
+
     /**
      * Pandoc的安装目录
      */
@@ -116,6 +120,16 @@ public class BlogConfig {
     private String blogPlatformSupported;
 
 
+    /**
+     * CSDN的登录账号
+     */
+    private String csdnUserName;
+    /**
+     * CSDN的登录密码
+     */
+    private String csdnPassword;
+
+
     private BlogConfig() {
         initialize();
     }
@@ -176,6 +190,9 @@ public class BlogConfig {
         this.githubLocalCodeDir = ConfigContext.getStringProperty(GITHUB_LOCAL_CODE_DIR);
         this.githubAuthorName = ConfigContext.getStringProperty(GITHUB_AUTHOR_NAME);
         this.githubAuthorEmail = ConfigContext.getStringProperty(GITHUB_AUTHOR_EMAIL);
+
+        this.csdnUserName = ConfigContext.getStringProperty(CSDN_USERNAME);
+        this.csdnPassword = ConfigContext.getStringProperty(CSDN_PASSWORD);
     }
 
     @Override
@@ -188,6 +205,8 @@ public class BlogConfig {
         stringBuilder.append("Hexo BasePath: " + getHexoBasePath() + "\n");
         stringBuilder.append("Blog SendDate: " + getBlogSendDate() + "\n");
         stringBuilder.append("Blog Platform Supported List: " + getBlogPlatformSupported() + "\n");
+        stringBuilder.append("CSDN UserName: " + getCsdnUserName() + "\n");
+        stringBuilder.append("CSDN Password: " + getCsdnPassword() + "\n");
         stringBuilder.append("Github UserName: " + getGithubUserName() + "\n");
         stringBuilder.append("Github Password: " + getGithubPassword() + "\n");
         stringBuilder.append("Github Private Key: " + getGithubPrivateKeyPath() + "\n");
@@ -343,6 +362,22 @@ public class BlogConfig {
 
     public void setBlogPlatformSupported(String blogPlatformSupported) {
         this.blogPlatformSupported = blogPlatformSupported;
+    }
+
+    public String getCsdnUserName() {
+        return csdnUserName;
+    }
+
+    public void setCsdnUserName(String csdnUserName) {
+        this.csdnUserName = csdnUserName;
+    }
+
+    public String getCsdnPassword() {
+        return csdnPassword;
+    }
+
+    public void setCsdnPassword(String csdnPassword) {
+        this.csdnPassword = csdnPassword;
     }
 
     public List<String> getBlogPlatformSupportedList() {

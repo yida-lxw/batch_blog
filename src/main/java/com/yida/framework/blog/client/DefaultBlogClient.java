@@ -187,6 +187,10 @@ public class DefaultBlogClient extends AbstractBlogClient {
                     ReflectionUtil.setFieldValue(blogPublishParam, "filePatterns", getFilePatterns());
                 }
 
+                //将需要发布的Markdown文件路径设置到每个blogPublisher实现类对应的参数对象中
+                if (null != this.markdownFilePaths && this.markdownFilePaths.size() > 0) {
+                    ReflectionUtil.setFieldValue(blogPublishParam, "markdownFilePaths", this.markdownFilePaths);
+                }
 
                 try {
                     blogPublisher.publish(blogPublishParam);

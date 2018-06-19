@@ -15,6 +15,11 @@
 	<!-- 当前博客发布工具支持的博客平台,多个博客平台名称请使用分号;进行分割 -->
 	<entry key="blog_platform_supported">github;hexo;CSDN</entry>
 
+	<!-- CSDN登录账号 -->
+	<entry key="csdn_username">vnetoolxw_87</entry>
+	<!-- CSDN登录密码 -->
+	<entry key="csdn_password">abcdefg</entry>
+
 	<!-- Github的本地仓库目录 -->
 	<entry key="github_local_repo_path">G:/git-local</entry>
 	<!-- Github的远程仓库的URL -->

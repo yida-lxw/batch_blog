@@ -46,6 +46,11 @@ public abstract class BlogPublishParam extends DefaultConfigurable {
      */
     private String password;
 
+    /**
+     * 需要发布的Markdown文件的存放路径
+     */
+    protected List<String> markdownFilePaths;
+
     public String getWordBasePath() {
         this.wordBasePath = this.config.getWordBasePath();
         return this.wordBasePath;
@@ -110,5 +115,13 @@ public abstract class BlogPublishParam extends DefaultConfigurable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<String> getMarkdownFilePaths() {
+        return markdownFilePaths;
+    }
+
+    public void setMarkdownFilePaths(List<String> markdownFilePaths) {
+        this.markdownFilePaths = markdownFilePaths;
     }
 }
