@@ -256,7 +256,7 @@ public class ReflectionUtil {
     public static String convertElementPropertyToString(final Collection collection, final String propertyName,
                                                         final String separator) {
         List list = convertElementPropertyToList(collection, propertyName);
-        return GerneralUtil.joinCollection(list, separator);
+        return GeneralUtil.joinCollection(list, separator);
     }
 
     /**
@@ -278,7 +278,7 @@ public class ReflectionUtil {
      */
     public static boolean hasThisFieldOfSelf(Class target, String propertyName) {
         Field[] fields = target.getDeclaredFields();
-        if (GerneralUtil.isEmptyArray(fields)) {
+        if (GeneralUtil.isEmptyArray(fields)) {
             return false;
         }
         for (Field field : fields) {
@@ -325,7 +325,7 @@ public class ReflectionUtil {
             return false;
         }
         Class[] faces = target.getInterfaces();
-        if (GerneralUtil.isEmptyArray(faces) || !Modifier.isInterface(interfaceClazz.getModifiers())) {
+        if (GeneralUtil.isEmptyArray(faces) || !Modifier.isInterface(interfaceClazz.getModifiers())) {
             return false;
         }
         //递归判断父接口是否实现指定接口
@@ -334,7 +334,7 @@ public class ReflectionUtil {
                 return true;
             }
             Class[] parentFaces = face.getInterfaces();
-            if (GerneralUtil.isEmptyArray(parentFaces)) {
+            if (GeneralUtil.isEmptyArray(parentFaces)) {
                 return false;
             }
             for (Class parentFace : parentFaces) {
@@ -390,7 +390,7 @@ public class ReflectionUtil {
             return;
         }
         Field[] fields = clazz.getDeclaredFields();
-        if (GerneralUtil.isNotEmptyArray(fields)) {
+        if (GeneralUtil.isNotEmptyArray(fields)) {
             for (Field field : fields) {
                 //只添加非Private非static属性
                 if (!Modifier.isPrivate(field.getModifiers()) &&
@@ -417,7 +417,7 @@ public class ReflectionUtil {
             fieldList = new ArrayList<Field>();
         }
         Field[] fields = clazz.getDeclaredFields();
-        if (GerneralUtil.isNotEmptyArray(fields)) {
+        if (GeneralUtil.isNotEmptyArray(fields)) {
             for (Field method : fields) {
                 fieldList.add(method);
             }
@@ -435,7 +435,7 @@ public class ReflectionUtil {
      */
     public static void getParentMethods(List<Method> methodList, Class clazz) {
         Method[] methods = clazz.getDeclaredMethods();
-        if (GerneralUtil.isNotEmptyArray(methods)) {
+        if (GeneralUtil.isNotEmptyArray(methods)) {
             for (Method method : methods) {
                 //只添加非Private非abstract非static方法
                 if (!Modifier.isPrivate(method.getModifiers()) &&
@@ -462,7 +462,7 @@ public class ReflectionUtil {
             methodList = new ArrayList<Method>();
         }
         Method[] methods = clazz.getDeclaredMethods();
-        if (GerneralUtil.isNotEmptyArray(methods)) {
+        if (GeneralUtil.isNotEmptyArray(methods)) {
             for (Method method : methods) {
                 methodList.add(method);
             }
@@ -486,7 +486,7 @@ public class ReflectionUtil {
             fieldList = new ArrayList<Field>();
         }
         getFields(fieldList, clazz, false);
-        if (GerneralUtil.isNotEmptyCollection(fieldList)) {
+        if (GeneralUtil.isNotEmptyCollection(fieldList)) {
             for (Iterator<Field> it = fieldList.iterator(); it.hasNext(); ) {
                 Field field = it.next();
                 //若不是private属性,从集合中删除它

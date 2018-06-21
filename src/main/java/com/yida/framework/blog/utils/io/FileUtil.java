@@ -1,7 +1,7 @@
 package com.yida.framework.blog.utils.io;
 
 import com.yida.framework.blog.utils.Constant;
-import com.yida.framework.blog.utils.common.GerneralUtil;
+import com.yida.framework.blog.utils.common.GeneralUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sun.nio.ch.FileChannelImpl;
@@ -804,7 +804,7 @@ public class FileUtil {
      * @return
      */
     public static Clob string2Clob(String string) {
-        if (GerneralUtil.isEmptyString(string)) {
+        if (GeneralUtil.isEmptyString(string)) {
             return null;
         }
         try {
@@ -1128,8 +1128,8 @@ public class FileUtil {
      * @return
      */
     public static String getFullFilePath(String fileName, String filePath) {
-        if (GerneralUtil.isEmptyString(filePath)
-                || GerneralUtil.isEmptyString(fileName)) {
+        if (GeneralUtil.isEmptyString(filePath)
+                || GeneralUtil.isEmptyString(fileName)) {
             return null;
         }
         filePath = wrapFilePath(filePath);
@@ -1175,7 +1175,7 @@ public class FileUtil {
      * @return
      */
     public static String getFileName(String fullPath) {
-        if (GerneralUtil.isEmptyString(fullPath)) {
+        if (GeneralUtil.isEmptyString(fullPath)) {
             return "";
         }
         int iPos1 = fullPath.lastIndexOf("/");
@@ -1194,7 +1194,7 @@ public class FileUtil {
      * @return
      */
     public static String getFileNameFromUrl(String url) {
-        if (GerneralUtil.isEmptyString(url)) {
+        if (GeneralUtil.isEmptyString(url)) {
             return "";
         }
         if (url.endsWith("/")) {
@@ -1262,7 +1262,7 @@ public class FileUtil {
      */
     public static String guessFileNameFromUrl(String url) {
         String reg = "(/|=)([^/&?]+\\.[a-zA-Z]+)";
-        if (GerneralUtil.isEmptyString(url) || Pattern.compile(reg).matcher(url).find()) {
+        if (GeneralUtil.isEmptyString(url) || Pattern.compile(reg).matcher(url).find()) {
             return "UnknowName.temp";
         }
         Matcher matcher = Pattern.compile(reg).matcher(url);
@@ -1280,7 +1280,7 @@ public class FileUtil {
      * @return
      */
     public static String getFileNameFromContentDisposition(String contentDisposition) {
-        if (GerneralUtil.isEmptyString(contentDisposition)) {
+        if (GeneralUtil.isEmptyString(contentDisposition)) {
             return "UnknowName.temp";
         }
         if (!contentDisposition.startsWith("attachment")) {
@@ -1371,7 +1371,7 @@ public class FileUtil {
     public static String randomFileName() {
         String id = UUID.randomUUID().toString();
         id = id.replace("-", "");
-        int num = GerneralUtil.generateRandomNumber(1000000, 0);
+        int num = GeneralUtil.generateRandomNumber(1000000, 0);
         if (num % 2 == 0) {
             id = id.toUpperCase();
         }

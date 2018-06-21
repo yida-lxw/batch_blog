@@ -185,7 +185,7 @@ public class StringUtil {
      * 不编码字符包括.-*_,注意空格会被编码成加号+,本函数已修复此BUG
      */
     public static String encode(String url) {
-        if (GerneralUtil.isEmptyString(url)) {
+        if (GeneralUtil.isEmptyString(url)) {
             return url;
         }
         String result = URLEncoder.encode(url);
@@ -202,7 +202,7 @@ public class StringUtil {
      * @Description: URL解码(会将+加号解码成空格)
      */
     public static String decode(String url) {
-        if (GerneralUtil.isEmptyString(url)) {
+        if (GeneralUtil.isEmptyString(url)) {
             return url;
         }
         return URLDecoder.decode(url);
@@ -217,7 +217,7 @@ public class StringUtil {
      * @Description: URL中特殊字符编码(* + - . / @ _ 0-9 a-z A-Z不会被编码)
      */
     public static String escape(String src) {
-        if (GerneralUtil.isEmptyString(src)) {
+        if (GeneralUtil.isEmptyString(src)) {
             return src;
         }
         char j = 0;
@@ -260,7 +260,7 @@ public class StringUtil {
      * @Description: 对URI进行完整的编码(!#$&'()*+,-./:;=?@_~0-9a-zA-Z不会被编码)
      */
     public static String encodeURI(String src) {
-        if (GerneralUtil.isEmptyString(src)) {
+        if (GeneralUtil.isEmptyString(src)) {
             return src;
         }
         char j = 0;
@@ -306,7 +306,7 @@ public class StringUtil {
      * 因此你只需要把中文和50%传递给此函数进行编码
      */
     public static String encodeURIComponent(String src) {
-        if (GerneralUtil.isEmptyString(src)) {
+        if (GeneralUtil.isEmptyString(src)) {
             return src;
         }
         char j = 0;
@@ -385,7 +385,7 @@ public class StringUtil {
      * @return
      */
     public static String getDateTextFromString(String text) {
-        if (GerneralUtil.isEmptyString(text)) {
+        if (GeneralUtil.isEmptyString(text)) {
             return null;
         }
         StringBuffer reg = new StringBuffer();
@@ -439,7 +439,7 @@ public class StringUtil {
      * @return
      */
     public static String getNumbericFromString(String text) {
-        if (GerneralUtil.isEmptyString(text)) {
+        if (GeneralUtil.isEmptyString(text)) {
             return null;
         }
         StringBuffer reg = new StringBuffer();
@@ -461,7 +461,7 @@ public class StringUtil {
      * @return
      */
     public static String getURLFromString(String text) {
-        if (GerneralUtil.isEmptyString(text)) {
+        if (GeneralUtil.isEmptyString(text)) {
             return null;
         }
         StringBuffer reg = new StringBuffer();
@@ -569,7 +569,7 @@ public class StringUtil {
      */
     public static String cleanJavaScript(String str) {
 		/*
-		 * if (GerneralUtil.null == str || str.length() == 0) { return null; } return
+         * if (GeneralUtil.null == str || str.length() == 0) { return null; } return
 		 * str.replaceAll("(?s)<script.*?>(.*?)</script>","");
 		 */
         if (null == str || str.length() == 0) {
@@ -705,10 +705,10 @@ public class StringUtil {
      * @return
      */
     public static String gernerateHTML(String data, String pageTitle, String template) {
-        if (GerneralUtil.isEmptyString(data) || GerneralUtil.isEmptyString(template)) {
+        if (GeneralUtil.isEmptyString(data) || GeneralUtil.isEmptyString(template)) {
             return "";
         }
-        if (GerneralUtil.isEmptyString(pageTitle)) {
+        if (GeneralUtil.isEmptyString(pageTitle)) {
             pageTitle = "New Page";
         }
         return String.format(template, data, pageTitle);
@@ -777,10 +777,10 @@ public class StringUtil {
      * @return
      */
     public static String replaceHTMLCharsetFromMeta(String html, String targetCharset) {
-        if (GerneralUtil.isEmptyString(html)) {
+        if (GeneralUtil.isEmptyString(html)) {
             return null;
         }
-        if (GerneralUtil.isEmptyString(targetCharset)) {
+        if (GeneralUtil.isEmptyString(targetCharset)) {
             return html;
         }
         Pattern pattern = Pattern.compile("<meta\\s+http-equiv=\"Content-Type\"\\s+content=\"[\\s\\S]*?charset=(\\S+?)\"\\s*/>");
@@ -990,7 +990,7 @@ public class StringUtil {
         String[] arrayData = str.split(split);
         List list = Arrays.asList(arrayData);
         Collections.reverse(list);
-        return GerneralUtil.joinCollection(list).replace("\",{", "\"},{") + "}";
+        return GeneralUtil.joinCollection(list).replace("\",{", "\"},{") + "}";
     }
 
     /**
@@ -1541,7 +1541,7 @@ public class StringUtil {
      * @return
      */
     public static boolean isDate(String dateString) {
-        if (GerneralUtil.isEmptyString(dateString)) {
+        if (GeneralUtil.isEmptyString(dateString)) {
             return false;
         }
         DateFormat df = null;

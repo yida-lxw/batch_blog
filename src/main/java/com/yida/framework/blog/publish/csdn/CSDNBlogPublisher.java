@@ -3,6 +3,7 @@ package com.yida.framework.blog.publish.csdn;
 import com.yida.framework.blog.publish.BlogPublisher;
 import com.yida.framework.blog.utils.common.StringUtil;
 import com.yida.framework.blog.utils.httpclient.HttpClientUtil;
+import com.yida.framework.blog.utils.httpclient.Result;
 import com.yida.framework.blog.utils.io.FileUtil;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.net.URLCodec;
@@ -104,7 +105,8 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         requestHeanders.put("Upgrade-Insecure-Requests", "1");
         /************************设置请求头信息  End ************************/
         try {
-            String html = HttpClientUtil.get(loginUrl, null, requestHeanders);
+            Result responseResult = HttpClientUtil.get(loginUrl, null, requestHeanders);
+            String html = (null == responseResult) ? "" : responseResult.getResponseBody();
             Document doc = Jsoup.parse(html);
             Element form = doc.select(".user-pass").get(0);
             String lt = form.select("input[name=lt]").get(0).val();
@@ -151,7 +153,8 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         requestHeanders.put("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36");
         requestHeanders.put("Upgrade-Insecure-Requests", "1");
 
-        String ret = HttpClientUtil.postForm(loginUrl, requestParams, requestHeanders);
+        Result responseResult = HttpClientUtil.postForm(loginUrl, requestParams, requestHeanders);
+        String ret = (null == responseResult) ? "" : responseResult.getResponseBody();
 
         if (ret.indexOf("redirect_back") > -1) {
             System.out.println("登录成功。。。。。");
@@ -296,7 +299,8 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
 
 
         /************************开始发布博客至CSDN  Bgin ************************/
-        String ret = HttpClientUtil.postForm(postBlogUrl, requestParams, requestHeanders);
+        Result responseResult = HttpClientUtil.postForm(postBlogUrl, requestParams, requestHeanders);
+        String ret = (null == responseResult) ? "" : responseResult.getResponseBody();
         boolean isPostSuccess = false;
         if (StringUtil.isNotEmpty(ret)) {
             isPostSuccess = ret.contains("\"status\":true");

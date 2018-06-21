@@ -4,11 +4,14 @@ import com.yida.framework.blog.utils.httpclient.factory.HttpClientFactory;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -52,13 +55,9 @@ public class HttpClientUtil {
      * @param formEncoding            请求参数的编码字符集,默认为UTF-8
      * @return
      */
-    public static String postForm(String url, Map<String, String> formParams, Map<String, String> headers,
+    public static Result postForm(String url, Map<String, String> formParams, Map<String, String> headers,
                                   String contentEncoding, String responseContentType, String formEncoding) {
-        //Get HttpClient instance
-        CloseableHttpClient closeHttpClient = getHttpClient();
-        CloseableHttpResponse httpResponse = null;
         HttpPost httpPost = new HttpPost(url);
-
         if (null != headers && !headers.isEmpty()) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 httpPost.addHeader(entry.getKey(), entry.getValue());
@@ -82,12 +81,32 @@ public class HttpClientUtil {
         }
 
         //begin to issue post request
+        //Get HttpClient instance
+        CloseableHttpClient closeHttpClient = getHttpClient();
+        CloseableHttpResponse httpResponse = null;
+        HttpClientContext context = null;
+        Result result = null;
         try {
-            httpResponse = closeHttpClient.execute(httpPost);
+            context = HttpClientContext.create();
+            httpResponse = closeHttpClient.execute(httpPost, context);
             HttpEntity httpEntity = httpResponse.getEntity();
-            return httpEntity2String(httpEntity, contentEncoding, responseContentType);
+            String responseBody = httpEntity2String(httpEntity, contentEncoding, responseContentType);
+
+            CookieStore cookieStore = context.getCookieStore();
+            List<Cookie> cookieList = cookieStore.getCookies();
+            result = new Result(responseBody);
+            result.toCookieMap(cookieList);
+            return result;
         } catch (IOException e) {
             log.error("An exception occurred while performing the HTTP post request with URL[{}]:\n{}.", url, e.getMessage());
+        } finally {
+            if (null != httpResponse) {
+                try {
+                    httpResponse.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return null;
     }
@@ -102,7 +121,7 @@ public class HttpClientUtil {
      * @param responseContentType 响应体内容的MIME类型,默认为text/html
      * @return
      */
-    public static String postForm(String url, Map<String, String> formParams, Map<String, String> headers,
+    public static Result postForm(String url, Map<String, String> formParams, Map<String, String> headers,
                                   String contentEncoding, String responseContentType) {
         return postForm(url, formParams, headers, contentEncoding, responseContentType, null);
     }
@@ -116,7 +135,7 @@ public class HttpClientUtil {
      * @param contentEncoding 响应体内容的字符编码,默认为UTF-8
      * @return
      */
-    public static String postForm(String url, Map<String, String> formParams, Map<String, String> headers,
+    public static Result postForm(String url, Map<String, String> formParams, Map<String, String> headers,
                                   String contentEncoding) {
         return postForm(url, formParams, headers, contentEncoding, null, null);
     }
@@ -129,7 +148,7 @@ public class HttpClientUtil {
      * @param headers    请求头信息
      * @return
      */
-    public static String postForm(String url, Map<String, String> formParams, Map<String, String> headers) {
+    public static Result postForm(String url, Map<String, String> formParams, Map<String, String> headers) {
         return postForm(url, formParams, headers, null, null, null);
     }
 
@@ -142,7 +161,7 @@ public class HttpClientUtil {
      * @param responseContentType 响应体内容的MIME类型,默认为text/html
      * @return
      */
-    public static String postForm(String url, Map<String, String> formParams, String contentEncoding, String responseContentType) {
+    public static Result postForm(String url, Map<String, String> formParams, String contentEncoding, String responseContentType) {
         return postForm(url, formParams, null, contentEncoding, responseContentType, null);
     }
 
@@ -154,7 +173,7 @@ public class HttpClientUtil {
      * @param contentEncoding 响应体内容的字符编码,默认为UTF-8
      * @return
      */
-    public static String postForm(String url, Map<String, String> formParams, String contentEncoding) {
+    public static Result postForm(String url, Map<String, String> formParams, String contentEncoding) {
         return postForm(url, formParams, null, contentEncoding, null, null);
     }
 
@@ -165,7 +184,7 @@ public class HttpClientUtil {
      * @param formParams 表单提交参数
      * @return
      */
-    public static String postForm(String url, Map<String, String> formParams) {
+    public static Result postForm(String url, Map<String, String> formParams) {
         return postForm(url, formParams, null, null, null, null);
     }
 
@@ -177,7 +196,7 @@ public class HttpClientUtil {
      * @param responseContentType 响应体内容的MIME类型,默认为text/html
      * @return
      */
-    public static String postForm(String url, String contentEncoding, String responseContentType) {
+    public static Result postForm(String url, String contentEncoding, String responseContentType) {
         return postForm(url, null, null, contentEncoding, responseContentType, null);
     }
 
@@ -188,7 +207,7 @@ public class HttpClientUtil {
      * @param contentEncoding 响应体内容的字符编码,默认为UTF-8
      * @return
      */
-    public static String postForm(String url, String contentEncoding) {
+    public static Result postForm(String url, String contentEncoding) {
         return postForm(url, null, null, contentEncoding, null, null);
     }
 
@@ -198,7 +217,7 @@ public class HttpClientUtil {
      * @param url Post提交的请求URL地址
      * @return
      */
-    public static String postForm(String url) {
+    public static Result postForm(String url) {
         return postForm(url, null, null, null, null, null);
     }
 
@@ -213,7 +232,7 @@ public class HttpClientUtil {
      * @param urlEncoding         get请求参数的URL编码字符集,默认为UTF-8
      * @return
      */
-    public static String get(String url, Map<String, String> requestParams, Map<String, String> requestHeader,
+    public static Result get(String url, Map<String, String> requestParams, Map<String, String> requestHeader,
                              String contentEncoding, String responseContentType, String urlEncoding) {
         HttpGet httpGet = new HttpGet();
         if (null != requestParams && !requestParams.isEmpty()) {
@@ -265,19 +284,37 @@ public class HttpClientUtil {
         }
         //Get HttpClient instance
         CloseableHttpClient closeHttpClient = getHttpClient();
+        HttpClientContext context = null;
         CloseableHttpResponse httpResponse = null;
+        HttpEntity httpEntity = null;
+        Result result = null;
         try {
-            httpResponse = closeHttpClient.execute(httpGet);
+            context = HttpClientContext.create();
+            httpResponse = closeHttpClient.execute(httpGet, context);
+            httpEntity = httpResponse.getEntity();
+            if (null == httpEntity) {
+                log.error("The http entity for the http get request with URL[{}] is null,please check it out.", httpGet.getURI().toString());
+                return null;
+            }
+
+            CookieStore cookieStore = context.getCookieStore();
+            List<Cookie> cookieList = cookieStore.getCookies();
+            String responseBody = httpEntity2String(httpEntity, contentEncoding, responseContentType);
+            result = new Result(responseBody);
+            result.toCookieMap(cookieList);
         } catch (IOException e) {
             log.error("An exception occurred while performing the HTTP get request with URL[{}]:\n{}.", httpGet.getURI().toString(), e.getMessage());
             return null;
+        } finally {
+            try {
+                if (null != httpResponse) {
+                    httpResponse.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        HttpEntity httpEntity = httpResponse.getEntity();
-        if (null == httpEntity) {
-            log.error("The http entity for the http get request with URL[{}] is null,please check it out.", httpGet.getURI().toString());
-            return null;
-        }
-        return httpEntity2String(httpEntity, contentEncoding, responseContentType);
+        return result;
     }
 
     /**
@@ -290,7 +327,7 @@ public class HttpClientUtil {
      * @param responseContentType 响应体内容的MIME类型,默认为text/html
      * @return
      */
-    public static String get(String url, Map<String, String> requestParams, Map<String, String> requestHeader,
+    public static Result get(String url, Map<String, String> requestParams, Map<String, String> requestHeader,
                              String contentEncoding, String responseContentType) {
         return get(url, requestParams, requestHeader, contentEncoding, responseContentType, null);
     }
@@ -304,7 +341,7 @@ public class HttpClientUtil {
      * @param contentEncoding 响应体内容的字符串编码,默认为UTF-8
      * @return
      */
-    public static String get(String url, Map<String, String> requestParams, Map<String, String> requestHeader,
+    public static Result get(String url, Map<String, String> requestParams, Map<String, String> requestHeader,
                              String contentEncoding) {
         return get(url, requestParams, requestHeader, contentEncoding, null, null);
     }
@@ -318,7 +355,7 @@ public class HttpClientUtil {
      * @param responseContentType 响应体内容的MIME类型,默认为text/html
      * @return
      */
-    public static String get(String url, Map<String, String> requestParams,
+    public static Result get(String url, Map<String, String> requestParams,
                              String contentEncoding, String responseContentType) {
         return get(url, requestParams, null, contentEncoding, responseContentType, null);
     }
@@ -331,7 +368,7 @@ public class HttpClientUtil {
      * @param responseContentType 响应体内容的MIME类型,默认为text/html
      * @return
      */
-    public static String get(String url, Map<String, String> requestParams, String responseContentType) {
+    public static Result get(String url, Map<String, String> requestParams, String responseContentType) {
         return get(url, requestParams, null, null, responseContentType, null);
     }
 
@@ -343,7 +380,7 @@ public class HttpClientUtil {
      * @param requestHeader get请求的头信息
      * @return
      */
-    public static String get(String url, Map<String, String> requestParams, Map<String, String> requestHeader) {
+    public static Result get(String url, Map<String, String> requestParams, Map<String, String> requestHeader) {
         return get(url, requestParams, requestHeader, null, null, null);
     }
 
@@ -354,7 +391,7 @@ public class HttpClientUtil {
      * @param requestParams get请求的请求参数,通过代码自动拼接到请求URL末尾
      * @return
      */
-    public static String get(String url, Map<String, String> requestParams) {
+    public static Result get(String url, Map<String, String> requestParams) {
         return get(url, requestParams, null, null, null, null);
     }
 
@@ -365,7 +402,7 @@ public class HttpClientUtil {
      * @param contentEncoding 响应体内容的字符串编码,默认为UTF-8
      * @return
      */
-    public static String get(String url, String contentEncoding) {
+    public static Result get(String url, String contentEncoding) {
         return get(url, null, null, contentEncoding, null, null);
     }
 
@@ -375,7 +412,7 @@ public class HttpClientUtil {
      * @param url get请求的请求URL
      * @return
      */
-    public static String get(String url) {
+    public static Result get(String url) {
         return get(url, null, null, null, null, null);
     }
 

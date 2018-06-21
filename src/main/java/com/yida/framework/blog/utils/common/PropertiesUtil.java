@@ -426,7 +426,7 @@ public class PropertiesUtil {
         }
         String filePath = (path + propertiesName).replace("/bin", "/src");
         if (content.length() > 0 && content.toString().endsWith("\n")) {
-            FileUtil.writeFile(GerneralUtil.replaceEndsWith(content.toString(), "\n$"), filePath, "UTF-8", false);
+            FileUtil.writeFile(GeneralUtil.replaceEndsWith(content.toString(), "\n$"), filePath, "UTF-8", false);
         } else {
             FileUtil.writeFile(content.toString(), filePath, "UTF-8", false);
         }

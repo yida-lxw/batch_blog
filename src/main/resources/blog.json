@@ -14,7 +14,7 @@
   //CSDN登录账号
   "csdn_username": "vnetoolxw_87",
   //CSDN登录密码
-  "csdn_password": "你猜",
+  "csdn_password": "",
   "github_local_repo_path": "G:/git-local",
   "github_remote_repo_path": "https://github.com/yida-lxw/blog.git",
   "github_blog_branch_name": "master",

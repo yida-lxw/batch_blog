@@ -1,7 +1,7 @@
 package com.yida.framework.blog.config;
 
 import com.yida.framework.blog.utils.cache.CacheManager;
-import com.yida.framework.blog.utils.common.GerneralUtil;
+import com.yida.framework.blog.utils.common.GeneralUtil;
 import com.yida.framework.blog.utils.common.PropertiesUtil;
 import com.yida.framework.blog.utils.json.FastJsonUtil;
 import org.apache.logging.log4j.LogManager;
@@ -100,14 +100,14 @@ public class ConfigManager {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 //跳过空白行和注释行
-                if (GerneralUtil.isEmptyString(line) || line.startsWith("#")) {
+                if (GeneralUtil.isEmptyString(line) || line.startsWith("#")) {
                     continue;
                 }
                 if (line.contains("http://") || line.contains("https://")) {
                     line = line.replaceAll("http://", "http:##").replaceAll("https://", "https:##");
                 }
                 line = line.replaceAll("\\/\\/[^\\n]*|\\/\\*([^\\*^\\/]*|[\\*^\\/*]*|[^\\**\\/]*)*\\*+\\/", "").trim();
-                if (GerneralUtil.isEmptyString(line)) {
+                if (GeneralUtil.isEmptyString(line)) {
                     continue;
                 }
                 if (-1 != line.lastIndexOf("\" ,") && line.lastIndexOf("\" ,") == line.indexOf("\" ,")) {

@@ -85,6 +85,15 @@
 		</dependency>
 		<!-- JSoup end -->
 
+		<!-- H2 begin -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.196</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- H2 end -->
+
 		<!-- LOG begin -->
 		<dependency>
 			<groupId>commons-logging</groupId>

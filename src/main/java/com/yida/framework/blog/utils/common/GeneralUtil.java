@@ -4,11 +4,13 @@ import com.yida.framework.blog.utils.Constant;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -20,7 +22,7 @@ import java.util.*;
  * @Description 通用函数工具类
  */
 @SuppressWarnings({"rawtypes", "serial", "unchecked"})
-public class GerneralUtil {
+public class GeneralUtil {
     private static final Map<String, Integer> monthMap = new HashMap<String, Integer>();
     /**
      * 基本数据类型注册
@@ -326,7 +328,7 @@ public class GerneralUtil {
      * @return
      */
     public static String splitCamelName(String propertyName, String prefix, String stuffix) {
-        if (GerneralUtil.isEmptyString(propertyName)) {
+        if (GeneralUtil.isEmptyString(propertyName)) {
             return propertyName;
         }
         char[] dest = new char[propertyName.length()];
@@ -371,7 +373,7 @@ public class GerneralUtil {
      * @return
      */
     public static String splitDBFieldName(String fieldName, String prefix, String stuffix) {
-        if (GerneralUtil.isEmptyString(fieldName)) {
+        if (GeneralUtil.isEmptyString(fieldName)) {
             return fieldName;
         }
         if (isNotEmptyString(prefix)) {
@@ -1866,5 +1868,86 @@ public class GerneralUtil {
             }
         }
         return !diff;
+    }
+
+    public static <T> T cast(Object obj, Class<T> clazz, String datePattern) {
+        if (null == obj) {
+            if (short.class.equals(clazz) || Short.class.equals(clazz)) {
+                return clazz.cast((short) 0);
+            } else if (int.class.equals(clazz) || Integer.class.equals(clazz)) {
+                return clazz.cast(0);
+            } else if (long.class.equals(clazz) || Long.class.equals(clazz)) {
+                return clazz.cast(0L);
+            } else if (float.class.equals(clazz) || Float.class.equals(clazz)) {
+                return clazz.cast(0.0f);
+            } else if (double.class.equals(clazz) || Double.class.equals(clazz)) {
+                return clazz.cast(0.0d);
+            } else if (boolean.class.equals(clazz) || Boolean.class.equals(clazz)) {
+                return clazz.cast(false);
+            } else if (char.class.equals(clazz) || Character.class.equals(clazz)) {
+                return clazz.cast('\u0000');
+            } else if (byte.class.equals(clazz) || Byte.class.equals(clazz)) {
+                return clazz.cast((byte) 0);
+            } else if (String.class.equals(clazz)) {
+                return null;
+            } else if (Date.class.equals(clazz)) {
+                return null;
+            } else {
+                return null;
+            }
+        } else {
+            if (short.class.equals(clazz) || Short.class.equals(clazz)) {
+                return clazz.cast(Short.valueOf(obj.toString()));
+            } else if (int.class.equals(clazz) || Integer.class.equals(clazz)) {
+                return clazz.cast(Integer.valueOf(obj.toString()));
+            } else if (long.class.equals(clazz) || Long.class.equals(clazz)) {
+                return clazz.cast(Long.valueOf(obj.toString()));
+            } else if (float.class.equals(clazz) || Float.class.equals(clazz)) {
+                return clazz.cast(Float.valueOf(obj.toString()));
+            } else if (double.class.equals(clazz) || Double.class.equals(clazz)) {
+                return clazz.cast(Double.valueOf(obj.toString()));
+            } else if (boolean.class.equals(clazz) || Boolean.class.equals(clazz)) {
+                if ("1".equalsIgnoreCase(obj.toString())) {
+                    return clazz.cast(Boolean.TRUE);
+                } else if ("0".equalsIgnoreCase(obj.toString())) {
+                    return clazz.cast(Boolean.FALSE);
+                }
+                return clazz.cast(Boolean.valueOf(obj.toString()));
+            } else if (char.class.equals(clazz) || Character.class.equals(clazz)) {
+                return clazz.cast(Character.valueOf(obj.toString().charAt(0)));
+            } else if (byte.class.equals(clazz) || Byte.class.equals(clazz)) {
+                try {
+                    return clazz.cast(Long.valueOf(obj.toString().getBytes(Charset.forName("UTF-8").name())[0]));
+                } catch (UnsupportedEncodingException e) {
+                    return null;
+                }
+            } else if (String.class.equals(clazz)) {
+                return clazz.cast(obj.toString());
+            } else if (Date.class.equals(clazz)) {
+                if (null == datePattern || "".equals(datePattern)) {
+                    datePattern = "yyyy-MM-dd";
+                }
+                if (String.class.equals(obj.getClass())) {
+                    return clazz.cast(DateUtil.parse(obj.toString(), datePattern));
+                }
+                if (java.sql.Date.class.equals(obj.getClass())) {
+                    return clazz.cast(new java.util.Date(((java.sql.Date) obj).getTime()));
+                }
+                if (java.sql.Timestamp.class.equals(obj.getClass())) {
+                    return clazz.cast(new java.util.Date(((java.sql.Timestamp) obj).getTime()));
+                }
+                if (java.util.Date.class.equals(obj.getClass())) {
+                    return clazz.cast(obj);
+                } else {
+                    return clazz.cast(obj);
+                }
+            } else {
+                return clazz.cast(obj);
+            }
+        }
+    }
+
+    public static <T> T cast(Object obj, Class<T> clazz) {
+        return cast(obj, clazz);
     }
 }
