@@ -16,12 +16,14 @@ public class H2DBUtilTest {
         //创建表测试
         createTable();
 
-        //插入数据测试
+        System.out.println(Boolean.valueOf("1"));
+
+        /*//插入数据测试
         insertData();
         //查询表测试
         queryTable();
         //删除表数据测试
-        clearData();
+        clearData();*/
     }
 
     public static void dropTable() throws SQLException {

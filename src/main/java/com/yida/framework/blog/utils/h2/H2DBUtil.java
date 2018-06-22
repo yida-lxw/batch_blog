@@ -693,7 +693,7 @@ public class H2DBUtil {
             String columnLabel = null;
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
                 columnLabel = metaData.getColumnLabel(i);
-                if (columnName.equals(columnLabel)) {
+                if (columnName.equalsIgnoreCase(columnLabel)) {
                     t = GeneralUtil.cast(resultSet.getObject(i), clazz);
                     break;
                 }

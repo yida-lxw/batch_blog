@@ -2,6 +2,7 @@ package com.yida.framework.blog.publish.csdn;
 
 import com.yida.framework.blog.publish.BlogPublisher;
 import com.yida.framework.blog.utils.common.StringUtil;
+import com.yida.framework.blog.utils.h2.H2DBUtil;
 import com.yida.framework.blog.utils.httpclient.HttpClientUtil;
 import com.yida.framework.blog.utils.httpclient.Result;
 import com.yida.framework.blog.utils.io.FileUtil;
@@ -12,6 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +63,20 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         if (null == params || params.length <= 0) {
             return null;
         }
-        boolean isSuccess = login(loginUrl, csdnUserName, csdnPassword, params);
+
+        boolean isSuccess = false;
+        if (params.length == 1) {
+            isSuccess = "1".equals(params[0]) ? true : false;
+        }
+        if (!isSuccess) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            isSuccess = login(loginUrl, csdnUserName, csdnPassword, params);
+        }
+
         if (isSuccess) {
             String blogContent = null;
             String fileName = null;
@@ -75,8 +90,6 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
                 }
             }
         }
-
-
         System.out.println("Exit CSDNBlogPublisher...");
         return null;
     }
@@ -92,21 +105,27 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         // 这样登录不行，因为第一次需要访问需要拿到上下文context
         // Document doc = Jsoup.connect(LOGIN_URL).get();
 
+
         /************************设置请求头信息  Begin ************************/
         Map<String, String> requestHeanders = new LinkedHashMap<>();
         requestHeanders.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
         requestHeanders.put("Accept-Language", "zh-CN,zh;q=0.9");
         requestHeanders.put("Connection", "keep-alive");
         requestHeanders.put("Cache-Control", "max-age=0");
-        //requestHeanders.put("Cookie","uuid_tt_dd=1233261396770835785_20171126; csdn_tt_dd=v10_cc91e6490f381a75aa9d4004b2ea9c2fc993e7361101dc5dbeb5c37fedd29284; UE=\"vnetoolxw_87@163.com\"; kd_user_id=ab7d70ee-bd0e-41b5-808c-9e9b7e1c6462; sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%2216026782080d1-09479f8b739aac-464c0328-2073600-160267820816ff%22%2C%22%24device_id%22%3A%2216026782080d1-09479f8b739aac-464c0328-2073600-160267820816ff%22%7D; gr_user_id=f3a8d719-fe44-4d34-ae3f-61117a74eee4; _ga=GA1.2.1645377725.1516633775; Hm_ct_6bcd52f51e9b3dce32bec4a3997715ac=1788*1*PC_VC; UN=vnetoolxw_87; dc_session_id=10_1529207119260.739075; smidV2=201806191754495a809c78fbe2fa2145c1ae6ab365049000afdccb6730cd560; Hm_lvt_6bcd52f51e9b3dce32bec4a3997715ac=1529413734,1529414216,1529414236,1529414846; UserName=vnetoolxw_87; UserInfo=bDdMJYfKPdOmf7NM865WhDJECFwTXj%2FwNWnL4s5K%2BB5Kpg8tf83zPAhyPpovRaazPOQQnPvKX6CyZIwmFb%2FfbG1X01%2FWdSrBs9MVxM%2FKE1zWqUJrdG1gjpXAOzr1FS21subsNIoqaYFaR94f4R3qIw%3D%3D; UserNick=vnetoolxw_87; AU=200; BT=1529417245649; dc_tos=pakpq4; Hm_lpvt_6bcd52f51e9b3dce32bec4a3997715ac=1529417021");
+        //设置Cookie
+        setRequestCookie(requestHeanders);
         requestHeanders.put("Host", "passport.csdn.net");
         requestHeanders.put("Referer", "https://passport.csdn.net/account/logout?ref=toolbar");
         requestHeanders.put("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36");
         requestHeanders.put("Upgrade-Insecure-Requests", "1");
         /************************设置请求头信息  End ************************/
+        Result responseResult = null;
         try {
-            Result responseResult = HttpClientUtil.get(loginUrl, null, requestHeanders);
+            responseResult = HttpClientUtil.get(loginUrl, null, requestHeanders);
             String html = (null == responseResult) ? "" : responseResult.getResponseBody();
+            if (html.contains("redirect_back")) {
+                return new String[]{"1"};
+            }
             Document doc = Jsoup.parse(html);
             Element form = doc.select(".user-pass").get(0);
             String lt = form.select("input[name=lt]").get(0).val();
@@ -118,6 +137,11 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
             return new String[]{lt, execution, _eventId};
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (null != responseResult) {
+                Map<String, String> cookieMap = responseResult.getCookies();
+                saveCookie(cookieMap);
+            }
         }
         return null;
     }
@@ -136,7 +160,6 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         Map<String, String> requestParams = new LinkedHashMap<>();
         requestParams.put("username", userName);
         requestParams.put("password", password);
-
         requestParams.put("lt", otherParams[0]);
         requestParams.put("execution", otherParams[1]);
         requestParams.put("_eventId", otherParams[2]);
@@ -147,25 +170,37 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         requestHeanders.put("Accept-Language", "zh-CN,zh;q=0.9");
         requestHeanders.put("Connection", "keep-alive");
         requestHeanders.put("Cache-Control", "max-age=0");
-        //requestHeanders.put("Cookie","uuid_tt_dd=1233261396770835785_20171126; csdn_tt_dd=v10_cc91e6490f381a75aa9d4004b2ea9c2fc993e7361101dc5dbeb5c37fedd29284; UE=\"vnetoolxw_87@163.com\"; kd_user_id=ab7d70ee-bd0e-41b5-808c-9e9b7e1c6462; sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%2216026782080d1-09479f8b739aac-464c0328-2073600-160267820816ff%22%2C%22%24device_id%22%3A%2216026782080d1-09479f8b739aac-464c0328-2073600-160267820816ff%22%7D; gr_user_id=f3a8d719-fe44-4d34-ae3f-61117a74eee4; _ga=GA1.2.1645377725.1516633775; Hm_ct_6bcd52f51e9b3dce32bec4a3997715ac=1788*1*PC_VC; UN=vnetoolxw_87; dc_session_id=10_1529207119260.739075; JSESSIONID=5E69164CC2C5A5B540158521C7E9F040.tomcat2; smidV2=201806191754495a809c78fbe2fa2145c1ae6ab365049000afdccb6730cd560; BT=1529413854993; LSSC=LSSC-390603-exFu2BvpyuFeLc0sM1LlzCB7EK5DMY-passport.csdn.net; Hm_lvt_6bcd52f51e9b3dce32bec4a3997715ac=1529413734,1529414216,1529414236,1529414846; Hm_lpvt_6bcd52f51e9b3dce32bec4a3997715ac=1529415080; dc_tos=pako87");
+        //设置Cookie
+        setRequestCookie(requestHeanders);
         requestHeanders.put("Host", "passport.csdn.net");
         requestHeanders.put("Referer", "https://passport.csdn.net/account/logout?ref=toolbar");
         requestHeanders.put("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36");
         requestHeanders.put("Upgrade-Insecure-Requests", "1");
 
-        Result responseResult = HttpClientUtil.postForm(loginUrl, requestParams, requestHeanders);
-        String ret = (null == responseResult) ? "" : responseResult.getResponseBody();
-
-        if (ret.indexOf("redirect_back") > -1) {
-            System.out.println("登录成功。。。。。");
-            result = true;
-        } else if (ret.indexOf("登录太频繁") > -1) {
-            System.out.println("登录太频繁，请稍后再试。。。。。");
-            result = false;
-        } else {
-            System.out.println("登录失败。。。。。");
-            result = false;
+        Result responseResult = null;
+        try {
+            responseResult = HttpClientUtil.postForm(loginUrl, requestParams, requestHeanders);
+            String ret = (null == responseResult) ? "" : responseResult.getResponseBody();
+            System.out.println(ret);
+            if (ret.indexOf("redirect_back") > -1) {
+                System.out.println("登录成功。。。。。");
+                result = true;
+            } else if (ret.indexOf("登录太频繁") > -1) {
+                System.out.println("登录太频繁，请稍后再试。。。。。");
+                result = false;
+            } else {
+                System.out.println("登录失败。。。。。");
+                result = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null != responseResult) {
+                Map<String, String> cookieMap = responseResult.getCookies();
+                saveCookie(cookieMap);
+            }
         }
+
         return result;
     }
 
@@ -269,6 +304,8 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         requestHeanders.put("Referer", "https://mp.csdn.net/mdeditor");
         requestHeanders.put("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36");
         requestHeanders.put("X-Requested-With", "XMLHttpRequest");
+        //设置Cookie
+        setRequestCookie(requestHeanders);
         /************************设置请求头信息  End ************************/
 
 
@@ -299,15 +336,68 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
 
 
         /************************开始发布博客至CSDN  Bgin ************************/
-        Result responseResult = HttpClientUtil.postForm(postBlogUrl, requestParams, requestHeanders);
-        String ret = (null == responseResult) ? "" : responseResult.getResponseBody();
+
+        Result responseResult = null;
         boolean isPostSuccess = false;
-        if (StringUtil.isNotEmpty(ret)) {
-            isPostSuccess = ret.contains("\"status\":true");
-            //System.out.println(ret);
+        try {
+            responseResult = HttpClientUtil.postForm(postBlogUrl, requestParams, requestHeanders);
+            String ret = (null == responseResult) ? "" : responseResult.getResponseBody();
+
+            if (StringUtil.isNotEmpty(ret)) {
+                isPostSuccess = ret.contains("\"status\":true");
+                //System.out.println(ret);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null != responseResult) {
+                Map<String, String> cookieMap = responseResult.getCookies();
+                saveCookie(cookieMap);
+            }
         }
         System.out.println("博客发布结果：\n" + (isPostSuccess ? "成功" : "失败"));
         /************************开始发布博客至CSDN  End ************************/
         return true;
+    }
+
+    private void saveCookie(Map<String, String> cookieMap) {
+        if (null == cookieMap || cookieMap.size() <= 0) {
+            return;
+        }
+        String key = null;
+        String val = null;
+        String site_id = "csdn";
+        String querySql = "select id from cookies where site_id=? and cookie_key=?";
+        String updateSql = "update cookies set cookie_key=?,cookie_val=? where site_id=? and id=?";
+        String insertSql = "insert into cookies(site_id,cookie_key,cookie_val) values(?,?,?)";
+        for (Map.Entry<String, String> entry : cookieMap.entrySet()) {
+            key = entry.getKey();
+            val = entry.getValue();
+            try {
+                Long id = H2DBUtil.queryColumn(querySql, new Object[]{site_id, key}, "id", Long.class);
+                if (id == null || id == 0) {
+                    H2DBUtil.executeUpdate(insertSql, new Object[]{site_id, key, val});
+                } else {
+                    H2DBUtil.executeUpdate(updateSql, new Object[]{key, val, site_id, id});
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setRequestCookie(Map<String, String> requestHeanders) {
+        List<Map<String, Object>> cookieList = null;
+        try {
+            cookieList = H2DBUtil.executeQuery(
+                    "select * from cookies where site_id = ?",
+                    new Object[]{"csdn"});
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        String cookie = new Result(null).buildCookie(cookieList);
+        if (StringUtil.isNotEmpty(cookie)) {
+            requestHeanders.put("Cookie", cookie);
+        }
     }
 }

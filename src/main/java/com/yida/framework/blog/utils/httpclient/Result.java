@@ -71,6 +71,17 @@ public class Result {
         return cookieString.toString();
     }
 
+    public String buildCookie(List<Map<String, Object>> list) {
+        if (null != list && list.size() > 0) {
+            StringBuilder builder = new StringBuilder();
+            for (Map<String, Object> map : list) {
+                builder.append(map.get("COOKIE_KEY") + "=" + map.get("COOKIE_VAL") + "; ");
+            }
+            return builder.toString();
+        }
+        return "";
+    }
+
     public String getResponseBody() {
         return responseBody;
     }

@@ -2,6 +2,7 @@ package com.yida.framework.blog.utils.httpclient;
 
 import com.yida.framework.blog.utils.httpclient.factory.HttpClientFactory;
 import org.apache.http.Consts;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
@@ -14,6 +15,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.Args;
@@ -301,7 +303,30 @@ public class HttpClientUtil {
             List<Cookie> cookieList = cookieStore.getCookies();
             String responseBody = httpEntity2String(httpEntity, contentEncoding, responseContentType);
             result = new Result(responseBody);
+            Header[] responseHeader = httpResponse.getAllHeaders();
+            if (null != responseHeader && responseHeader.length > 0) {
+                if (null == cookieList) {
+                    cookieList = new ArrayList<>();
+                }
+                Cookie cookie = null;
+                String headerVal = null;
+                String headerKey = null;
+                for (Header header : responseHeader) {
+                    String headerName = header.getName();
+                    if ("Set-Cookie".equals(headerName)) {
+                        headerVal = header.getValue();
+                        headerKey = headerVal.substring(0, headerVal.indexOf("="));
+                        headerVal = headerVal.substring(headerVal.indexOf("=") + 1,
+                                headerVal.indexOf(";")).replace("\"", "");
+
+                        cookie = new BasicClientCookie(headerKey, headerVal);
+                        cookieList.add(cookie);
+                    }
+                }
+            }
             result.toCookieMap(cookieList);
+
+
         } catch (IOException e) {
             log.error("An exception occurred while performing the HTTP get request with URL[{}]:\n{}.", httpGet.getURI().toString(), e.getMessage());
             return null;

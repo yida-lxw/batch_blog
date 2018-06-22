@@ -1948,6 +1948,6 @@ public class GeneralUtil {
     }
 
     public static <T> T cast(Object obj, Class<T> clazz) {
-        return cast(obj, clazz);
+        return cast(obj, clazz, null);
     }
 }
