@@ -12,11 +12,11 @@ import java.sql.SQLException;
 public class H2DBUtilTest {
     public static void main(String[] args) throws SQLException {
         //删除表测试
-        dropTable();
+        dropCookieTable();
+        dropBlogTable();
         //创建表测试
-        createTable();
-
-        System.out.println(Boolean.valueOf("1"));
+        createCookieTable();
+        createBlogTable();
 
         /*//插入数据测试
         insertData();
@@ -26,13 +26,37 @@ public class H2DBUtilTest {
         clearData();*/
     }
 
-    public static void dropTable() throws SQLException {
+    public static void dropBlogTable() throws SQLException {
+        String dropSQL = "DROP TABLE blogs";
+        H2DBUtil.executeUpdate(dropSQL, null);
+    }
+
+    public static void dropCookieTable() throws SQLException {
         String dropSQL = "DROP TABLE cookies";
         H2DBUtil.executeUpdate(dropSQL, null);
     }
 
-    public static void createTable() throws SQLException {
-        String createSQL = "CREATE TABLE cookies(id bigint auto_increment primary key, "
+    /**
+     * 创建Blogs表
+     *
+     * @throws SQLException
+     */
+    public static void createBlogTable() throws SQLException {
+        String createSQL = "CREATE TABLE IF NOT EXISTS blogs(id bigint auto_increment primary key, "
+                + "                                site_id varchar(20), "
+                + "                                blog_id varchar(100), "
+                + "                                title varchar(2000))";
+
+        H2DBUtil.executeUpdate(createSQL, null);
+    }
+
+    /**
+     * 创建Cookie表
+     *
+     * @throws SQLException
+     */
+    public static void createCookieTable() throws SQLException {
+        String createSQL = "CREATE TABLE IF NOT EXISTS cookies(id bigint auto_increment primary key, "
                 + "                                site_id varchar(20), "
                 + "                                cookie_key varchar(100), "
                 + "                                cookie_val varchar(2000))";

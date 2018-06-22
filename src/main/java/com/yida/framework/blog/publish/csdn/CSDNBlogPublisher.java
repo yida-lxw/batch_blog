@@ -6,6 +6,7 @@ import com.yida.framework.blog.utils.h2.H2DBUtil;
 import com.yida.framework.blog.utils.httpclient.HttpClientUtil;
 import com.yida.framework.blog.utils.httpclient.Result;
 import com.yida.framework.blog.utils.io.FileUtil;
+import com.yida.framework.blog.utils.json.FastJsonUtil;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.net.URLCodec;
 import org.jsoup.Jsoup;
@@ -204,6 +205,14 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         return result;
     }
 
+    /**
+     * 发布博客
+     *
+     * @param postBlogUrl 发布博客的接口URL
+     * @param blogContent 博客的Markdown语法格式的字符串
+     * @param fileName    Markdown文件名称
+     * @return
+     */
     private boolean postBlog(String postBlogUrl, String blogContent, String fileName) {
         if (StringUtil.isEmpty(blogContent)) {
             return false;
@@ -320,8 +329,13 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         }
 
         Map<String, String> requestParams = new LinkedHashMap<>();
+        String blogId = loadBlogId(title);
+        if (StringUtil.isNotEmpty(blogId)) {
+            //设置了ID参数，则会更新博客，而不是重新发布一篇新博客，从而避免博客重复发布
+            requestParams.put("id", blogId);
+        }
         requestParams.put("title", title);
-        requestParams.put("content", "aa");
+        requestParams.put("content", "    ");
         requestParams.put("markdowncontent", factContent);
         requestParams.put("id", "");
         requestParams.put("private", "0");
@@ -339,13 +353,26 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
 
         Result responseResult = null;
         boolean isPostSuccess = false;
+        String errorMsg = null;
         try {
             responseResult = HttpClientUtil.postForm(postBlogUrl, requestParams, requestHeanders);
             String ret = (null == responseResult) ? "" : responseResult.getResponseBody();
 
             if (StringUtil.isNotEmpty(ret)) {
+                System.out.println(ret);
                 isPostSuccess = ret.contains("\"status\":true");
-                //System.out.println(ret);
+                //如果博客发布成功
+                if (isPostSuccess) {
+                    String blog_id = getBlogId(ret);
+                    if (StringUtil.isNotEmpty(blog_id)) {
+                        //将已发布的博客的ID保存到本地的H2数据库表blogs中
+                        saveBlogInfo(blog_id, title);
+                    }
+                } else {
+                    //如果博客发布失败
+                    errorMsg = getErrorMsg(ret);
+                    System.out.println("博客发布失败原因：" + errorMsg);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -355,11 +382,15 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
                 saveCookie(cookieMap);
             }
         }
-        System.out.println("博客发布结果：\n" + (isPostSuccess ? "成功" : "失败"));
+        System.out.println("博客发布结果：\n" + (isPostSuccess ? "成功" : "失败,可能原因：" + errorMsg));
         /************************开始发布博客至CSDN  End ************************/
         return true;
     }
 
+    /**
+     * 将服务器端返回的Cookie数据保存到本地H2数据库表中
+     * @param cookieMap
+     */
     private void saveCookie(Map<String, String> cookieMap) {
         if (null == cookieMap || cookieMap.size() <= 0) {
             return;
@@ -386,6 +417,10 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         }
     }
 
+    /**
+     * 将本地缓存的Cookie数据设置到请求头信息中
+     * @param requestHeanders
+     */
     private void setRequestCookie(Map<String, String> requestHeanders) {
         List<Map<String, Object>> cookieList = null;
         try {
@@ -399,5 +434,103 @@ public class CSDNBlogPublisher implements BlogPublisher<CSDNBlogPublisherParam> 
         if (StringUtil.isNotEmpty(cookie)) {
             requestHeanders.put("Cookie", cookie);
         }
+    }
+
+    /**
+     * 从服务器端返回的JSON字符串中获取新发布的博客的ID
+     *
+     * @param responseJson
+     * @return
+     */
+    private String getBlogId(String responseJson) {
+        Map<String, Object> map = null;
+        try {
+            map = FastJsonUtil.toMap(responseJson);
+        } catch (Exception e) {
+            return null;
+        }
+        if (null == map || map.size() <= 0) {
+            return null;
+        }
+        Map<String, Object> dataMap = (Map<String, Object>) map.get("data");
+        if (null == dataMap || dataMap.size() <= 0) {
+            return null;
+        }
+        Object obj = dataMap.get("id");
+        if (null == obj || "".equalsIgnoreCase(obj.toString())) {
+            return null;
+        }
+        return obj.toString();
+    }
+
+    /**
+     * 从服务器端返回的JSON字符串中获取博客发布失败的提示信息
+     *
+     * @param responseJson
+     * @return
+     */
+    private String getErrorMsg(String responseJson) {
+        Map<String, Object> map = null;
+        try {
+            map = FastJsonUtil.toMap(responseJson);
+        } catch (Exception e) {
+            return null;
+        }
+        if (null == map || map.size() <= 0) {
+            return null;
+        }
+        Object obj = map.get("error");
+        if (null == obj || "".equalsIgnoreCase(obj.toString())) {
+            return null;
+        }
+        return obj.toString();
+    }
+
+    /**
+     * 保存博客信息至H2数据库
+     *
+     * @param blogId
+     * @param title
+     */
+    private void saveBlogInfo(String blogId, String title) {
+        String querySql = "select id from blogs where blog_id=? and site_id=?";
+        String insertSql = "insert into blogs(site_id,blog_id,title) values(?,?,?)";
+        String updateSql = "update blogs set title=? where id=? and blog_id=? and site_id=?";
+        Long id = null;
+        try {
+            id = H2DBUtil.queryColumn(querySql, new Object[]{blogId, "csdn"}, "id", Long.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (null == id || id.longValue() == 0L) {
+            try {
+                H2DBUtil.executeUpdate(insertSql, new Object[]{"csdn", blogId, title});
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                H2DBUtil.executeUpdate(updateSql, new Object[]{title, id, blogId, "csdn"});
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 从H2数据库中加载出是否包含有符合指定标题title的博客对应的唯一ID
+     *
+     * @param title 博客的标题
+     * @return
+     */
+    private String loadBlogId(String title) {
+        String querySql = "select blog_id from blogs where site_id=? and title=?";
+        String blogId = null;
+        try {
+            blogId = H2DBUtil.queryColumn(querySql, new Object[]{"csdn", title}, "blog_id", String.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return blogId;
     }
 }
