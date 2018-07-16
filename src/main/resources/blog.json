@@ -6,11 +6,11 @@
   /**Markdown文档的存储根目录,当你的博客是直接采用Markdown格式编写的，此时你可以配置此参数,它与word_basepath参数二选一即可*/
   "markdown_basepath": "C:/myblog/",
   //VNote笔记存放目录
-  "vnote_blog_path": "G:/VNote_Data/GO",
+  "vnote_blog_path": "G:/VNote_Data/Java",
   //Hexo安装根目录
   "hexo_basepath": "G:/hexo",
-  "blog_send_dates": "20180207",
-  "blog_platform_supported": "github;hexo;CSDN",
+  "blog_send_dates": "20180716",
+  "blog_platform_supported": "CSDN",
   //CSDN登录账号
   "csdn_username": "vnetoolxw_87",
   //CSDN登录密码

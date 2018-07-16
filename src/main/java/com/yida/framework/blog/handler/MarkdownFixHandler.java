@@ -136,7 +136,11 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
                         continue;
                     }
                     boolean nextSkip = false;
+                    boolean hasImgTitle = false;
+                    String imgTitle = null;
                     for (String line : lines) {
+                        hasImgTitle = false;
+                        imgTitle = null;
                         if (null == line) {
                             continue;
                         }
@@ -146,6 +150,12 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
                             String picPath = line.substring(line.indexOf("[") + 1, line.indexOf("]"));
                             line = line.replace(picPath, "");
                             nextSkip = true;
+                        } else {
+                            imgTitle = line.replaceAll("!\\[(.*)\\]\\(images.*", "$1");
+                            if (StringUtil.isNotEmpty(imgTitle)) {
+                                hasImgTitle = true;
+                                line = line.replace(imgTitle, "");
+                            }
                         }
                         if (line.contains("![](media")) {
                             line = line.replaceAll("\\s+", "");
@@ -177,6 +187,9 @@ public class MarkdownFixHandler implements Handler<MarkdownFixHandlerInput, Mark
                             builder.append(line).append("\n");
                             nextSkip = true;
                             continue;
+                        }
+                        if (hasImgTitle && StringUtil.isNotEmpty(imgTitle)) {
+                            line = line.replace("![]", "![" + imgTitle + "]");
                         }
                         if (!nextSkip) {
                             builder.append(line).append("\n");
